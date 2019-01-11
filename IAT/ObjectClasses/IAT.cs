@@ -81,6 +81,9 @@
             name = Path.GetFileNameWithoutExtension(path);
             Console.WriteLine($"Converting {name}");
 
+            // Sanitise the filename so it is compatible with XML tags
+            name = Toolbox.SanitiseXName(name);
+
             // Load the .xlsx into various objects
             doc = SpreadsheetDocument.Open(path, false);
             book = doc.WorkbookPart;
@@ -121,6 +124,7 @@
         /// <param name="newsheet">The name of the new sheet</param>
         public void SetSheet(string name)
         {
+            // This assumes a valid IAT is provided as input and will break otherwise (need to fix)
             sheet = FindSheet(name);
             part = (WorksheetPart)book.GetPartById(sheet.Id);
             return;

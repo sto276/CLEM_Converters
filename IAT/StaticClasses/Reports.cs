@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace IAT
@@ -11,12 +12,19 @@ namespace IAT
         /// </summary>
         public static XElement GetReports(XElement resources)
         {
-            XElement reports = new XElement("CLEMFolder");
-            reports.Add(new XElement("Name", "Reports"));                      
-            reports.Add(GetLedgers(resources.Elements()));
-            //reports.Add(GetBalances());
-            reports.Add(GetPerformed());
-            reports.Add(GetShortfalls());
+            // Skip first and last elements (they contain metadata, not actual resource data)
+            var r = resources.Elements();
+            var input = r.Skip(1).Take(r.Count() - 2);
+
+            XElement reports = new XElement
+            (
+                "Folder",
+                new XElement("Name", "Reports"),                      
+                GetLedgers(input),
+                //GetBalances(),
+                GetPerformed(),
+                GetShortfalls()
+            );
 
             return reports;
         }
@@ -46,7 +54,7 @@ namespace IAT
         /// <summary>
         /// Returns the resource ledgers reports
         /// </summary>
-        private static XElement GetLedgers(IEnumerable<XElement> resources)
+        private static IEnumerable<XElement> GetLedgers(IEnumerable<XElement> resources)
         {
             XElement ledgers = new XElement("Ledgers");
 
@@ -65,7 +73,7 @@ namespace IAT
                 ledgers.Add(ledger);
             }
 
-            return ledgers;
+            return ledgers.Elements();
         }
 
         /// <summary>

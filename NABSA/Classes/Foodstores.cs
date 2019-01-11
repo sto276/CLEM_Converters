@@ -19,14 +19,15 @@ namespace NABSA
             XElement param = nabsa.Element("SingleParams");
 
             // Picking out specific parameters from the element
-            XElement type = new XElement(
+            XElement type = new XElement
+            (
                 "GrazeFoodStoreType",
                 new XElement("Name", "NativePasture"),
                 new XElement("IncludeInDocumentation", "true"),
                 new XElement("NToDMDCoefficient", param.Element("Coeff_DMD").Value),
                 new XElement("NToDMDIntercept", param.Element("Incpt_DMD").Value),
                 new XElement("NToDMDCrudeProteinDenominator", "0"),
-                new XElement("GreenNitrogen", "0"),
+                new XElement("GreenNitrogen", param.Element("Native_N").Value),
                 new XElement("DecayNitrogen", param.Element("Decay_N").Value),
                 new XElement("MinimumNitrogen", param.Element("Native_N_min").Value),
                 new XElement("DecayDMD", param.Element("Decay_DMD").Value),
@@ -35,7 +36,7 @@ namespace NABSA
                 new XElement("CarryoverDetachRate", param.Element("Carryover_detach").Value),
                 new XElement("IntakeTropicalQualityCoefficient", param.Element("Intake_trop_quality").Value),
                 new XElement("IntakeQualityCoefficient", param.Element("Intake_coeff_quality").Value)
-                );
+            );
 
             // Adding the parameters to the food store
             XElement store = new XElement(

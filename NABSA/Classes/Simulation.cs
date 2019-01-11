@@ -142,6 +142,7 @@ namespace NABSA
         private static XElement GetCLEM(XElement nabsa)
         {
             XElement resources = GetResources(nabsa);
+            XElement activities = GetActivities(nabsa, resources);
             XElement reports = IAT.Reports.GetReports(resources);
 
             XElement clem = new XElement
@@ -149,7 +150,7 @@ namespace NABSA
                 "ZoneCLEM",
                 new XElement("Name", "CLEM"),
                 resources,
-                GetActivities(nabsa),
+                activities,
                 reports,
                 new XElement("IncludeInDocumentation", "true"),
                 new XElement("Area", "1"),
@@ -189,7 +190,7 @@ namespace NABSA
         /// </summary>
         /// <param name="nabsa"></param>
         /// <returns></returns>
-        public static XElement GetActivities(XElement nabsa)
+        public static XElement GetActivities(XElement nabsa, XElement resources)
         {
             XElement activities = new XElement
             (
@@ -197,7 +198,7 @@ namespace NABSA
                 new XElement("Name", "Activities"),
                 Finances.GetCashFlow(nabsa),
                 Land.GetPastureManage(nabsa),
-                Ruminants.Manage(nabsa),
+                Ruminants.Manage(nabsa, resources),
                 IAT.Reports.GetHerdSummary(),
                 IAT.Reports.GetHerdReport(),
                 new XElement("IncludeInDocumentation", "true")

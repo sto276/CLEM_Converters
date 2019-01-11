@@ -8,18 +8,23 @@
 
     static class Ruminants
     {
+        /// <summary>
+        /// A List containing all breeds present in the current set of NABSA data
+        /// </summary>
         private static List<string> present = new List<string>();
 
         /// <summary>
         /// Constructs the ruminants section
         /// </summary>
-        /// <param name="nabsa">Source NABSA</param>
+        /// <param name="nabsa">Source NABSA data</param>
         public static XElement GetRuminants(XElement nabsa)
         {
             XElement herd = GetHerd(nabsa);
+
+            // Adds any existing cohorts to each breed in the herd
             AddCohortsToHerd(nabsa, herd);
 
-            // Removes any breed which doesn't pass the validation test
+            // Searches through the herd and removes any breed which doesn't pass the validation test
             herd.Elements().Skip(1).Where(b => !ValidateBreed(nabsa, b)).Remove();
 
             herd.Add(new XElement("IncludeInDocumentation", "true"));
@@ -27,44 +32,48 @@
         }
 
         /// <summary>
-        /// 
+        /// Finds all available ruminant breeds and builds an XML structure to store breed data in
         /// </summary>
-        /// <param name="nabsa"></param>
-        /// <returns></returns>
+        /// <param name="nabsa">Source NABSA data</param>
         private static XElement GetHerd(XElement nabsa)
         {
             // Names of the breeds are stored in the "SuppAllocs" table under the element "ColumnNames" 
             XElement allocs = Queries.FindFirst(nabsa, "SuppAllocs");
             var breeds = Queries.GetElementValues(allocs.Element("ColumnNames"));
 
+            // Parent element of herd data
             XElement herd = new XElement
             (
                 "RuminantHerd",
                 new XElement("Name", "Ruminants")
             );
 
-            // Iterate over all breeds
+            // Initial Cohorts XML base
+            XElement cohorts = new XElement
+            (
+                "RuminantInitialCohorts",
+                new XElement("Name", "InitialCohorts")
+            );
+
+            // Animal Pricing XML base
+            XElement pricing = new XElement
+            (
+                "AnimalPricing",
+                new XElement("Name", "Prices"),
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("PricingStyle", "perKg")
+            );
+
+            // Iterate over all breeds, adding cohorts and pricing to each
             foreach (string breed in breeds)
             {
-                //string name = breed.Replace('.', ' ');
-                string name = breed;
                 XElement type = new XElement
                 (
                     "RuminantType",
-                    new XElement("Name", name),
-                    new XElement("Breed", name),
-                    new XElement
-                    (
-                        "RuminantInitialCohorts",
-                        new XElement("Name", "InitialCohorts")
-                    ),
-                    new XElement
-                    (
-                        "AnimalPricing",
-                        new XElement("Name", "Prices"),
-                        new XElement("IncludeInDocumentation", "true"),
-                        new XElement("PricingStyle", "perKg")
-                    ),
+                    new XElement("Name", breed),
+                    new XElement("Breed", breed),
+                    cohorts,
+                    pricing,
                     new XElement("IncludeInDocumentation", "true")
                 );
                 herd.Add(type);
@@ -74,12 +83,14 @@
         }
 
         /// <summary>
-        /// 
+        /// Searches the source data for all possible cohort data.
+        /// Adds any data found to the parent node.
         /// </summary>
-        /// <param name="nabsa"></param>
-        /// <param name="herd"></param>
+        /// <param name="nabsa">Source NABSA data</param>
+        /// <param name="herd">Parent node to add data to</param>
         private static void AddCohortsToHerd(XElement nabsa, XElement herd)
         {
+            // Search for the data tables in the source
             XElement nums = Queries.FindByName(nabsa, "Startup ruminant numbers");
             XElement ages = Queries.FindByName(nabsa, "Startup ruminant ages");
             XElement weights = Queries.FindByName(nabsa, "Startup ruminant weights");
@@ -87,64 +98,71 @@
 
             // Names of each cohort
             var cohorts = Queries.GetElementNames(nums).Skip(1);
+
             foreach (string cohort in cohorts)
             {
+                // Find the data for a given cohort in each table
                 var nvalues = Queries.GetElementValues(nums.Element(cohort));
                 var avalues = Queries.GetElementValues(ages.Element(cohort));
                 var wvalues = Queries.GetElementValues(weights.Element(cohort));
                 var pvalues = Queries.GetElementValues(prices.Element(cohort));
 
+                // Look at the current cohort data for each breed
                 foreach (var breed in herd.Elements().Skip(1))
                 {
                     int index = breed.ElementsBeforeSelf().Count() - 1;
 
+                    // Sire price is required even if there are no sires present,
+                    // so it must be evaluated before the 'continue'
                     string price = pvalues.ElementAt(index);
                     if (cohort.Contains("ire"))
                     {
                         breed.Element("AnimalPricing").Add(new XElement("BreedingSirePrice", price));
                     }                    
 
+                    // Skip the cohort if it has no members
                     string num = nvalues.ElementAt(index);
                     if (num == "0") continue;
 
+                    // Add the cohort to the parent
                     present.Add(breed.Elements().First().Value);
 
+                    // Find age/weight data
                     string age = avalues.ElementAt(index);
                     string weight = wvalues.ElementAt(index);
                     
+                    // Construct the cohort node and add it to the herd
                     XElement type = GetCohort(cohort, age, num, weight);
                     breed.Element("RuminantInitialCohorts").Add(type);
 
+                    // Construct the pricing node and add it to the herd
                     XElement pricing = GetPriceGroup(cohort, age, price);
                     breed.Element("AnimalPricing").Add(pricing);
                 }
             }
-
-            return;
         }
 
         /// <summary>
-        /// 
+        /// For each cohort category, generate a filter for the pricing
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="age"></param>
+        /// <param name="name">Name of the cohort</param>
+        /// <param name="age">Average age of the cohort (months)</param>
         /// <returns></returns>
-        private static IEnumerable<XElement> GetFilters(string name, string age)
+        private static IEnumerable<XElement> GetCohortPricingFilters(string name, string age)
         {
             XElement filters = new XElement("Filters");
 
-            // Find the gender filter
+            // Construct the gender filter
             string gender = "Male";
             if (name.Contains("F")) gender = "Female";
 
             filters.Add(GetFilter(gender, "Gender", "Equal", gender));
 
-            // Find the Age filter
-
+            // Construct the Age filter
             string descriptor = "";
             string parameter = "Age";
             string comparer = "LessThan";
-            string value = age;
+            string value = ShiftAge(age);
 
             // Check if the cohort is breeding sires
             if (name.Contains("ire"))
@@ -161,7 +179,7 @@
                 comparer = "NotEqual";
                 value = "True";
             }
-
+            
             descriptor = parameter + comparer + value;
             filters.Add(GetFilter(descriptor, parameter, comparer, value));
 
@@ -169,12 +187,12 @@
         }
 
         /// <summary>
-        /// 
+        /// Constructs the XML representation of a filter
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="parameter"></param>
-        /// <param name="comparer"></param>
-        /// <param name="value"></param>
+        /// <param name="name">Name of the filter</param>
+        /// <param name="parameter">Parameter to find data for</param>
+        /// <param name="comparer">Operator that compares the parameter and value</param>
+        /// <param name="value">Value that the parameter is compared against</param>
         private static XElement GetFilter(string name, string parameter, string comparer, string value)
         {
             XElement filter = new XElement
@@ -191,7 +209,18 @@
         }
 
         /// <summary>
-        /// 
+        /// Shifts an age older by 6 months. 
+        /// </summary>
+        /// <param name="age">Age to shift</param>
+        private static string ShiftAge(string age)
+        {
+            int.TryParse(age, out int n);
+            n += 6;
+            return n.ToString();
+        }
+
+        /// <summary>
+        /// Construct the XML for a single cohort
         /// </summary>
         /// <param name="nabsa"></param>
         /// <returns></returns>
@@ -227,9 +256,8 @@
         }
 
         /// <summary>
-        /// 
+        /// Construct the XML for a single price group
         /// </summary>
-        /// <returns></returns>
         private static XElement GetPriceGroup(string name, string age, string price)
         {
             XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
@@ -240,7 +268,7 @@
                 "Model",
                 xa,
                 new XElement("Name", name),
-                GetFilters(name, age),                
+                GetCohortPricingFilters(name, age),                
                 new XElement("IncludeInDocumentation", "true"),
                 new XElement("PurchaseValue", price),
                 new XElement("SellValue", price)
@@ -250,41 +278,22 @@
         }
 
         /// <summary>
-        /// 
+        /// Checks if a breed has present cohorts, and adds the breed parameters if it does
         /// </summary>
-        /// <param name="nabsa"></param>
-        /// <param name="herd"></param>
-        //private static void AddParametersToHerd(XElement nabsa, XElement herd)
-        //{
-        //    int j = -1;
-        //    foreach (var breed in herd.Elements().Skip(1))
-        //    {
-        //        j++;
-        //        int count = breed.Element("RuminantInitialCohorts").Elements().Count();
-        //        if (count > 0)
-        //        {
-        //            var parameters = GetParameters(nabsa, j);
-        //            breed.Add(parameters);
-        //        }
-        //        else
-        //        {
-        //            breed.Remove();
-        //            breed.
-        //        }
-        //    }
-
-        //    return;
-        //}
-
+        /// <param name="nabsa">Source NABSA data</param>
+        /// <param name="breed">Breed data to be validated</param>
+        /// <returns></returns>
         private static bool ValidateBreed(XElement nabsa, XElement breed)
         {
             XElement cohorts = breed.Element("RuminantInitialCohorts");
-            // A breed needs to have cohorts to be considered valid
+            
+            // A breed requires cohorts to be considered valid
             int count = cohorts.Elements().Count();
             if (count > 1)
             {
-                // Note that ElementsBeforeSelf.Count() still considers siblings
-                // that were skipped
+                // Invalid breeds are removed, so parameters are added now
+                // to reduce complexity of indexing, as opposed to invoking
+                // a separate method later
                 int index = breed.ElementsBeforeSelf().Count() - 1;
 
                 // A validated breed needs to add parameters
@@ -300,10 +309,10 @@
         }        
 
         /// <summary>
-        /// Writes the specifications and coefficients for a given breed to CLEM
+        /// Constructs the XML form for the specifications and coefficients of a given breed
         /// </summary>
-        /// <param name="nabsa">Source NABSA</param>
-        /// <param name="i">Breed identifier</param>
+        /// <param name="nabsa">Source NABSA data</param>
+        /// <param name="i">Breed id</param>
         private static IEnumerable<XElement> GetParameters(XElement nabsa, int i)
         {
             XElement parameters = new XElement("Parameters");
@@ -311,17 +320,21 @@
             StreamReader csv = new StreamReader("params.csv");
             string line = null;
 
-            // Skips the header
+            // Skip the head line
             csv.ReadLine();
             while ((line = csv.ReadLine()) != null)
             {
+                // Determine which data to look for
                 string[] data = line.Split(',');
                 XElement item = Queries.FindFirst(nabsa, data[0]);
-                string s;
-                if (item.HasElements) s = item.Elements().ElementAt(i).Value;
-                else s = item.Value;
 
-                double.TryParse(s, out double value);
+                // Location of specification value depends on the format of the data in the NABSA file
+                string spec;
+                if (item.HasElements) spec = item.Elements().ElementAt(i).Value;
+                else spec = item.Value;
+
+                // Convert data format and add to the element
+                double.TryParse(spec, out double value);
                 double.TryParse(data[2], out double ratio);
                 parameters.Add(new XElement($"{data[1]}", $"{value * ratio}"));
             }
@@ -333,25 +346,19 @@
 
             return parameters.Elements();
         }
-
-        
-
+                
         /// <summary>
-        /// Writes the 'Ruminant Manage' activity section
+        /// Construct the Ruminant Manage XML
         /// </summary>
         /// <param name="nabsa">Source XElement</param>
-        public static XElement Manage(XElement nabsa)
+        public static XElement Manage(XElement nabsa, XElement resources)
         {
-            // Don't need to do anything if no ruminants are present
-            //if (nabsa.ruminants.Count == 0) return null;
-
-            //Section: ActivityFolder - Manage herd
             XElement manage = new XElement
             (
                 "ActivityFolder",
                 new XElement("Name", $"Manage herd"),
                 ManageBreeds(nabsa),
-                GetCutAndCarry(nabsa),
+                GetCutAndCarry(nabsa, resources),
                 GetGrazeAll(nabsa),
                 GetSuppCommonLand(),
                 GetFeed(nabsa),
@@ -367,7 +374,7 @@
         }
 
         /// <summary>
-        /// 
+        /// Create an XML activity folder to manage the activities of a specific breed
         /// </summary>
         /// <param name="nabsa"></param>
         /// <returns></returns>
@@ -375,16 +382,22 @@
         {
             XElement breeds = new XElement("Breeds");
 
+            // Find the data in the NABSA file
             XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
-
             XElement allocs = Queries.FindFirst(nabsa, "SuppAllocs");
+
             var names = Queries.GetElementValues(allocs.Element("ColumnNames"));
 
             int i = -1;
-            foreach (string name in names)
+            foreach (string n in names)
             {
-                i++;
-                if (!present.Exists(s => s == name)) continue;
+                i++;                
+                
+                // If the breed isn't listed as present, skip over it
+                if (!present.Exists(s => s == n)) continue;
+
+                // Sanitise the name for ApsimX
+                string name = n.Replace(".", " ");
 
                 // Check if any milk is used for home consumption
                 XElement milking = null;
@@ -408,17 +421,100 @@
         }
 
         /// <summary>
-        /// Writes the 'Cut and carry' Activity section of a CLEM simulation
+        /// Writes the 'Wean' Activity section of a CLEM simulation
+        /// </summary>
+        /// <param name="nabsa">Source XElement</param>
+        private static XElement GetWean(XElement nabsa, int col)
+        {
+            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
+
+            XElement wean = new XElement
+            (
+                "RuminantActivityWean",
+                new XElement("Name", "Wean"),
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
+                new XElement("HerdFilters", null),
+                new XElement("WeaningAge", specs.Element("Weaning_age").Elements().ElementAt(col).Value),
+                new XElement("WeaningWeight", specs.Element("Weaning_weight").Elements().ElementAt(col).Value),
+                new XElement("GrazeFoodStoreName", "NativePasture")
+            );
+            return wean;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private static XElement GetMilking(string name)
+        {
+            XElement milking = new XElement
+            (
+                "RuminantActivityMilking",
+                new XElement("Name", "Milk"),
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
+                new XElement("HerdFilters", null),
+                new XElement("ResourceTypeName", $"HumanFoodStore.Milk_{name}")
+            );
+            return milking;
+        }
+
+        /// <summary>
+        /// Writes the 'Manage numbers' Activity section of a CLEM simulation
+        /// </summary>
+        /// <param name="nabsa">Source XElement</param>
+        private static XElement GetNumbers(XElement nabsa, int col)
+        {
+            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
+
+            XElement timer = new XElement
+            (
+                "ActivityTimerInterval",
+                new XElement("Name", "ManageHerdTimer"),
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("MonthDue", "12")
+            );
+
+            XElement numbers = new XElement
+            (
+                "RuminantActivityManage",
+                new XElement("Name", "Manage numbers"),
+                timer,
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
+                new XElement("HerdFilters", null),
+                new XElement("MaximumBreedersKept", specs.Element("Max_breeders").Elements().ElementAt(col).Value),
+                new XElement("MinimumBreedersKept", "0"),
+                new XElement("MaximumBreederAge", specs.Element("Max_breeder_age").Elements().ElementAt(col).Value),
+                new XElement("MaximumBreedersPerPurchase", "1"),
+                new XElement("MaximumSiresKept", "0"),
+                new XElement("MaximumBullAge", specs.Element("Max_Bull_age").Elements().ElementAt(col).Value),
+                new XElement("AllowSireReplacement", "false"),
+                new XElement("MaximumSiresPerPurchase", "0"),
+                new XElement("MaleSellingAge", specs.Element("Anim_sell_age").Elements().ElementAt(col).Value),
+                new XElement("MaleSellingWeight", specs.Element("Anim_sell_wt").Elements().ElementAt(col).Value),
+                new XElement("GrazeFoodStoreName", "GrazeFoodStore.NativePasture"),
+                new XElement("MinimumPastureBeforeRestock", "0"),
+                new XElement("SellFemalesLikeMales", "false"),
+                new XElement("ContinuousMaleSales", "false")
+            );
+
+            return numbers;
+        }
+
+        /// <summary>
+        /// Construct the XML for the CutAndCarry element
         /// </summary>
         /// <param name="nabsa"></param>
-        private static XElement GetCutAndCarry(XElement nabsa)
+        private static XElement GetCutAndCarry(XElement nabsa, XElement resources)
         {
-            // Checks the feeding system for each breed, and adds cut & carry if appropriate
             XElement cutcarry = new XElement
             (
                 "ActivityFolder",
                 new XElement("Name", "Cut and carry"),
-                GetCCFeeds(nabsa),
+                GetCutAndCarryFeeds(nabsa, resources),
                 new XElement("IncludeInDocumentation", "true"),
                 new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop")
             );
@@ -430,18 +526,18 @@
         /// </summary>
         /// <param name="nabsa"></param>
         /// <returns></returns>
-        private static IEnumerable<XElement> GetCCFeeds(XElement nabsa)
-        {
-            return null;
+        private static IEnumerable<XElement> GetCutAndCarryFeeds(XElement nabsa, XElement resources)
+        {                      
+            XElement feeds = new XElement("Feeds");
 
-            XElement feeds = new XElement("feeds");
-
-            //foreach (int pool in nabsa.pools.Keys)
+            XElement foodstore = Queries.FindByName(resources, "AnimalFoodStore");
+            foreach (var store in foodstore.Elements("AnimalFoodStoreType"))
             {
+                string name = store.Element("Name").Value;
                 XElement feed = new XElement
                 (
                     "RuminantActivityFeed",
-                    new XElement("Name", $"Feed "),
+                    new XElement("Name", $"Feed {name}"),
                     GetFeedGroups(nabsa),
                     Labour.GetLabourRequirement(),
                     new XElement("IncludeInDocumentation", "true"),
@@ -458,7 +554,7 @@
         }
 
         /// <summary>
-        /// 
+        /// Construct the FeedGroup XML for each present breed
         /// </summary>
         /// <param name="breed"></param>
         /// <returns></returns>
@@ -472,31 +568,11 @@
                 (
                     "RuminantFeedGroup",
                     new XElement("Name", breed),
-                    new XElement("IncludeInDocumentation", "false")
+                    new XElement("IncludeInDocumentation", "true")
                 );
             }
 
             return groups.Elements();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="breed"></param>
-        /// <returns></returns>
-        private static XElement GetRuminantFilter(string breed)
-        {
-            XElement filter = new XElement
-            (
-                "RuminantFilter",
-                new XElement("Name", "RuminantFilter"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("Parameter", "Breed"),
-                new XElement("Operator", "Equal"),
-                new XElement("Value", breed)
-            );
-
-            return filter;
         }
 
         /// <summary>
@@ -601,89 +677,7 @@
             return breed;
         }
 
-        /// <summary>
-        /// Writes the 'Wean' Activity section of a CLEM simulation
-        /// </summary>
-        /// <param name="nabsa">Source XElement</param>
-        private static XElement GetWean(XElement nabsa, int col)
-        {
-            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
-
-            XElement wean = new XElement
-            (
-                "RuminantActivityWean",
-                new XElement("Name", "Wean"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
-                new XElement("HerdFilters", null),
-                new XElement("WeaningAge", specs.Element("Weaning_age").Elements().ElementAt(col).Value),
-                new XElement("WeaningWeight", specs.Element("Weaning_weight").Elements().ElementAt(col).Value)
-            );
-            return wean;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private static XElement GetMilking(string name)
-        {
-            XElement milking = new XElement
-            (
-                "RuminantActivityMilking",
-                new XElement("Name", "Milk"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
-                new XElement("HerdFilters", null),
-                new XElement("ResourceTypeName", $"HumanFoodStore.Milk_{name}")
-            );
-            return milking;
-        }
-
-        /// <summary>
-        /// Writes the 'Manage numbers' Activity section of a CLEM simulation
-        /// </summary>
-        /// <param name="nabsa">Source XElement</param>
-        private static XElement GetNumbers(XElement nabsa, int col)
-        {
-            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
-
-            XElement timer = new XElement
-            (
-                "ActivityTimerInterval",
-                new XElement("Name", "ManageHerdTimer"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("MonthDue", "12")
-            );            
-
-            XElement numbers = new XElement
-            (
-                "RuminantActivityManage",
-                new XElement("Name", "Manage numbers"),
-                timer,
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
-                new XElement("HerdFilters", null),
-                new XElement("MaximumBreedersKept", specs.Element("Max_breeders").Elements().ElementAt(col).Value),
-                new XElement("MinimumBreedersKept", "0"),
-                new XElement("MaximumBreederAge", specs.Element("Max_breeder_age").Elements().ElementAt(col).Value),
-                new XElement("MaximumBreedersPerPurchase", "1"),
-                new XElement("MaximumSiresKept", "0"),
-                new XElement("MaximumBullAge", specs.Element("Max_Bull_age").Elements().ElementAt(col).Value),
-                new XElement("AllowSireReplacement", "false"),
-                new XElement("MaximumSiresPerPurchase", "0"),
-                new XElement("MaleSellingAge", specs.Element("Anim_sell_age").Elements().ElementAt(col).Value),
-                new XElement("MaleSellingWeight", specs.Element("Anim_sell_wt").Elements().ElementAt(col).Value),
-                new XElement("GrazeFoodStoreName", "Not specified - general yards"),
-                new XElement("MinimumPastureBeforeRestock", "0"),
-                new XElement("SellFemalesLikeMales", "false"),
-                new XElement("ContinuousMaleSales", "false")
-            );
-
-            return numbers;
-        }
-
+        
         /// <summary>
         /// Writes the 'Buy/Sell' Activity section of a CLEM simulation
         /// </summary>

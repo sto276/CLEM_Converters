@@ -7,8 +7,8 @@
     {
         public static void Main(string[] args)
         {
-            string source = "Simulations";        
-            
+            string source = "Simulations";     
+
             // Checks that the source directory exists
             if (!Directory.Exists(source))
             {
@@ -17,7 +17,7 @@
             }
 
             string[] dir = Directory.GetFiles(source, "*.nabsa");
-            
+
             Console.WriteLine("NABSA to CLEM file conversion.");
             Console.WriteLine("Missing/Incorrect IAT data may produce incomplete .apsimx files.\n");
 
@@ -71,6 +71,5 @@
             if (key.KeyChar == 'y') return true;
             else return false;
         }
-
     }
 }

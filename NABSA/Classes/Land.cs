@@ -26,7 +26,8 @@ namespace NABSA
                 if (data[0].Value != "0")
                 {
                     XElement type = new XElement
-                    ("LandType",
+                    (
+                        "LandType",
                         new XElement("Name", items[i].Name),
                         new XElement("IncludeInDocumentation", "true"),
                         new XElement("LandArea", data[0].Value),
@@ -53,7 +54,8 @@ namespace NABSA
             (
                 "PastureActivityManage",
                 new XElement("Name", "PastureActivityManage"),
-                GetRelationships(nabsa),
+                GetConditionIndex(nabsa),
+                GetBasalArea(nabsa),
                 new XElement("IncludeInDocumentation", "true"),
                 new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
                 new XElement("LandTypeNameToUse", ""),
@@ -70,31 +72,54 @@ namespace NABSA
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="nabsa"></param>
         /// <returns></returns>
-        private static IEnumerable<XElement> GetRelationships(XElement nabsa)
+        private static XElement GetConditionIndex(XElement nabsa)
         {
-            XElement relationships = new XElement("Relationships");
+            string start = Queries.FindFirst(nabsa, "Land_con").Value;
 
-            List<string> xdata = new List<string>() {"0", "20", "30", "100"};
-            List<string> ydata = new List<string>() { "-0.95", "-0.15", "0", "1.05" };
+            string[] xdata = new[] { "0", "20", "30", "100" };
+            string[] ydata = new[] { "-0.625", "-0.125", "0", "0.75" };
 
-            var changes = nabsa.Element("LandChangeCoeffs").Elements().Skip(1);
-            foreach(var land in changes.First().Elements())
-            {
-                XElement relationship = new XElement
-                (
-                    "Relationship",
-                    new XElement("IncludeInDocumentation", "true"),
-                    new XElement("StartingValue", "3"),
-                    new XElement("Minimum", "1"),
-                    new XElement("Maximum", "8"),
-                    GetDoubles("XValues", xdata),
-                    GetDoubles("YValues", ydata)
-                );
-            }            
+            XElement index = new XElement
+            (
+                "Relationship",
+                new XElement("LandConditionIndex"),
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("StartingValue", start),
+                new XElement("Minimum", "1"),
+                new XElement("Maximum", "8"),
+                GetDoubles("XValues", xdata),
+                GetDoubles("YValues", ydata)
+            );
 
-            return relationships.Elements();
+            return index;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private static XElement GetBasalArea(XElement nabsa)
+        {
+            string start = Queries.FindFirst(nabsa, "Grass_BA").Value;
+            string max = Queries.FindFirst(nabsa, "GBAmax").Value;
+
+            string[] xdata = new[] { "0", "20", "30", "100" };
+            string[] ydata = new[] { "-0.95", "-0.15", "0", "1.05" };
+
+            XElement basal = new XElement
+            (
+                "Relationship",
+                new XElement("GrassBasalArea"),
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("StartingValue", start),
+                new XElement("Minimum", max),
+                new XElement("Maximum", "8"),
+                GetDoubles("XValues", xdata),
+                GetDoubles("YValues", ydata)
+            );
+
+            return basal;
         }
 
         /// <summary>

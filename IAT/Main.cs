@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Linq;
     using DocumentFormat.OpenXml.Spreadsheet;
@@ -23,12 +24,7 @@
             Console.WriteLine("IAT to CLEM file conversion.");
             Console.WriteLine("Missing/Incorrect IAT data may produce incomplete .apsimx files.\n");
 
-            // Defaults to using the 'Simulations' directory if the input directory was invalid
-            if (!Directory.Exists(Toolbox.InDir))
-            {
-                Console.WriteLine("Input directory not found.");
-                if (!Directory.Exists("Simulations")) Directory.CreateDirectory("Simulations");
-            }
+            ManageDirectories();
 
             // Obtain all .xlsx files in the given directory, ignoring temporary files that might exist
             // .xlsx files in the input directory are assumed to be IAT files
@@ -78,7 +74,8 @@
                         }
 
                         //
-                        XElement sims = new XElement(iat.name.Replace(" ", ""));
+                        string xname = Toolbox.SanitiseXName(iat.name);
+                        XElement sims = new XElement(xname);
 
                         // Add 1 simulation which contains the CLEM model for each sheet
                         if (same_sim) sims.Add(Simulation.GetSimulation(iat, clems));
@@ -107,13 +104,13 @@
                     if (same_file)
                     {
                         // Create a new object which has every simulation as sibling elements
-                        XElement all = new XElement("irrelevant");
+                        XElement all = new XElement("irrelevant_name");
                         foreach (var apsim in apsims.Elements()) all.Add(apsim.Elements());
 
                         // Wrap all the simulations together
                         var apsimx = Simulation.GetApsimx(all);
 
-                        xtw = Toolbox.MakeApsimX("CLEM_Simulations");
+                        xtw = Toolbox.MakeApsimX("Simulations", "All_Sims");
 
                         apsimx.WriteTo(xtw);
                         xtw.WriteEndDocument();
@@ -124,16 +121,15 @@
                         // Create a separate file for each simulation
                         foreach(var apsim in apsims.Elements())
                         {
-                            // Create a separate folder for each base IAT
-                            path = apsim.Elements().First().Name.ToString();
-                            Directory.CreateDirectory(path);
+                            // Refers directly to the location of the file name in the XML
+                            path = apsim.Elements().First().Elements().First().Value;                            
 
                             //
                             foreach(var sim in apsim.Elements())
                             {
                                 var zone = sim.Descendants("ZoneCLEM").First();
                                 string name = zone.Descendants("Name").First().Value;
-                                xtw = Toolbox.MakeApsimX($"{path}/{name}");
+                                xtw = Toolbox.MakeApsimX(path, name);
 
                                 var apsimx = Simulation.GetApsimx(sim);
 
@@ -158,7 +154,7 @@
                     foreach (Sheet sheet in iat.book.Workbook.Sheets)
                     {
                         string name = sheet.Name.ToString();
-                        if (!name.ToLower().Contains("input")) sheets.Add(name);
+                        if (name.ToLower().Contains("param")) sheets.Add(name);
                     }
 
                     WriteSim(iat, sheets, true);
@@ -171,6 +167,50 @@
             return;
         }
 
+        /// <summary>
+        /// Provides the user the choice to select new input/output directories
+        /// </summary>
+        private static void ManageDirectories()
+        {
+            // Create the simulations directory
+            if (!Directory.Exists("Simulations"))
+            {
+                Directory.CreateDirectory("Simulations");
+            }
+
+            // Select a new input directory
+            if (YesNo("select a new input directory"))
+            {
+                Console.WriteLine("Enter the full directory path: \n");
+                Toolbox.InDir = Console.ReadLine();
+            }
+
+            // Validate the new input directory, return to default if invalid
+            if (!Directory.Exists(Toolbox.InDir))
+            {
+                Console.WriteLine("Input directory not found. Switching to default directory.");                
+                Toolbox.InDir = "Simulations";
+            }
+
+            // Select a new output directory
+            if (YesNo("select a new output directory"))
+            {
+                Console.WriteLine("Enter the full directory path: \n");
+                Toolbox.OutDir = Console.ReadLine();
+            }
+
+            // Validate the new output directory, return to default if invalid
+            if (!Directory.Exists(Toolbox.InDir))
+            {
+                Console.WriteLine("Input directory not found. Switching to default directory.");
+                if (!Directory.Exists("Simulations"))
+                {
+                    Directory.CreateDirectory("Simulations");
+                }
+                Toolbox.OutDir = "Simulations";
+            }
+        }
+                
         /// <summary>
         /// Ask the user to choose which IAT files to convert
         /// '0' for all files, or list position of the specific file to convert.
@@ -201,16 +241,21 @@
             return 1;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private static IAT PrepareIAT(string name)
         {
             // Create the object
             IAT iat = new IAT(name);
 
             // Prepare the directory
-            Directory.CreateDirectory($"{Toolbox.OutDir}\\{iat.name}");
+            Directory.CreateDirectory($"{Toolbox.OutDir}/{iat.name}");
 
             // Prepares the error log
-            Toolbox.OpenErrorLog($"{Toolbox.OutDir}\\{iat.name}\\ErrorLog.txt");
+            Toolbox.OpenErrorLog($"{Toolbox.OutDir}/{iat.name}/ErrorLog.txt");
 
             // Write the PRN files
             Grains.FileCrop(iat);
@@ -231,7 +276,7 @@
             int choice = 0;
             if (choose && (sheets.Count() > 1)) choice = PickSheet(sheets);            
 
-            XElement clems = new XElement("");
+            XElement clems = new XElement("clems");
             // Convert a single parameter sheet
             if (choice != 0)
             {
@@ -248,9 +293,7 @@
                     iat.SetSheet(sheet);
                     clems.Add(Simulation.GetCLEM(iat, sheet));
                 }
-            }
-
-            
+            }            
 
             Toolbox.CloseErrorLog();
             return;

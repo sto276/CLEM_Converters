@@ -1,9 +1,10 @@
-﻿namespace IAT
-{
-    using System;
-    using System.IO;
-    using System.Xml;
+﻿using System;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Xml;
 
+namespace IAT
+{   
     /// <summary>
     /// Contains various miscellaneous methods for
     /// aiding in IAT to CLEM conversion.
@@ -39,22 +40,15 @@
         /// Creates and formats the xml document (.apsimx) for a simulation.
         /// </summary>
         /// <param name="subdir">The sub-directory containing all simulations produced from an IAT file</param>
-        /// <param name="path">The name of the .apsimx file</param>
+        /// <param name="folder">The name of the .apsimx file</param>
         /// <returns>The XmlTextWriter that the .apsimx is written to</returns>
-        public static XmlTextWriter MakeApsimX(string path)
+        public static XmlTextWriter MakeApsimX(string folder, string name)
         {
-            // Establish output directory
-            try
-            {
-                Directory.CreateDirectory(OutDir);
-            }
-            catch
-            {
-                throw new Exception("Invalid output directory.");
-            }
+            // Ensure the file has a location to be saved
+            Directory.CreateDirectory($"{OutDir}/{folder}");
 
             // Create the .apsimx file in the directory
-            FileStream fs = new FileStream($"{OutDir}/{path}.apsimx", FileMode.Create);
+            FileStream fs = new FileStream($"{OutDir}/{folder}/{name}.apsimx", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
 
             // Format the document
@@ -109,5 +103,31 @@
             error_sw.Close();
             return;
         }
+
+        /// <summary>
+        /// Shifts invalid starting characters to the end of the XName
+        /// </summary>
+        /// <param name="name">The name to sanitise</param>
+        public static string SanitiseXName(string name)
+        {
+            // Replace all whitespace, brackets, and underscores
+            name = Regex.Replace(name, @"[\(\)\{\}\[\]_\s+]", "");
+
+            // Matches non letter characters
+            Regex reg = new Regex("[^a-zA-Z]");
+
+            // Move invalid starting characters (like numbers) to the tail of the name
+            // (preserving order to keep information where possible)
+            string suffix = "";
+            while (reg.IsMatch(name[0].ToString()))
+            {
+                suffix += name[0];
+                name = name.Remove(0, 1);
+            }            
+            name += suffix;
+
+            return name;
+        }
+
     }
 }
