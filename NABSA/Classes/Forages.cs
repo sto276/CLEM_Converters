@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Resources;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Xml.Linq;
 
 namespace NABSA
 {
+    using static Queries;
     class Forages
     {
         /// <summary>
@@ -19,10 +21,10 @@ namespace NABSA
             var inputs = new XElement("Inputs", nabsa.Elements("Input"));
 
             // Find the forages file from the inputs
-            var forages = Queries.FindByName(inputs, "Forages File");
+            var forages = FindByName(inputs, "Forages File");
 
             // Find all the saved file names
-            var files = Queries.FindFirst(forages, "FileNames").Elements();
+            var files = FindFirst(forages, "FileNames").Elements();
 
             foreach (var file in files)
             {
@@ -68,10 +70,10 @@ namespace NABSA
             writer.WriteLine($"{"()",-36}{"()",-36}{"()",-36}{"()",-36}{"()",-36}");
 
             // Find the climate region
-            string climate = Queries.FindFirst(nabsa, "ClimRegion").Value;
+            string climate = FindFirst(nabsa, "ClimRegion").Value;
 
             // Find the list of grown forages
-            XElement specs = Queries.FindByName(nabsa, "Forage Crop Specs - General");
+            XElement specs = FindByName(nabsa, "Forage Crop Specs - General");
             var crops = specs.Elements().Skip(2);
 
             string line = reader.ReadLine();

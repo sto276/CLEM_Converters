@@ -1,12 +1,15 @@
-﻿namespace NABSA
-{
-    using System.IO;
-    using System;
+﻿using Resources;
+using System.IO;
+using System;
 
+namespace NABSA
+{   
     class Terminal
     {
         public static void Main(string[] args)
         {
+            Tools.SetProjectDirectory();
+
             string source = "Simulations";     
 
             // Checks that the source directory exists

@@ -1,10 +1,11 @@
 ﻿namespace IAT
 {
+    using Resources;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text.RegularExpressions;
+    using System.Reflection;
     using System.Xml;
     using System.Xml.Linq;
     using DocumentFormat.OpenXml.Spreadsheet;
@@ -13,14 +14,12 @@
     /// Provides utility for the user to pick and choose
     /// which IAT files to convert, through a command terminal
     /// </summary>
-    static class Terminal 
+    public static class Terminal 
 	{
-        /// <summary>
-        /// Entry point of the program
-        /// </summary>
-        /// <param name="args"></param>
         public static void Main(string[] args)
-		{
+        {
+            Tools.SetProjectDirectory();
+
             Console.WriteLine("IAT to CLEM file conversion.");
             Console.WriteLine("Missing/Incorrect IAT data may produce incomplete .apsimx files.\n");
 
@@ -28,15 +27,24 @@
 
             // Obtain all .xlsx files in the given directory, ignoring temporary files that might exist
             // .xlsx files in the input directory are assumed to be IAT files
-            string[] dir = Directory.GetFiles(Toolbox.InDir, "*.xlsx").Where(file => !file.Contains("~$")).ToArray();                       
+            string[] dir = Directory.GetFiles(Toolbox.InDir, "*.xlsx").Where(file => !file.Contains("~$")).ToArray();
 
             // Check that files exist to convert
             if (dir.Length == 0)
             {
                 Console.WriteLine("No files found in input directory.");
                 return;
-            }            
+            }
 
+            Start(dir);
+        }
+
+        /// <summary>
+        /// Entry point of the program
+        /// </summary>
+        /// <param name="args"></param>
+        public static void Start(string[] dir)
+		{                      
             // This loops until the user opts out (given a choice to do so each iteration)
             do
             {
@@ -48,98 +56,9 @@
                 {
                     bool same_file = YesNo("save all the simulations to the same .apsimx file");
                     bool same_sim = YesNo("place parameter sets from the same IAT file into the same simulation");
-
-                    IAT iat = null;                    
-                    XElement apsims = new XElement("irrelevant");
-
-                    foreach (string file in dir)
-                    {
-                        // Load the IAT object
-                        iat = PrepareIAT(file);
-
-                        // Find all the parameter sheets in the IAT
-                        List<string> sheets = new List<string>();
-                        foreach (Sheet sheet in iat.book.Workbook.Sheets)
-                        {
-                            string name = sheet.Name.ToString();
-                            if (name.ToLower().Contains("params")) sheets.Add(name);
-                        }
-
-                        // Generates a collection of all the CLEM objects
-                        XElement clems = new XElement("irrelevant");
-                        foreach (string sheet in sheets)
-                        {
-                            iat.SetSheet(sheet);
-                            clems.Add(Simulation.GetCLEM(iat, sheet));
-                        }
-
-                        //
-                        string xname = Toolbox.SanitiseXName(iat.name);
-                        XElement sims = new XElement(xname);
-
-                        // Add 1 simulation which contains the CLEM model for each sheet
-                        if (same_sim) sims.Add(Simulation.GetSimulation(iat, clems));
-
-                        // Alternatively, add 1 simulation per sheet, each containing 1 CLEM model
-                        else
-                        {
-                            foreach (var clem in clems.Elements())
-                            {
-                                // Note: GetSimulation acts on the child elements,
-                                // so we set up an element with the child we want to pass
-                                XElement temp = new XElement("irrelevant", clem);
-                                sims.Add(Simulation.GetSimulation(iat, temp));
-                            }
-                        }
-
-                        // Each element in this object is a collection of all the simulations 
-                        // generated from a single IAT file
-                        apsims.Add(sims);
-
-                        Toolbox.CloseErrorLog();
-                    }
-
-                    string path = "";
-                    XmlTextWriter xtw = null;
-                    if (same_file)
-                    {
-                        // Create a new object which has every simulation as sibling elements
-                        XElement all = new XElement("irrelevant_name");
-                        foreach (var apsim in apsims.Elements()) all.Add(apsim.Elements());
-
-                        // Wrap all the simulations together
-                        var apsimx = Simulation.GetApsimx(all);
-
-                        xtw = Toolbox.MakeApsimX("Simulations", "All_Sims");
-
-                        apsimx.WriteTo(xtw);
-                        xtw.WriteEndDocument();
-                        xtw.Close();
-                    }
-                    else
-                    {
-                        // Create a separate file for each simulation
-                        foreach(var apsim in apsims.Elements())
-                        {
-                            // Refers directly to the location of the file name in the XML
-                            path = apsim.Elements().First().Elements().First().Value;                            
-
-                            //
-                            foreach(var sim in apsim.Elements())
-                            {
-                                var zone = sim.Descendants("ZoneCLEM").First();
-                                string name = zone.Descendants("Name").First().Value;
-                                xtw = Toolbox.MakeApsimX(path, name);
-
-                                var apsimx = Simulation.GetApsimx(sim);
-
-                                apsimx.WriteTo(xtw);
-                                xtw.WriteEndDocument();
-                                xtw.Close();
-
-                            }
-                        }
-                    }
+                                       
+                    RunConverter(dir, same_sim, same_file);                   
+                    
                     // If every file is converted, don't have to ask the user if more files need converting
                     break;
                 }
@@ -148,7 +67,7 @@
                     bool same_sim = YesNo("place separate parameter sets into the same simulation");
 
                     // Prepare a single IAT, giving the user the option to choose which parameter sheets
-                    IAT iat = PrepareIAT(dir[choice - 1]);
+                    IAT iat = PrepareIAT(dir[choice - 1], Toolbox.OutDir);
 
                     List<string> sheets = new List<string>();
                     foreach (Sheet sheet in iat.book.Workbook.Sheets)
@@ -168,77 +87,128 @@
         }
 
         /// <summary>
-        /// Provides the user the choice to select new input/output directories
+        /// Runs the conversion process for the given IAT files and options
         /// </summary>
-        private static void ManageDirectories()
+        /// <param name="dir">Files to convert</param>
+        /// <param name="same_file">Shared .apsimx file option</param>
+        /// <param name="same_sim">Shared simulation option</param>
+        public static void RunConverter(string[] dir, bool same_file, bool same_sim)
         {
-            // Create the simulations directory
-            if (!Directory.Exists("Simulations"))
-            {
-                Directory.CreateDirectory("Simulations");
-            }
+            IAT iat = null;
+            XElement apsims = new XElement("name_is_ignored");
 
-            // Select a new input directory
-            if (YesNo("select a new input directory"))
+            foreach (string file in dir)
             {
-                Console.WriteLine("Enter the full directory path: \n");
-                Toolbox.InDir = Console.ReadLine();
-            }
+                // Load the IAT object
+                iat = PrepareIAT(file, Toolbox.OutDir);
 
-            // Validate the new input directory, return to default if invalid
-            if (!Directory.Exists(Toolbox.InDir))
-            {
-                Console.WriteLine("Input directory not found. Switching to default directory.");                
-                Toolbox.InDir = "Simulations";
-            }
-
-            // Select a new output directory
-            if (YesNo("select a new output directory"))
-            {
-                Console.WriteLine("Enter the full directory path: \n");
-                Toolbox.OutDir = Console.ReadLine();
-            }
-
-            // Validate the new output directory, return to default if invalid
-            if (!Directory.Exists(Toolbox.InDir))
-            {
-                Console.WriteLine("Input directory not found. Switching to default directory.");
-                if (!Directory.Exists("Simulations"))
+                // Find all the parameter sheets in the IAT
+                List<string> sheets = new List<string>();
+                foreach (Sheet sheet in iat.book.Workbook.Sheets)
                 {
-                    Directory.CreateDirectory("Simulations");
+                    string name = sheet.Name.ToString();
+                    if (name.ToLower().Contains("params")) sheets.Add(name);
                 }
-                Toolbox.OutDir = "Simulations";
+
+                // Generates a collection of all the CLEM objects
+                XElement clems = new XElement("name_is_ignored");
+                foreach (string sheet in sheets)
+                {
+                    iat.SetSheet(sheet);
+                    clems.Add(Simulation.GetCLEM(iat, sheet));
+                }
+
+                // Sanitise the simulation name
+                string xname = Toolbox.SanitiseXName(iat.name);
+                XElement sims = new XElement(xname);
+
+                // Add one simulation containing a CLEM model per sheet
+                if (same_sim)
+                {
+                    sims.Add(Simulation.GetSimulation(iat, clems));
+                }
+                // Add one simulation per sheet, containing a CLEM model each
+                else
+                {
+                    foreach (var clem in clems.Elements())
+                    {
+                        // Note: GetSimulation acts on the child elements,
+                        // so we set up an element with the child we want to pass
+                        XElement temp = new XElement("name_is_ignored", clem);
+                        sims.Add(Simulation.GetSimulation(iat, temp));
+                    }
+                }
+
+                // Each element in this object is a collection of all the simulations 
+                // generated from a single IAT file
+                apsims.Add(sims);
+
+                Toolbox.CloseErrorLog();                
+            }
+
+            if (same_file)
+            {
+                WriteSingle(apsims);
+            }
+            else
+            {
+                WriteMultiple(apsims);
             }
         }
-                
-        /// <summary>
-        /// Ask the user to choose which IAT files to convert
-        /// '0' for all files, or list position of the specific file to convert.
-        /// Repeat the process until the user gives valid input or opts out.
-        /// </summary>
-        /// <param name="dir">Collection of files in the directory</param>
-        private static int PickFile(string[] dir)
+
+        public static void WriteSingle(XElement apsims)
         {
-            do
+            string path = "Simulations";
+            string name = "All_Sims";
+
+            // Create a new object which has every simulation as sibling elements
+            XElement all = new XElement("this_name_is_ignored");
+            foreach (var apsim in apsims.Elements())
             {
-                // Display IAT files found in the directory
-                Console.WriteLine("The following IAT files are available:\n");
-                for (int i = 0; i < dir.Length; i++)
-                {
-                    Console.WriteLine($"  {i + 1}. {dir[i].Substring(Toolbox.InDir.Length + 1)}");
-                }
-                // Take user input
-                Console.WriteLine("\nEnter the number corresponding to the file you wish to convert, or '0' for all files.");
-                string input = Console.ReadLine();
-
-                // If the user provides a valid choice, move to the next stage
-                if (int.TryParse(input, out int choice)) return choice;
-                else Console.WriteLine("Invalid input.");
+                all.Add(apsim.Elements());
             }
-            while (YesNo("choose another IAT"));
 
-            Console.WriteLine("No selection provided. Selecting first available file.");
-            return 1;
+            WriteApsimx(all, path, name);
+        }
+
+        public static void WriteMultiple(XElement apsims)
+        {
+            string path = "";
+            string name = "";
+
+            // Create a separate file for each simulation
+            foreach (var apsim in apsims.Elements())
+            {
+                // Refers directly to the location of the file name in the XML
+                path = apsim.Elements().First().Elements().First().Value;
+
+                //
+                foreach (var sim in apsim.Elements())
+                {
+                    var zone = sim.Descendants("ZoneCLEM").First();
+                    name = zone.Descendants("Name").First().Value;
+
+                    WriteApsimx(sim, path, name);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates an .apsimx file using the given simulations
+        /// </summary>
+        /// <param name="sims">The simulations in the file</param>
+        /// <param name="path">The path to the file</param>
+        /// <param name="name">The name of the .apsimx file</param>
+        private static void WriteApsimx(XElement sims, string path, string name)
+        {
+            XmlTextWriter xtw = null;
+
+            var apsimx = Simulation.GetApsimx(sims);
+            xtw = Toolbox.MakeApsimX(path, name);
+
+            apsimx.WriteTo(xtw);
+            xtw.WriteEndDocument();
+            xtw.Close();
         }
 
         /// <summary>
@@ -246,16 +216,16 @@
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private static IAT PrepareIAT(string name)
+        private static IAT PrepareIAT(string name, string folder)
         {
             // Create the object
             IAT iat = new IAT(name);
 
             // Prepare the directory
-            Directory.CreateDirectory($"{Toolbox.OutDir}/{iat.name}");
+            Directory.CreateDirectory($"{folder}/{iat.name}");
 
             // Prepares the error log
-            Toolbox.OpenErrorLog($"{Toolbox.OutDir}/{iat.name}/ErrorLog.txt");
+            Toolbox.OpenErrorLog($"{folder}/{iat.name}/ErrorLog.txt");
 
             // Write the PRN files
             Grains.FileCrop(iat);
@@ -299,6 +269,85 @@
             return;
         }
 
+        /// <summary>
+        /// Provides the user the choice to select new input/output directories
+        /// </summary>
+        private static void ManageDirectories()
+        {
+            // Create the simulations directory
+            if (!Directory.Exists("Simulations"))
+            {
+                Directory.CreateDirectory("Simulations");
+            }
+
+            // Select a new input directory
+            if (YesNo("select a new input directory"))
+            {
+                Console.WriteLine("Enter the full directory path: \n");
+                Toolbox.InDir = Console.ReadLine();
+            }
+
+            // Validate the new input directory, return to default if invalid
+            if (!Directory.Exists(Toolbox.InDir))
+            {
+                Console.WriteLine("Input directory not found. Switching to default directory.");
+                Toolbox.InDir = "Simulations";
+            }
+
+            // Select a new output directory
+            if (YesNo("select a new output directory"))
+            {
+                Console.WriteLine("Enter the full directory path: \n");
+                Toolbox.OutDir = Console.ReadLine();
+            }
+
+            // Validate the new output directory, return to default if invalid
+            if (!Directory.Exists(Toolbox.InDir))
+            {
+                Console.WriteLine("Input directory not found. Switching to default directory.");
+                if (!Directory.Exists("Simulations"))
+                {
+                    Directory.CreateDirectory("Simulations");
+                }
+                Toolbox.OutDir = "Simulations";
+            }
+        }
+
+        /// <summary>
+        /// Ask the user to choose which IAT files to convert
+        /// '0' for all files, or list position of the specific file to convert.
+        /// Repeat the process until the user gives valid input or opts out.
+        /// </summary>
+        /// <param name="dir">Collection of files in the directory</param>
+        private static int PickFile(string[] dir)
+        {
+            do
+            {
+                // Display IAT files found in the directory
+                Console.WriteLine("The following IAT files are available:\n");
+                for (int i = 0; i < dir.Length; i++)
+                {
+                    Console.WriteLine($"  {i + 1}. {dir[i].Substring(Toolbox.InDir.Length + 1)}");
+                }
+                // Take user input
+                Console.WriteLine("\nEnter the number corresponding to the file you wish to convert, or '0' for all files.");
+                string input = Console.ReadLine();
+
+                // If the user provides a valid choice, move to the next stage
+                if (int.TryParse(input, out int choice)) return choice;
+                else Console.WriteLine("Invalid input.");
+            }
+            while (YesNo("choose another IAT"));
+
+            Console.WriteLine("No selection provided. Selecting first available file.");
+            return 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sheets"></param>
+        /// <returns></returns>
         private static int PickSheet(List<string> sheets)
         {
             // Repeat until valid input is provided or the user opts out

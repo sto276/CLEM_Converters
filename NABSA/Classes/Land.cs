@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,8 @@ using System.Xml.Linq;
 
 namespace NABSA
 {
-    class Land
+    using static Queries;
+    static class Land
     {
         /// <summary>
         /// Builds the 'Land' subsection 
@@ -75,7 +77,7 @@ namespace NABSA
         /// <returns></returns>
         private static XElement GetConditionIndex(XElement nabsa)
         {
-            string start = Queries.FindFirst(nabsa, "Land_con").Value;
+            string start = FindFirst(nabsa, "Land_con").Value;
 
             string[] xdata = new[] { "0", "20", "30", "100" };
             string[] ydata = new[] { "-0.625", "-0.125", "0", "0.75" };
@@ -101,8 +103,8 @@ namespace NABSA
         /// <returns></returns>
         private static XElement GetBasalArea(XElement nabsa)
         {
-            string start = Queries.FindFirst(nabsa, "Grass_BA").Value;
-            string max = Queries.FindFirst(nabsa, "GBAmax").Value;
+            string start = FindFirst(nabsa, "Grass_BA").Value;
+            string max = FindFirst(nabsa, "GBAmax").Value;
 
             string[] xdata = new[] { "0", "20", "30", "100" };
             string[] ydata = new[] { "-0.95", "-0.15", "0", "1.05" };

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Resources;
+using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 
 namespace NABSA
-{   
+{
     using static Queries;
     class Simulation
     {

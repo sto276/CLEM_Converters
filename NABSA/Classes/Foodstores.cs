@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Xml.Linq;
 
 namespace NABSA
 {
+    using static Queries;
     static class Foodstores
     {
         /// <summary>
@@ -75,8 +77,8 @@ namespace NABSA
         /// <returns></returns>
         private static IEnumerable<XElement> GetSupplements(XElement nabsa)
         {
-            var allocs = Queries.FindByName(nabsa, "Supplement allocations").Elements().Skip(2);
-            var specs = Queries.FindByName(nabsa, "Supplement specifications").Elements().Skip(2);
+            var allocs = FindByName(nabsa, "Supplement allocations").Elements().Skip(2);
+            var specs = FindByName(nabsa, "Supplement specifications").Elements().Skip(2);
 
             XElement supplements = new XElement("Supplements");
 
@@ -84,7 +86,7 @@ namespace NABSA
             {
                 specs = specs.Skip(1);
 
-                var amounts = Queries.GetElementValues(supplement).ToList();
+                var amounts = GetElementValues(supplement).ToList();
                 if (!amounts.Exists(s => s != "0")) continue;
                 
                 XElement type = GetAnimalFoodStoreType(specs.First());
@@ -101,8 +103,8 @@ namespace NABSA
         /// <returns></returns>
         private static IEnumerable<XElement> GetBought(XElement nabsa)
         {
-            var fodder = Queries.FindByName(nabsa, "Bought fodder").Elements().Skip(2);
-            var specs = Queries.FindByName(nabsa, "Bought fodder specs").Elements().Skip(2);
+            var fodder = FindByName(nabsa, "Bought fodder").Elements().Skip(2);
+            var specs = FindByName(nabsa, "Bought fodder specs").Elements().Skip(2);
 
             XElement bought = new XElement("Bought");
 

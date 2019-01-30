@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Xml.Linq;
 
 namespace NABSA
 {
+    using static Queries;
     class Finances
     {
         /// <summary>
@@ -16,8 +18,8 @@ namespace NABSA
         public static XElement GetFinance(XElement nabsa)
         {
             // Find the balance and interest
-            string balance = Queries.FindFirst(nabsa, "Cash_balance").Value;
-            string interest = Queries.FindFirst(nabsa, "Int_rate").Value;
+            string balance = FindFirst(nabsa, "Cash_balance").Value;
+            string interest = FindFirst(nabsa, "Int_rate").Value;
 
             // Write the bank data XML
             XElement bank = new XElement(
@@ -48,7 +50,7 @@ namespace NABSA
         /// <param name="iat">Source IAT</param>
         public static XElement GetCashFlow(XElement nabsa)
         {
-            XElement singleparams = Queries.FindFirst(nabsa, "SingleParams");
+            XElement singleparams = FindFirst(nabsa, "SingleParams");
 
             XElement cashflow = new XElement
             (
@@ -84,7 +86,7 @@ namespace NABSA
         /// <param name="iat">Source IAT</param>
         private static XElement GetLivingCost(XElement singleparams)
         {
-            string value = Queries.FindFirst(singleparams, "Living_cost").Value;
+            string value = FindFirst(singleparams, "Living_cost").Value;
             int.TryParse(value, out int amount);
 
             XElement cost = new XElement
@@ -142,7 +144,7 @@ namespace NABSA
             XElement expenses = new XElement("Expenses");
             foreach (string item in items)
             {
-                string value = Queries.FindFirst(singleparams, item).Value;
+                string value = FindFirst(singleparams, item).Value;
                 int.TryParse(value, out int amount);
 
                 // Only need to add the element if its a non-zero expenditure
@@ -172,7 +174,7 @@ namespace NABSA
         public static XElement GetCalculateInterest(XElement singleparams)
         {
             // Find the interest amount
-            string value = Queries.FindFirst(singleparams, "Int_rate").Value;
+            string value = FindFirst(singleparams, "Int_rate").Value;
             int.TryParse(value, out int rate);
 
             // If the interest is 0, don't add the element
