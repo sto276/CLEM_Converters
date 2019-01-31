@@ -1,9 +1,10 @@
-﻿namespace NABSA
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
+﻿using Resources;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 
+namespace NABSA
+{   
     using static Queries;
     static class Labour
     {      

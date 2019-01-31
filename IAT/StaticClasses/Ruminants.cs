@@ -120,7 +120,7 @@ namespace IAT
             XElement parameters = new XElement("Parameters");
             
             // Read the .csv mapping IAT names to CLEM names
-            StreamReader csvIAT = new StreamReader("Resources_IAT.csv"); 
+            StreamReader csvIAT = new StreamReader($"{Directory.GetCurrentDirectory()}/Resources/csv/Resources_IAT.csv"); 
 
             // Reads the map line by line, finding IAT data (skipping the title row)
             csvIAT.ReadLine();
@@ -153,7 +153,7 @@ namespace IAT
         {
             XElement parameters = new XElement("CLEMParams");
             // Reads in parameters which are new to CLEM and don't exist in IAT (Defaults to B. Indicus values)            
-            StreamReader csvCLEM = new StreamReader("Resources_CLEM.csv");
+            StreamReader csvCLEM = new StreamReader($"{Directory.GetCurrentDirectory()}/Resources/csv/Resources_CLEM.csv");
             csvCLEM.ReadLine();
             string line;
             while ((line = csvCLEM.ReadLine()) != null)

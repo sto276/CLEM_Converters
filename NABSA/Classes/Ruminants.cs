@@ -1,11 +1,13 @@
-﻿namespace NABSA
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Xml.Linq;
+﻿using Resources;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 
+namespace NABSA
+{   
+    using static Queries;
     static class Ruminants
     {
         /// <summary>
@@ -38,8 +40,8 @@
         private static XElement GetHerd(XElement nabsa)
         {
             // Names of the breeds are stored in the "SuppAllocs" table under the element "ColumnNames" 
-            XElement allocs = Queries.FindFirst(nabsa, "SuppAllocs");
-            var breeds = Queries.GetElementValues(allocs.Element("ColumnNames"));
+            XElement allocs = FindFirst(nabsa, "SuppAllocs");
+            var breeds = GetElementValues(allocs.Element("ColumnNames"));
 
             // Parent element of herd data
             XElement herd = new XElement
@@ -91,21 +93,21 @@
         private static void AddCohortsToHerd(XElement nabsa, XElement herd)
         {
             // Search for the data tables in the source
-            XElement nums = Queries.FindByName(nabsa, "Startup ruminant numbers");
-            XElement ages = Queries.FindByName(nabsa, "Startup ruminant ages");
-            XElement weights = Queries.FindByName(nabsa, "Startup ruminant weights");
-            XElement prices = Queries.FindByName(nabsa, "Ruminant prices");
+            XElement nums = FindByName(nabsa, "Startup ruminant numbers");
+            XElement ages = FindByName(nabsa, "Startup ruminant ages");
+            XElement weights = FindByName(nabsa, "Startup ruminant weights");
+            XElement prices = FindByName(nabsa, "Ruminant prices");
 
             // Names of each cohort
-            var cohorts = Queries.GetElementNames(nums).Skip(1);
+            var cohorts = GetElementNames(nums).Skip(1);
 
             foreach (string cohort in cohorts)
             {
                 // Find the data for a given cohort in each table
-                var nvalues = Queries.GetElementValues(nums.Element(cohort));
-                var avalues = Queries.GetElementValues(ages.Element(cohort));
-                var wvalues = Queries.GetElementValues(weights.Element(cohort));
-                var pvalues = Queries.GetElementValues(prices.Element(cohort));
+                var nvalues = GetElementValues(nums.Element(cohort));
+                var avalues = GetElementValues(ages.Element(cohort));
+                var wvalues = GetElementValues(weights.Element(cohort));
+                var pvalues = GetElementValues(prices.Element(cohort));
 
                 // Look at the current cohort data for each breed
                 foreach (var breed in herd.Elements().Skip(1))
@@ -317,7 +319,7 @@
         {
             XElement parameters = new XElement("Parameters");
 
-            StreamReader csv = new StreamReader("params.csv");
+            StreamReader csv = new StreamReader($"{Directory.GetCurrentDirectory()}/Resources/csv/Params_NABSA.csv");
             string line = null;
 
             // Skip the head line
@@ -326,7 +328,7 @@
             {
                 // Determine which data to look for
                 string[] data = line.Split(',');
-                XElement item = Queries.FindFirst(nabsa, data[0]);
+                XElement item = FindFirst(nabsa, data[0]);
 
                 // Location of specification value depends on the format of the data in the NABSA file
                 string spec;
@@ -383,10 +385,10 @@
             XElement breeds = new XElement("Breeds");
 
             // Find the data in the NABSA file
-            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
-            XElement allocs = Queries.FindFirst(nabsa, "SuppAllocs");
+            XElement specs = FindByName(nabsa, "Ruminant specifications");
+            XElement allocs = FindFirst(nabsa, "SuppAllocs");
 
-            var names = Queries.GetElementValues(allocs.Element("ColumnNames"));
+            var names = GetElementValues(allocs.Element("ColumnNames"));
 
             int i = -1;
             foreach (string n in names)
@@ -426,7 +428,7 @@
         /// <param name="nabsa">Source XElement</param>
         private static XElement GetWean(XElement nabsa, int col)
         {
-            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
+            XElement specs = FindByName(nabsa, "Ruminant specifications");
 
             XElement wean = new XElement
             (
@@ -467,7 +469,7 @@
         /// <param name="nabsa">Source XElement</param>
         private static XElement GetNumbers(XElement nabsa, int col)
         {
-            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
+            XElement specs = FindByName(nabsa, "Ruminant specifications");
 
             XElement timer = new XElement
             (
@@ -530,7 +532,7 @@
         {                      
             XElement feeds = new XElement("Feeds");
 
-            XElement foodstore = Queries.FindByName(resources, "AnimalFoodStore");
+            XElement foodstore = FindByName(resources, "AnimalFoodStore");
             foreach (var store in foodstore.Elements("AnimalFoodStoreType"))
             {
                 string name = store.Element("Name").Value;
@@ -676,8 +678,7 @@
             );
             return breed;
         }
-
-        
+                
         /// <summary>
         /// Writes the 'Buy/Sell' Activity section of a CLEM simulation
         /// </summary>
@@ -702,7 +703,7 @@
         /// <param name="nabsa">Source XElement</param>
         private static XElement GetSellDry(XElement nabsa, int col)
         {
-            XElement specs = Queries.FindByName(nabsa, "Ruminant specifications");
+            XElement specs = FindByName(nabsa, "Ruminant specifications");
 
             string value = specs.Element("Dry_breeder_cull_rate").Elements().ElementAt(col).Value;
             double.TryParse(value, out double cullrate);

@@ -1,12 +1,16 @@
-﻿namespace NABSA
-{
-    using System.IO;
-    using System;
+﻿using Resources;
+using System.IO;
+using System;
+using System.Collections.Generic;
 
-    class Terminal
+namespace NABSA
+{   
+    public class Terminal
     {
         public static void Main(string[] args)
         {
+            Tools.SetProjectDirectory();
+
             string source = "Simulations";     
 
             // Checks that the source directory exists
@@ -26,7 +30,7 @@
                 int choice = ChooseFile(dir);
                 if (choice == 0)
                 {
-                    foreach (string iat in dir) Simulation.Create(iat);
+                    RunConverter(dir);
                     break; // Skips reset if all files are converted
                 }
                 else Simulation.Create(dir[choice - 1]);
@@ -34,6 +38,11 @@
 
             Console.ReadKey();
             return;
+        }
+
+        public static void RunConverter(IEnumerable<string> files)
+        {
+            foreach (string nabsa in files) Simulation.Create(nabsa);
         }
 
         /// <summary>
