@@ -319,7 +319,7 @@ namespace NABSA
         {
             XElement parameters = new XElement("Parameters");
 
-            StreamReader csv = new StreamReader("params.csv");
+            StreamReader csv = new StreamReader($"{Directory.GetCurrentDirectory()}/Resources/csv/Params_NABSA.csv");
             string line = null;
 
             // Skip the head line

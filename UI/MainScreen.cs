@@ -1,10 +1,12 @@
 ﻿using Gtk;
 using IAT;
+using NABSA;
 using Resources;
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace UI
 {
@@ -14,6 +16,8 @@ namespace UI
     class MainScreen
     {
         public Window window = null;
+
+        private Builder builder = null;
 
         private Entry inentry = null;
         private Entry outentry = null;
@@ -30,24 +34,28 @@ namespace UI
 
         private ComboBox combobox = null;
 
-        private TreeView filelist = null;
+        private VBox listbox = null;
+
+        private string path = null;
        
         public MainScreen()
         {
-            Builder builder = Tools.ReadGlade("MainMenu");
+            builder = Tools.ReadGlade("MainMenu");
 
             // Main window
             window = (Window)builder.GetObject("window");
             window.Title = "CLEM File Converter";
             window.Icon = new Gdk.Pixbuf($"{Directory.GetCurrentDirectory()}/Resources/png/Maize.png");
+            window.Destroyed += OnQuitClicked;
 
             // Entry boxes
             inentry = (Entry)builder.GetObject("inentry");
             outentry = (Entry)builder.GetObject("outentry");
 
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            inentry.Text = path + "\\IAT_Stuff\\ExampleInputs";
-            outentry.Text = path;
+            path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            outentry.Text = path + "/testnabsa";
+            path += "/IAT_Stuff/ExampleInputs";
+            inentry.Text = path;            
 
             inentry.Changed += OnInentryChanged;
 
@@ -79,13 +87,17 @@ namespace UI
             combobox.AppendText("NABSA");
             combobox.Active = 0;
 
-            // Tree views            
-            filelist = (TreeView)builder.GetObject("filelist");
-            BuildFileList(filelist);
-            AppendListItems(null, null);            
+            combobox.Changed += OnComboChanged;
 
-            builder.Dispose();
-        }        
+            // VBoxes
+            listbox = (VBox)builder.GetObject("listbox");
+            SetListItems(null, null);            
+        }
+
+        private void OnComboChanged(object sender, EventArgs e)
+        {
+            SetListItems(null, null);
+        }
 
         /// <summary>
         /// 
@@ -96,7 +108,9 @@ namespace UI
         {
             if (Directory.Exists(inentry.Text))
             {
-                AppendListItems(null, null);
+                path = inentry.Text;               
+
+                SetListItems(null, null);
             }
         }
 
@@ -107,46 +121,10 @@ namespace UI
         /// <param name="e"></param>
         private void OnAllToggled(object sender, EventArgs e)
         {
-            DialogBox box = null;
-
-            ListStore store = filelist.Model as ListStore;
-
-            if (allcheck.Active)
+            foreach (CheckButton child in listbox.AllChildren)
             {
-                foreach (var x in filelist)
-                {
-                    box = new DialogBox(x.ToString());      
-                }
+                child.Active = allcheck.Active;
             }
-            else
-            {
-                box = new DialogBox("Deactivated");
-            }
-        }
-
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filelist"></param>
-        private void BuildFileList(TreeView filelist)
-        {
-            ListStore store = new ListStore(typeof(ToggleButton), typeof(string));
-
-            CellRendererToggle toggle = new CellRendererToggle()
-            {
-                Activatable = true,
-                Sensitive = true
-            };            
-
-            TreeViewColumn checks = new TreeViewColumn("Select", toggle, "togglebutton", 0);          
-            TreeViewColumn names = new TreeViewColumn("Filenames", new CellRendererText(), "text", 1);
-
-            filelist.AppendColumn(checks);
-            filelist.AppendColumn(names);            
-
-            filelist.Model = store;
-            
         }
 
         /// <summary>
@@ -154,36 +132,31 @@ namespace UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AppendListItems(object sender, EventArgs e)
+        private void SetListItems(object sender, EventArgs e)
         {
             string pattern;
             if (combobox.ActiveText == "IAT") pattern = "*.xlsx";
             else pattern = "*.nabsa";
 
-            if (!Directory.Exists(inentry.Text))
+            // Clear existing children                
+            foreach (CheckButton child in listbox.AllChildren)
             {
-                new DialogBox("Input folder not found.");
-                return;
+                listbox.Remove(child);
             }
 
             string[] items = Directory.GetFiles(inentry.Text, pattern, SearchOption.TopDirectoryOnly);
-
-            ToggleButton toggle = new ToggleButton()
-            {
-                Sensitive = true
-            };
-
-
-            ListStore store = filelist.Model as ListStore;
-            store.Clear();
-
             foreach (string item in items)
             {
-                TreeIter iter = store.Append();
+                string label = Path.GetFileName(item);
 
-                string path = Path.GetFileName(item);                
-                filelist.Model.SetValue(iter, 0, toggle);
-                filelist.Model.SetValue(iter, 1, path);
+                CheckButton check = new CheckButton()
+                {
+                    Sensitive = true,
+                    Visible = true,
+                    Label = label
+                };
+
+                listbox.PackStart(check, false, false, 0);
             }
         }
 
@@ -194,12 +167,12 @@ namespace UI
         /// <param name="e"></param>
         private void OnAboutClicked(object sender, EventArgs e)
         {
-            var icon = new Gdk.Pixbuf("../../Resources/Maize.png");
+            var icon = new Gdk.Pixbuf($"{Directory.GetCurrentDirectory()}/Resources/png/Maize.png");
 
             AboutDialog about = new AboutDialog()
             {
                 ProgramName = "CLEM File Converter",
-                Version = "0.1",
+                Version = "1.0",
                 Copyright = "(c) CSIRO",
                 Comments = "A tool for converting IAT & NABSA files to CLEM files (run through ApsimX)",
                 Logo = icon,
@@ -231,15 +204,24 @@ namespace UI
                 }
             }
 
-            switch (combobox.ActiveText)
+            List<string> files = new List<string>();
+            foreach (CheckButton child in listbox.AllChildren)
             {
+                if (child.Active)
+                {
+                    files.Add(path + "/" + child.Label);
+                }                
+            }           
+
+            switch (combobox.ActiveText)
+            {                
                 case "IAT":
-                    string[] files = Directory.GetFiles(inentry.Text, "*.xlsx").Where(file => !file.Contains("~$")).ToArray();
                     Toolbox.OutDir = outentry.Text;
-                    Terminal.RunConverter(files, sharecheck.Active, paramcheck.Active);
+                    IAT.Terminal.RunConverter(files, sharecheck.Active, paramcheck.Active);
                     break;
 
                 case "NABSA":
+                    NABSA.Terminal.RunConverter(files);
                     break;
 
                 default:
@@ -252,8 +234,9 @@ namespace UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void OnQuitClicked(object sender, EventArgs e)
+        private void OnQuitClicked(object sender, EventArgs e)
         {
+            Detach();
             Application.Quit();
         }
 
@@ -280,11 +263,21 @@ namespace UI
             inbtn.Sensitive = false;
 
             SelectFolder selecter = new SelectFolder(inbtn, inentry);
-            selecter.selected += AppendListItems;
+            selecter.selected += SetListItems;
 
             selecter.window.ShowAll();
         }
 
-        
+        private void Detach()
+        {
+            window.Destroyed -= OnQuitClicked;
+            inentry.Changed -= OnInentryChanged;
+            aboutbtn.Clicked -= OnAboutClicked;
+            convertbtn.Clicked -= OnConvertClicked;
+            quitbtn.Clicked -= OnQuitClicked;
+            inbtn.Clicked -= OnInClicked;
+            outbtn.Clicked -= OnOutClicked;
+            allcheck.Toggled -= OnAllToggled;
+        }
     }
 }

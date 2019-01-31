@@ -89,15 +89,15 @@
         /// <summary>
         /// Runs the conversion process for the given IAT files and options
         /// </summary>
-        /// <param name="dir">Files to convert</param>
+        /// <param name="files">Files to convert</param>
         /// <param name="same_file">Shared .apsimx file option</param>
         /// <param name="same_sim">Shared simulation option</param>
-        public static void RunConverter(string[] dir, bool same_file, bool same_sim)
+        public static void RunConverter(IEnumerable<string> files, bool same_file, bool same_sim)
         {
             IAT iat = null;
             XElement apsims = new XElement("name_is_ignored");
 
-            foreach (string file in dir)
+            foreach (string file in files)
             {
                 // Load the IAT object
                 iat = PrepareIAT(file, Toolbox.OutDir);
@@ -214,12 +214,12 @@
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        private static IAT PrepareIAT(string name, string folder)
+        private static IAT PrepareIAT(string path, string folder)
         {
             // Create the object
-            IAT iat = new IAT(name);
+            IAT iat = new IAT(path);
 
             // Prepare the directory
             Directory.CreateDirectory($"{folder}/{iat.name}");

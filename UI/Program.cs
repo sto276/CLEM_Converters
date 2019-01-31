@@ -3,6 +3,7 @@ using Resources;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Resources;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,5 @@ namespace UI
             Application.Run();
         }
 
-        
     }
 }

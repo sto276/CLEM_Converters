@@ -22,15 +22,15 @@ namespace UI
         private Button selectbtn = null;
         private Button cancelbtn = null;
 
-        private Widget parent = null;
+        private Widget caller = null;
         private Entry entry = null;
 
-        public SelectFolder(Widget parent, Entry entry)
+        public SelectFolder(Widget caller, Entry entry)
         {
-            this.parent = parent;
+            this.caller = caller;
             this.entry = entry;
 
-            if ((parent == null) || (entry == null)) throw new ArgumentNullException();
+            if ((caller == null) || (entry == null)) throw new ArgumentNullException();
           
             Builder builder = Tools.ReadGlade("SelectFolder");
 
@@ -61,9 +61,10 @@ namespace UI
         private void OnSelectClicked(object sender, EventArgs e)
         {
             entry.Text = chooser.CurrentFolder;
-            selected.Invoke(this, EventArgs.Empty);
+
+            if (selected != null) selected.Invoke(this, EventArgs.Empty);
            
-            parent.Sensitive = true;
+            caller.Sensitive = true;
             window.Destroy();
         }
 
@@ -74,7 +75,7 @@ namespace UI
         /// <param name="e">Event arguments</param>
         private void OnCancelClicked(object sender, EventArgs e)
         {
-            parent.Sensitive = true;
+            caller.Sensitive = true;
             window.Destroy();            
         }
     }

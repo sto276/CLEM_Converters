@@ -1,10 +1,11 @@
 ﻿using Resources;
 using System.IO;
 using System;
+using System.Collections.Generic;
 
 namespace NABSA
 {   
-    class Terminal
+    public class Terminal
     {
         public static void Main(string[] args)
         {
@@ -29,7 +30,7 @@ namespace NABSA
                 int choice = ChooseFile(dir);
                 if (choice == 0)
                 {
-                    foreach (string iat in dir) Simulation.Create(iat);
+                    RunConverter(dir);
                     break; // Skips reset if all files are converted
                 }
                 else Simulation.Create(dir[choice - 1]);
@@ -37,6 +38,11 @@ namespace NABSA
 
             Console.ReadKey();
             return;
+        }
+
+        public static void RunConverter(IEnumerable<string> files)
+        {
+            foreach (string nabsa in files) Simulation.Create(nabsa);
         }
 
         /// <summary>
