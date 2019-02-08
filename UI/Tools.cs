@@ -19,8 +19,7 @@ namespace UI
             Builder builder = new Builder();
             
             
-            string path = $"{Directory.GetCurrentDirectory()}/Resources/glade/{name}.glade";
-
+            string path = $"{Directory.GetCurrentDirectory()}/UI/Resources/{name}.glade";
             StreamReader reader = new StreamReader(path);
 
             string glade = reader.ReadToEnd();

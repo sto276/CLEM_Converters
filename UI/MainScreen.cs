@@ -1,7 +1,6 @@
 ﻿using Gtk;
 using IAT;
 using NABSA;
-using Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +44,7 @@ namespace UI
             // Main window
             window = (Window)builder.GetObject("window");
             window.Title = "CLEM File Converter";
-            window.Icon = new Gdk.Pixbuf($"{Directory.GetCurrentDirectory()}/Resources/png/Maize.png");
+            window.Icon = new Gdk.Pixbuf($"{Directory.GetCurrentDirectory()}/UI/Resources/Maize.png");
             window.Destroyed += OnQuitClicked;
 
             // Entry boxes
@@ -167,7 +166,7 @@ namespace UI
         /// <param name="e"></param>
         private void OnAboutClicked(object sender, EventArgs e)
         {
-            var icon = new Gdk.Pixbuf($"{Directory.GetCurrentDirectory()}/Resources/png/Maize.png");
+            var icon = new Gdk.Pixbuf($"{Directory.GetCurrentDirectory()}/UI/Resources/Maize.png");
 
             AboutDialog about = new AboutDialog()
             {

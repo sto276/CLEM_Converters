@@ -1,5 +1,4 @@
-﻿using Resources;
-using System;
+﻿using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;

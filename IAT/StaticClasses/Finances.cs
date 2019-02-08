@@ -16,7 +16,7 @@
             IATable overheads = iat.tables["Overheads"];
 
             XElement finance = new XElement("Finance");
-            finance.Add(new XElement("Name", "Finances"));
+            finance.Add(new XElement("Name", "Finance"));
 
             // Find what currency is being used
             int id = Convert.ToInt32(iat.GetCellValue(iat.part, 4, 9));

@@ -1,6 +1,5 @@
 ﻿namespace IAT
 {
-    using Resources;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -18,8 +17,6 @@
 	{
         public static void Main(string[] args)
         {
-            Tools.SetProjectDirectory();
-
             Console.WriteLine("IAT to CLEM file conversion.");
             Console.WriteLine("Missing/Incorrect IAT data may produce incomplete .apsimx files.\n");
 

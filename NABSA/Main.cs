@@ -1,5 +1,4 @@
-﻿using Resources;
-using System.IO;
+﻿using System.IO;
 using System;
 using System.Collections.Generic;
 
@@ -9,8 +8,6 @@ namespace NABSA
     {
         public static void Main(string[] args)
         {
-            Tools.SetProjectDirectory();
-
             string source = "Simulations";     
 
             // Checks that the source directory exists

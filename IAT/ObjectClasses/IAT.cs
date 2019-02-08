@@ -137,7 +137,9 @@
         public string ParseCell(Cell cell)
         {
             // Access the cell contents
-            string value = cell.InnerText;
+            string value = "";
+            if (cell.CellValue != null) value = cell.CellValue.InnerText;                      
+
             if (cell.DataType != null)
             {
                 // If the CellValue is a shared string, look through the shared table for its value
