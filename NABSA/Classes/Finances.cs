@@ -1,5 +1,4 @@
-﻿using Resources;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +19,7 @@ namespace NABSA
             // Find the balance and interest
             string balance = FindFirst(nabsa, "Cash_balance").Value;
             string interest = FindFirst(nabsa, "Int_rate").Value;
-
+           
             // Write the bank data XML
             XElement bank = new XElement(
                 "FinanceType",

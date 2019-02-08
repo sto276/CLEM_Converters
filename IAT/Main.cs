@@ -95,7 +95,7 @@
         public static void RunConverter(IEnumerable<string> files, bool same_file, bool same_sim)
         {
             IAT iat = null;
-            XElement apsims = new XElement("name_is_ignored");
+            XElement simulations = new XElement("name_is_ignored");
 
             foreach (string file in files)
             {
@@ -120,12 +120,12 @@
 
                 // Sanitise the simulation name
                 string xname = Toolbox.SanitiseXName(iat.name);
-                XElement sims = new XElement(xname);
+                XElement simulation = new XElement(xname);
 
                 // Add one simulation containing a CLEM model per sheet
                 if (same_sim)
                 {
-                    sims.Add(Simulation.GetSimulation(iat, clems));
+                    simulation.Add(Simulation.GetSimulation(iat, clems));
                 }
                 // Add one simulation per sheet, containing a CLEM model each
                 else
@@ -135,75 +135,57 @@
                         // Note: GetSimulation acts on the child elements,
                         // so we set up an element with the child we want to pass
                         XElement temp = new XElement("name_is_ignored", clem);
-                        sims.Add(Simulation.GetSimulation(iat, temp));
+                        simulation.Add(Simulation.GetSimulation(iat, temp));
                     }
                 }
 
                 // Each element in this object is a collection of all the simulations 
                 // generated from a single IAT file
-                apsims.Add(sims);
+                simulations.Add(simulation);
 
                 Toolbox.CloseErrorLog();                
             }
 
             if (same_file)
             {
-                WriteSingle(apsims);
+                WriteApsimx(simulations, "Simulations", "All_sims");
             }
             else
             {
-                WriteMultiple(apsims);
+                WriteApsimxs(simulations);
             }
         }
 
-        public static void WriteSingle(XElement apsims)
-        {
-            string path = "Simulations";
-            string name = "All_Sims";
-
-            // Create a new object which has every simulation as sibling elements
-            XElement all = new XElement("this_name_is_ignored");
-            foreach (var apsim in apsims.Elements())
-            {
-                all.Add(apsim.Elements());
-            }
-
-            WriteApsimx(all, path, name);
-        }
-
-        public static void WriteMultiple(XElement apsims)
+        /// <summary>
+        /// Write all the simulations to individual .apsimx files
+        /// </summary>
+        /// <param name="simulations"></param>
+        public static void WriteApsimxs(XElement simulations)
         {
             string path = "";
             string name = "";
 
             // Create a separate file for each simulation
-            foreach (var apsim in apsims.Elements())
+            foreach (var simulation in simulations.Elements())
             {
                 // Refers directly to the location of the file name in the XML
-                path = apsim.Elements().First().Elements().First().Value;
-
-                //
-                foreach (var sim in apsim.Elements())
-                {
-                    var zone = sim.Descendants("ZoneCLEM").First();
-                    name = zone.Descendants("Name").First().Value;
-
-                    WriteApsimx(sim, path, name);
-                }
+                path = simulation.Elements().First().Elements().First().Value;
+                name = simulation.Descendants("Name").First().Value;
+                WriteApsimx(simulation, path, name);                
             }
         }
 
         /// <summary>
         /// Creates an .apsimx file using the given simulations
         /// </summary>
-        /// <param name="sims">The simulations in the file</param>
+        /// <param name="simulations">The simulations in the file</param>
         /// <param name="path">The path to the file</param>
         /// <param name="name">The name of the .apsimx file</param>
-        private static void WriteApsimx(XElement sims, string path, string name)
+        private static void WriteApsimx(XElement simulations, string path, string name)
         {
             XmlTextWriter xtw = null;
 
-            var apsimx = Simulation.GetApsimx(sims);
+            var apsimx = Simulation.GetApsimx(simulations);
             xtw = Toolbox.MakeApsimX(path, name);
 
             apsimx.WriteTo(xtw);

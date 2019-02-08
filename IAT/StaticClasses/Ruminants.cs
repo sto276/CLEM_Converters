@@ -49,7 +49,7 @@ namespace IAT
                 memo.Add(new XElement("Name", "Memo"));
                 memo.Add(new XElement("IncludeInDocumentation", "true"));
                 memo.Add(new XElement("MemoText", new XCData(cdata.ToString())));
-                type.Add(memo);
+                //type.Add(memo);
 
                 // Write the Initial Cohorts section
                 XElement cohorts = new XElement("RuminantInitialCohorts");

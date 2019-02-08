@@ -1,9 +1,9 @@
-﻿namespace Resources
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 
+namespace NABSA
+{   
     /// <summary>
     /// A collection of methods for searching
     /// through an XElement object

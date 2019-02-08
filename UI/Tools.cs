@@ -1,15 +1,14 @@
 ﻿using Gtk;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Resources
+namespace UI
 {
-    public static class Tools
+    class Tools
     {
         /// <summary>
         /// Creates a builder from a glade file
@@ -18,10 +17,12 @@ namespace Resources
         public static Builder ReadGlade(string name)
         {
             Builder builder = new Builder();
-
+            
+            
             string path = $"{Directory.GetCurrentDirectory()}/Resources/glade/{name}.glade";
 
             StreamReader reader = new StreamReader(path);
+
             string glade = reader.ReadToEnd();
 
             builder.AddFromString(glade);
@@ -51,11 +52,11 @@ namespace Resources
         {
             string location = Directory.GetCurrentDirectory();
 
-            while(!File.Exists("CLEM_Converters.sln"))
+            while (!File.Exists("CLEM_Converters.sln"))
             {
                 location = Directory.GetParent(location).FullName;
                 Directory.SetCurrentDirectory(location);
-            }            
+            }
         }
     }
 }
