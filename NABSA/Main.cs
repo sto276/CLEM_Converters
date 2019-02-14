@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NABSA
 {   
-    public class Terminal
+    public class Converter
     {
         public static void Main(string[] args)
         {
@@ -27,7 +27,7 @@ namespace NABSA
                 int choice = ChooseFile(dir);
                 if (choice == 0)
                 {
-                    RunConverter(dir);
+                    Run(dir);
                     break; // Skips reset if all files are converted
                 }
                 else Simulation.Create(dir[choice - 1]);
@@ -37,7 +37,7 @@ namespace NABSA
             return;
         }
 
-        public static void RunConverter(IEnumerable<string> files)
+        public static void Run(IEnumerable<string> files)
         {
             foreach (string nabsa in files) Simulation.Create(nabsa);
         }

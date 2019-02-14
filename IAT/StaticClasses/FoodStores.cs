@@ -201,7 +201,7 @@
         /// <param name="iat">Source IAT</param>
         public static void GetGrownFodderPools(IAT iat)
         {
-            WorksheetPart crop = (WorksheetPart)iat.book.GetPartById(iat.FindSheet("crop_inputs").Id);
+            WorksheetPart crop = (WorksheetPart)iat.book.GetPartById(iat.SearchSheets("crop_inputs").Id);
 
             IATable gcg = iat.tables["Grain Crops Grown"];
             IATable gcs = iat.tables["Grain Crop Specifications"];

@@ -114,6 +114,13 @@
         public Sheet FindSheet(string name)
         {
             return book.Workbook.Descendants<Sheet>().
+                Where(s => s.Name.ToString() == name).
+                FirstOrDefault();
+        }
+
+        public Sheet SearchSheets(string name)
+        {
+            return book.Workbook.Descendants<Sheet>().
                 Where(s => s.Name.ToString().ToLower().Contains(name.ToLower())).
                 FirstOrDefault();
         }
@@ -126,6 +133,7 @@
         {
             // This assumes a valid IAT is provided as input and will break otherwise (need to fix)
             sheet = FindSheet(name);
+            if (sheet == null) sheet = SearchSheets(name);
             part = (WorksheetPart)book.GetPartById(sheet.Id);
             return;
         }
@@ -139,7 +147,7 @@
             // Access the cell contents
             string value = "";
             if (cell.CellValue != null) value = cell.CellValue.InnerText;                      
-
+            
             if (cell.DataType != null)
             {
                 // If the CellValue is a shared string, look through the shared table for its value

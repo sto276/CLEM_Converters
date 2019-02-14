@@ -1,8 +1,9 @@
-﻿namespace IAT
-{
-    using System;
-    using System.Xml.Linq;
+﻿using System;
+using System.Xml.Linq;
+using System.Collections.Generic;
 
+namespace IAT
+{   
     /// <summary>
     /// Methods for building the structure of a CLEM simulation
     /// </summary>
@@ -35,15 +36,14 @@
         /// Gets the XML representation of a single simulation
         /// </summary>
         /// <param name="iat"></param>
-        public static XElement GetSimulation(IAT iat, XElement clems)
+        public static XElement GetSimulation(IAT iat, XElement clem)
         {
             XElement simulation = new XElement(
                 "Simulation",
-                new XElement("Name", iat.name.Replace("_", "")),
+                new XElement("Name", iat.sheet.Name),
                 GetClock(iat),
-                GetSummary(),
-                GetFiles(iat).Elements(),
-                clems.Elements(),
+                GetSummary(),                
+                clem,
                 new XElement("IncludeInDocumentation", "true")
             );
 
@@ -55,22 +55,25 @@
         /// </summary>
         /// <param name="iat"></param>
         /// <returns>XML structure of a CLEM simulation</returns>
-        public static XElement GetCLEM(IAT iat, string name)
-        {
+        public static XElement GetCLEM(IAT iat, XElement prns)
+        {            
             XElement resources = iat.GetResources();
             XElement activities = iat.GetActivities();
             XElement reports = Reports.GetReports(resources);
 
-            XElement clem = new XElement("ZoneCLEM");
-            clem.Add(new XElement("Name", name));
-            clem.Add(resources);
-            clem.Add(activities);
-            clem.Add(reports);
-            clem.Add(new XElement("IncludeInDocumentation", "true"));
-            clem.Add(new XElement("Area", "1"));
-            clem.Add(new XElement("Slope", "0"));
-            clem.Add(new XElement("ClimateRegion", "0"));
-            clem.Add(new XElement("EcologicalIndicatorsCalculationMonth", "12"));
+            XElement clem = new XElement(
+                "ZoneCLEM",
+                new XElement("Name", "CLEM"),
+                prns.Elements(),
+                resources,
+                activities,
+                reports,
+                new XElement("IncludeInDocumentation", "true"),
+                new XElement("Area", "1"),
+                new XElement("Slope", "0"),
+                new XElement("ClimateRegion", "0"),
+                new XElement("EcologicalIndicatorsCalculationMonth", "12")
+            );
 
             return clem;
         }
@@ -127,27 +130,27 @@
         /// </summary>
         /// <param name="iat">Source IAT</param>
         /// <returns>Array of prn file XML structures</returns>
-        private static XElement GetFiles(IAT iat)
+        public static XElement GetFiles(IAT iat, string path)
         {
             XElement files = new XElement("Files");
 
-            XElement crop = new XElement("FileCrop");
-            crop.Add(new XElement("Name", "FileCrop"));
-            crop.Add(new XElement("IncludeInDocumentation", "true"));
-            crop.Add(new XElement("FileName", $"{iat.name}_FileCrop.prn"));
-            files.Add(crop);
+            List<string> items = new List<string>()
+            {
+                "FileCrop",
+                "FileCropResidue",
+                "FileForage"
+            };
 
-            XElement residue = new XElement("FileCrop");
-            residue.Add(new XElement("Name", "FileCropResidue"));
-            residue.Add(new XElement("IncludeInDocumentation", "true"));
-            residue.Add(new XElement("FileName", $"{iat.name}_FileCropResidue.prn"));
-            files.Add(residue);
-
-            XElement forage = new XElement("FileCrop");
-            forage.Add(new XElement("Name", "FileForage"));
-            forage.Add(new XElement("IncludeInDocumentation", "true"));
-            forage.Add(new XElement("FileName", $"{iat.name}_FileForage.prn"));
-            files.Add(forage);
+            foreach(string item in items)
+            {
+                XElement file = new XElement(
+                    "FileCrop",
+                    new XElement("Name", item),
+                    new XElement("IncludeInDocumentation", "true"),
+                    new XElement("FileName", $"{path}\\{iat.name}_{item}.prn")                    
+                    );
+                files.Add(file);
+            }
 
             return files;
         }

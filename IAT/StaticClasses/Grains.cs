@@ -32,7 +32,7 @@ namespace IAT
             foreach (int id in iat.grains)
             {
                 // Find the name of the crop in the file
-                Sheet sheet = iat.FindSheet("crop_inputs");
+                Sheet sheet = iat.SearchSheets("crop_inputs");
                 WorksheetPart inputs = (WorksheetPart)iat.book.GetPartById(sheet.Id);
                 string inputname = "Unknown";
                 int row = 1;
@@ -139,7 +139,7 @@ namespace IAT
                 StreamWriter swriter = new StreamWriter(stream);
 
                 // Find the data set
-                WorksheetPart crop = (WorksheetPart)iat.book.GetPartById(iat.FindSheet("crop_inputs").Id);              
+                WorksheetPart crop = (WorksheetPart)iat.book.GetPartById(iat.SearchSheets("crop_inputs").Id);              
                 var rows = crop.Worksheet.Descendants<Row>().Skip(1);                
 
                 // Write file header to output stream
@@ -185,7 +185,7 @@ namespace IAT
             {
                 FileStream stream = new FileStream($"{Toolbox.OutDir}/{iat.name}/{iat.name}_FileCropResidue.prn", FileMode.Create);
                 StreamWriter swriter = new StreamWriter(stream);
-                WorksheetPart residue = (WorksheetPart)iat.book.GetPartById(iat.FindSheet("crop_inputs").Id);
+                WorksheetPart residue = (WorksheetPart)iat.book.GetPartById(iat.SearchSheets("crop_inputs").Id);
 
                 // Add header to document
                 swriter.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}Npct");

@@ -39,16 +39,16 @@ namespace IAT
         /// <summary>
         /// Creates and formats the xml document (.apsimx) for a simulation.
         /// </summary>
-        /// <param name="subdir">The sub-directory containing all simulations produced from an IAT file</param>
-        /// <param name="folder">The name of the .apsimx file</param>
+        /// <param name="folder">The sub-directory containing all simulations produced from an IAT file</param>
+        /// <param name="name">The name of the .apsimx file</param>
         /// <returns>The XmlTextWriter that the .apsimx is written to</returns>
         public static XmlTextWriter MakeApsimX(string folder, string name)
         {
             // Ensure the file has a location to be saved
-            Directory.CreateDirectory($"{OutDir}/{folder}");
+            Directory.CreateDirectory($"{OutDir}\\{folder}");
 
             // Create the .apsimx file in the directory
-            FileStream fs = new FileStream($"{OutDir}/{folder}/{name}.apsimx", FileMode.Create);
+            FileStream fs = new FileStream($"{OutDir}\\{folder}\\{name}.apsimx", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
 
             // Format the document
@@ -83,7 +83,7 @@ namespace IAT
             error_count++;
             error_sw.WriteLine($"Error {error_count}:");
             error_sw.WriteLine("\t" + msg);
-            error_sw.WriteLine($"\tin {iat.name}: {iat.sheet.Name}");
+            error_sw.WriteLine($"\tin {iat.name}: {iat.sheet.Name}\n");
             return;
         }
 

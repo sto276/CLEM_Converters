@@ -144,7 +144,7 @@ namespace IAT
             {
                 FileStream stream = new FileStream($"{Toolbox.OutDir}/{iat.name}/{iat.name}_FileForage.prn", FileMode.Create);
                 StreamWriter swriter = new StreamWriter(stream);
-                WorksheetPart forage = (WorksheetPart)iat.book.GetPartById(iat.FindSheet("forage_inputs").Id);
+                WorksheetPart forage = (WorksheetPart)iat.book.GetPartById(iat.SearchSheets("forage_inputs").Id);
                 
                 // Add header to document
                 swriter.WriteLine($"{"SoilNum",-36}{"CropName",-36}{"YEAR",-36}{"Month",-36}{"AmtKg",-36}Npct");
@@ -167,7 +167,7 @@ namespace IAT
 
                     // Write row to file
                     if (AmtKg == "") AmtKg = "0";
-                    swriter.WriteLine($"{SoilNum,-36}{ForageName,-36}{YEAR,-36}{Month,-36}{AmtKg + ".00",-36}{Npct}");
+                    swriter.WriteLine($"{SoilNum,-36}{ForageName,-36}{YEAR,-36}{Month,-36}{AmtKg,-36}{Npct}");
                 }
 
                 swriter.Close();

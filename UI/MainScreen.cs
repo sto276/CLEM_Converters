@@ -28,8 +28,8 @@ namespace UI
         private Button outbtn = null;
 
         private CheckButton allcheck = null;
-        private CheckButton sharecheck = null;
-        private CheckButton paramcheck = null;
+        private CheckButton joincheck = null;
+        private CheckButton splitcheck = null;
 
         private ComboBox combobox = null;
 
@@ -52,8 +52,8 @@ namespace UI
             outentry = (Entry)builder.GetObject("outentry");
 
             path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            outentry.Text = path + "/testnabsa";
-            path += "/IAT_Stuff/ExampleInputs";
+            outentry.Text = path + "\\IAT_Stuff\\ExampleOutputs";
+            path += "\\IAT_Stuff\\ExampleInputs";
             inentry.Text = path;            
 
             inentry.Changed += OnInentryChanged;
@@ -74,10 +74,11 @@ namespace UI
 
             // Check buttons
             allcheck = (CheckButton)builder.GetObject("allcheck");
-            sharecheck = (CheckButton)builder.GetObject("sharecheck");
-            paramcheck = (CheckButton)builder.GetObject("paramcheck");
+            joincheck = (CheckButton)builder.GetObject("joincheck");
+            splitcheck = (CheckButton)builder.GetObject("splitcheck");
 
             allcheck.Toggled += OnAllToggled;
+            joincheck.Toggled += OnJoinToggled;
 
             // Combo boxes
             combobox = (ComboBox)builder.GetObject("combobox");
@@ -91,6 +92,20 @@ namespace UI
             // VBoxes
             listbox = (VBox)builder.GetObject("listbox");
             SetListItems(null, null);            
+        }
+
+        private void OnJoinToggled(object sender, EventArgs e)
+        {
+            if (joincheck.Active)
+            {
+                splitcheck.Active = false;
+                splitcheck.Sensitive = false;
+            }
+            else
+            {
+                splitcheck.Sensitive = true;
+            }
+                
         }
 
         private void OnComboChanged(object sender, EventArgs e)
@@ -216,11 +231,11 @@ namespace UI
             {                
                 case "IAT":
                     Toolbox.OutDir = outentry.Text;
-                    IAT.Terminal.RunConverter(files, sharecheck.Active, paramcheck.Active);
+                    IAT.Converter.Run(files, joincheck.Active, splitcheck.Active);
                     break;
 
                 case "NABSA":
-                    NABSA.Terminal.RunConverter(files);
+                    NABSA.Converter.Run(files);
                     break;
 
                 default:
