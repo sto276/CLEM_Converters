@@ -68,11 +68,12 @@ namespace IAT
                 resources,
                 activities,
                 reports,
-                new XElement("IncludeInDocumentation", "true"),
+                new XElement("RandomSeed", "1"),
                 new XElement("Area", "1"),
                 new XElement("Slope", "0"),
-                new XElement("ClimateRegion", "0"),
-                new XElement("EcologicalIndicatorsCalculationMonth", "12")
+                new XElement("ClimateRegion", iat.climate),
+                new XElement("EcologicalIndicatorsCalculationMonth", "12"),
+                new XElement("IncludeInDocumentation", "true")
             );
 
             return clem;

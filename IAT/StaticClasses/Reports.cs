@@ -18,12 +18,12 @@ namespace IAT
 
             XElement reports = new XElement
             (
-                "Folder",
-                new XElement("Name", "Reports"),                      
-                GetLedgers(input),
-                //GetBalances(),
+                "CLEMFolder",
+                new XElement("Name", "Reports"),
+                GetBalances(),
                 GetPerformed(),
-                GetShortfalls()
+                GetShortfalls(),
+                GetLedgers(input)
             );
 
             return reports;
@@ -88,7 +88,7 @@ namespace IAT
             balances.Add(new XElement("ExperimentFactorValues"));
 
             XElement variables = new XElement("VariableNames");
-            variables.Add(new XElement("string", "[Clock].Today as Date"));
+            variables.Add(new XElement("string", "[Clock].Today"));
             variables.Add(new XElement("string", "AnimalFoodStore"));
             balances.Add(variables);
 
