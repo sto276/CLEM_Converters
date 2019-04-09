@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Activities
 {
+    class ActivityNode : Node
+    {
+        public object SelectedTab { get; set; } = null;
+
+        public int OnPartialResourcesAvailableAction { get; set; } = 0;
+
+        public ActivityNode(Node parent) : base(parent)
+        {
+
+        }
+    }
+
     class ActivitiesHolder : Node
     {
         public string LastShortfallResourceRequest { get; set; }
@@ -15,6 +27,14 @@ namespace Models.CLEM.Activities
         public ActivitiesHolder(ZoneCLEM parent) : base(parent)
         {
             Name = "Activities";
+        }
+    }
+
+    class ActivitiesFolder : ActivityNode
+    {
+        public ActivitiesFolder(ActivityNode parent) : base(parent)
+        {
+
         }
     }
 }

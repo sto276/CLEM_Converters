@@ -17,4 +17,20 @@ namespace Models.CLEM.Resources
             Name = "Land";
         }
     }
+
+    class LandType : Node
+    {
+        public double LandArea { get; set; }
+
+        public double PortionBuildings { get; set; }
+
+        public double ProportionOfTotalArea { get; set; }
+
+        public int SoilType { get; set; }
+
+        public LandType(Land parent) : base(parent)
+        {
+
+        }
+    }
 }

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace Models.CLEM.Resources
 {
     class ResourcesHolder : Node
-    {
+    {      
         public ResourcesHolder(ZoneCLEM parent) : base(parent)
         {
             Name = "Resources";
         }
-    }
+    }    
 }

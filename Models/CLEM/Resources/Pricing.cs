@@ -19,4 +19,13 @@ namespace Models.CLEM.Resources
             Name = "Pricing";
         }
     }
+
+    class AnimalPricing : Node
+    {
+        public AnimalPricing(Node parent) : base(parent)
+        {
+            Name = "AnimalPricing";
+        }
+    }
+    
 }

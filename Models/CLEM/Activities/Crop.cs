@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Activities
 {
-    class CropActivityManageCrop : Node
+    class CropActivityManageCrop : ActivityNode
     {
         public string LandItemNameToUse { get; set; }
 
@@ -14,15 +14,13 @@ namespace Models.CLEM.Activities
 
         public bool UseAreaAvailable { get; set; } = false;
 
-        public int OnPartialResourcesAvailableAction { get; set; }
-
         public CropActivityManageCrop(ActivitiesHolder parent) : base(parent)
         {
 
         }
     }
 
-    class CropActivityManageProduct : Node
+    class CropActivityManageProduct : ActivityNode
     {
         public string ModelNameFileCrop { get; set; }
 
@@ -36,31 +34,27 @@ namespace Models.CLEM.Activities
 
         public double UnitsToHaConverter { get; set; }
 
-        public int OnPartialResourcesAvailableAction { get; set; }
-
         public CropActivityManageProduct(CropActivityManageCrop parent) : base(parent)
         {
 
         }
     }
 
-    class CropActivityManageTask : Node
+    class CropActivityManageTask : ActivityNode
     {
-        public int OnPartialResourcesAvailableAction { get; set; }
-
         public CropActivityManageTask(CropActivityManageProduct parent) : base(parent)
         {
 
         }
     }
 
-    class ActivityTimerCropHarvest : Node
+    class ActivityTimerCropHarvest : ActivityNode
     {
         public int OffsetMonthHarvestStart { get; set; }
 
         public int OffsetMonthHarvestStopo { get; set; }
 
-        public ActivityTimerCropHarvest(Node parent) : base(parent)
+        public ActivityTimerCropHarvest(ActivityNode parent) : base(parent)
         {
 
         }
