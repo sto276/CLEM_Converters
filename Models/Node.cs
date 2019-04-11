@@ -20,8 +20,13 @@ namespace Models
 
         public bool ReadOnly { get; set; } = false;
 
+        private readonly bool root;
+
         public Node(Node parent)
         {
+            if (parent == null) root = true;
+            else root = false;
+
             Parent = parent;
 
             Parent.Children.Add(this);

@@ -41,14 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLEM\Activities\ActivitiesHolder.cs" />
+    <Compile Include="CLEM\Activities\Activities.cs" />
     <Compile Include="CLEM\Activities\Crop.cs" />
+    <Compile Include="CLEM\Activities\Finances.cs" />
     <Compile Include="CLEM\Activities\Labour.cs" />
     <Compile Include="CLEM\Activities\ResourceActivitySell.cs" />
-    <Compile Include="CLEM\FileCrop.cs" />
-    <Compile Include="CLEM\Groupings\AnimalPriceGroup.cs" />
-    <Compile Include="CLEM\Groupings\LabourFilter.cs" />
-    <Compile Include="CLEM\Groupings\LabourFilterGroup.cs" />
+    <Compile Include="CLEM\Activities\Ruminants.cs" />
+    <Compile Include="CLEM\Groupings\Pricing.cs" />
+    <Compile Include="CLEM\Groupings\Labour.cs" />
+    <Compile Include="CLEM\Reporting\Reports.cs" />
     <Compile Include="CLEM\Resources\Finances.cs" />
     <Compile Include="CLEM\Resources\Labour.cs" />
     <Compile Include="CLEM\Resources\Land.cs" />
@@ -56,7 +57,7 @@
     <Compile Include="CLEM\Resources\Pricing.cs" />
     <Compile Include="CLEM\Resources\ResourcesHolder.cs" />
     <Compile Include="CLEM\Resources\Ruminants.cs" />
-    <Compile Include="CLEM\ZoneCLEM.cs" />
+    <Compile Include="CLEM\CLEM.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="Core\Folder.cs" />
     <Compile Include="Core\Simulations.cs" />

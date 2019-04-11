@@ -37,4 +37,16 @@ namespace Models.CLEM.Activities
 
         }
     }
+
+    class ActivityTimerInterval : Node
+    {
+        public int Interval { get; set; } = 12;
+
+        public int MonthDue { get; set; } = 12;
+
+        public ActivityTimerInterval(Node parent) : base(parent)
+        {
+
+        }
+    }
 }
