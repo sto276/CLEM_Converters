@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM
+﻿namespace Models.CLEM
 {
-    class ZoneCLEM : Node
+    using Resources;
+    using Activities;
+    public class ZoneCLEM : Node
     {
         public int RandomSeed { get; set; } = 1;
 
@@ -20,11 +16,46 @@ namespace Models.CLEM
 
         public ZoneCLEM(Node parent) : base(parent)
         {
+            AddFiles();
+            new ResourcesHolder(this);
+            new ActivitiesHolder(this);
+            AddReports();            
+        }
 
+        private void AddFiles()
+        {           
+            // Add the crop
+            new FileCrop(this)
+            {
+                FileName = Source.Name + "_FileCrop.prn",
+                Name = "FileCrop"
+            };
+
+            // Add the crop residue
+            new FileCrop(this)
+            {
+                FileName = Source.Name + "_FileCropResidue.prn",
+                Name = "FileCropResidue"
+            };
+
+            // Add the forage crop
+            new FileCrop(this)
+            {
+                FileName = Source.Name + "_FileForage.prn",
+                Name = "FileForage"
+            };
+        }
+
+        private void AddReports()
+        {
+            new CLEMFolder(this)
+            {
+
+            };
         }
     }
 
-    class CLEMFolder : Node
+    public class CLEMFolder : Node
     {
         public bool ShowPageOfGraphs { get; set; } = true;
 
@@ -34,7 +65,7 @@ namespace Models.CLEM
         }
     }
 
-    class FileCrop : Node
+    public class FileCrop : Node
     {
         public string FileName { get; set; }
 
@@ -46,7 +77,7 @@ namespace Models.CLEM
         }
     }
 
-    class SummariseRuminantHerd : Node
+    public class SummariseRuminantHerd : Node
     {
         public SummariseRuminantHerd(Node parent) : base(parent)
         {
@@ -54,7 +85,7 @@ namespace Models.CLEM
         }
     }
 
-    class ReportRuminantHerd : Node
+    public class ReportRuminantHerd : Node
     {
         public ReportRuminantHerd(Node parent) : base(parent)
         {

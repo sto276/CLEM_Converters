@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Activities
 {
-    class ActivityNode : Node
+    public class ActivityNode : Node
     {
         public object SelectedTab { get; set; } = null;
 
@@ -18,7 +18,7 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class ActivitiesHolder : Node
+    public class ActivitiesHolder : Node
     {
         public string LastShortfallResourceRequest { get; set; }
 
@@ -30,7 +30,7 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class ActivitiesFolder : ActivityNode
+    public class ActivitiesFolder : ActivityNode
     {
         public ActivitiesFolder(ActivityNode parent) : base(parent)
         {
@@ -38,7 +38,7 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class ActivityTimerInterval : Node
+    public class ActivityTimerInterval : Node
     {
         public int Interval { get; set; } = 12;
 

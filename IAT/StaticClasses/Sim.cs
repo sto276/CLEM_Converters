@@ -7,7 +7,7 @@ namespace IAT
     /// <summary>
     /// Methods for building the structure of a CLEM simulation
     /// </summary>
-    class Simulation
+    class Sim
     {
         /// <summary>
         /// Gets the XML representation of an .apsimx

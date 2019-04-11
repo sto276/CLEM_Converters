@@ -55,17 +55,26 @@
     <Compile Include="CLEM\Resources\Land.cs" />
     <Compile Include="CLEM\Resources\Stores.cs" />
     <Compile Include="CLEM\Resources\Pricing.cs" />
-    <Compile Include="CLEM\Resources\ResourcesHolder.cs" />
+    <Compile Include="CLEM\Resources\Resources.cs" />
     <Compile Include="CLEM\Resources\Ruminants.cs" />
     <Compile Include="CLEM\CLEM.cs" />
-    <Compile Include="Clock.cs" />
-    <Compile Include="Core\Folder.cs" />
-    <Compile Include="Core\Simulations.cs" />
-    <Compile Include="Memo.cs" />
+    <Compile Include="Core\Core.cs" />
+    <Compile Include="Interface\Properties.cs" />
+    <Compile Include="Interface\Resources.cs" />
+    <Compile Include="Models.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\DataStore.cs" />
-    <Compile Include="Summary.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IAT\IAT.csproj">
+      <Project>{f9922b4d-528f-458a-bbe4-f3d5a119986c}</Project>
+      <Name>IAT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NABSA\NABSA.csproj">
+      <Project>{0b652940-5b0b-4de6-977e-8da40bef745b}</Project>
+      <Name>NABSA</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

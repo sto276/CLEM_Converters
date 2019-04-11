@@ -33,4 +33,9 @@ namespace Models.CLEM.Resources
 
         }
     }
+
+    public struct LandData
+    {
+
+    }
 }

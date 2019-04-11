@@ -15,76 +15,6 @@
     /// </summary>
     public static class Converter 
 	{
-  //      public static void Main(string[] args)
-  //      {
-  //          Console.WriteLine("IAT to CLEM file conversion.");
-  //          Console.WriteLine("Missing/Incorrect IAT data may produce incomplete .apsimx files.\n");
-
-  //          ManageDirectories();
-
-  //          // Obtain all .xlsx files in the given directory, ignoring temporary files that might exist
-  //          // .xlsx files in the input directory are assumed to be IAT files
-  //          string[] dir = Directory.GetFiles(Toolbox.InDir, "*.xlsx").Where(file => !file.Contains("~$")).ToArray();
-
-  //          // Check that files exist to convert
-  //          if (dir.Length == 0)
-  //          {
-  //              Console.WriteLine("No files found in input directory.");
-  //              return;
-  //          }
-
-  //          Start(dir);
-  //      }
-
-  //      /// <summary>
-  //      /// Entry point of the program
-  //      /// </summary>
-  //      /// <param name="args"></param>
-  //      public static void Start(string[] dir)
-		//{                      
-  //          // This loops until the user opts out (given a choice to do so each iteration)
-  //          do
-  //          {
-  //              // Choose a file/s to convert
-  //              int choice = PickFile(dir);
-                
-  //              // Write one or all simulations based on user choice
-  //              if (choice == 0)
-  //              {
-  //                  bool join = YesNo("save all the simulations to the same .apsimx file");
-  //                  bool split = false;
-
-  //                  if (!join) split = YesNo("save parameter sheets to separate .apsimx files");
-                    
-  //                  RunConverter(dir, join, split);                   
-                    
-  //                  // If every file is converted, don't have to ask the user if more files need converting
-  //                  break;
-  //              }
-  //              else
-  //              {
-  //                  bool same_sim = YesNo("place separate parameter sets into the same simulation");
-
-  //                  // Prepare a single IAT, giving the user the option to choose which parameter sheets
-  //                  IAT iat = PrepareIAT(dir[choice - 1], Toolbox.OutDir);
-
-  //                  List<string> sheets = new List<string>();
-  //                  foreach (Sheet sheet in iat.book.Workbook.Sheets)
-  //                  {
-  //                      string name = sheet.Name.ToString();
-  //                      if (name.ToLower().Contains("param")) sheets.Add(name);
-  //                  }
-
-  //                  WriteSim(iat, sheets, true);
-  //              }
-  //          }
-  //          while (YesNo("attempt another conversion"));
-            
-  //          // Wait for user input before closing window
-  //          Console.ReadKey();
-  //          return;
-  //      }
-
         /// <summary>
         /// Runs the conversion process for the given IAT files and options
         /// </summary>
@@ -120,14 +50,14 @@
                     // Prepare the PRN files
                     string path = iat.name;
                     if (split) path = "";
-                    XElement prns = Simulation.GetFiles(iat, path);
+                    XElement prns = Sim.GetFiles(iat, path);
 
                     // Generate the CLEM model from the parameter sheet
                     iat.SetSheet(name);                    
-                    XElement clem = Simulation.GetCLEM(iat, prns);
+                    XElement clem = Sim.GetCLEM(iat, prns);
 
                     // Wrap the CLEM model in a simulation
-                    XElement simulation = Simulation.GetSimulation(iat, clem);
+                    XElement simulation = Sim.GetSimulation(iat, clem);
 
                     // Write the resulting simulation to its own .apsimx file
                     if (split) WriteApsimx(simulation, iat.name, name);
@@ -170,7 +100,7 @@
         {
             XmlTextWriter xtw = null;
 
-            var apsimx = Simulation.GetApsimx(simulations);
+            var apsimx = Sim.GetApsimx(simulations);
             xtw = Toolbox.MakeApsimX(path, name);
 
             apsimx.WriteTo(xtw);

@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Resources
 {
-    class ResourcesHolder : Node
+    public class ResourcesHolder : Node
     {      
         public ResourcesHolder(ZoneCLEM parent) : base(parent)
         {
             Name = "Resources";
+
+            new Land(this);
+            new Labour(this);
+            new RuminantHerd(this);
+            new Finance(this);
+            new AnimalFoodStore(this);
+            new GrazeFoodStore(this);
+            new ProductStore(this);
         }
     }    
 }

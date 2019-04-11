@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Models.Storage
 {
-    class DataStore
+    public class DataStore : Node
     {
+        public DataStore(Node parent) : base(parent)
+        {
+            Name = "DataStore";
+        }
     }
 }

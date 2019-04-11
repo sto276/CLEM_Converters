@@ -20,16 +20,21 @@ namespace Models
 
         public bool ReadOnly { get; set; } = false;
 
+        public IApsimX Source { get; set; }
+
         private readonly bool root;
 
         public Node(Node parent)
         {
             if (parent == null) root = true;
-            else root = false;
-
+            else
+            {
+                root = false;
+                Source = parent.Source;
+            }
             Parent = parent;
 
             Parent.Children.Add(this);
-        }
+        }        
     }
 }
