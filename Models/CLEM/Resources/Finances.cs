@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Resources
 {
-    class Finance : Node
+    public class Finance : Node
     {
         public string CurrencyName { get; set; }
 
         public Finance(ResourcesHolder parent) : base(parent)
         {
             Name = "Finance";
+            new FinanceType(this);
         }
     }
 
-    class FinanceType : Node
+    public class FinanceType : Node
     {
         public double OpeningBalance { get; set; }
 
@@ -32,7 +33,7 @@ namespace Models.CLEM.Resources
 
         public FinanceType(Finance parent) : base(parent)
         {
-
+            Source.SetFinanceData(this);
         }
     }
 }

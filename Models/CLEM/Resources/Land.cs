@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Resources
 {
-    class Land : Node
+    public class Land : Node
     {
         public string UnitsOfArea { get; set; } = "hectares";
 
@@ -15,10 +15,11 @@ namespace Models.CLEM.Resources
         public Land(ResourcesHolder parent) : base(parent)
         {
             Name = "Land";
+            Source.GetLandTypes(this);           
         }
     }
 
-    class LandType : Node
+    public class LandType : Node
     {
         public double LandArea { get; set; }
 
@@ -34,8 +35,4 @@ namespace Models.CLEM.Resources
         }
     }
 
-    public struct LandData
-    {
-
-    }
 }

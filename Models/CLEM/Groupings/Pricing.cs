@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Groupings
 {
-    class AnimalPriceGroup : Node
+    public class AnimalPriceGroup : Node
     {
         public int PricingStyle { get; set; }
 

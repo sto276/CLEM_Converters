@@ -1,7 +1,10 @@
-﻿namespace Models.CLEM
+﻿using System.Collections.Generic;
+
+namespace Models.CLEM
 {
     using Resources;
     using Activities;
+    using Reporting;
     public class ZoneCLEM : Node
     {
         public int RandomSeed { get; set; } = 1;
@@ -14,11 +17,15 @@
 
         public double Slope { get; set; } = 0;
 
+        private ResourcesHolder resources;
+
+        private ActivitiesHolder activities;
+
         public ZoneCLEM(Node parent) : base(parent)
         {
             AddFiles();
-            new ResourcesHolder(this);
-            new ActivitiesHolder(this);
+            resources = new ResourcesHolder(this);
+            activities = new ActivitiesHolder(this);
             AddReports();            
         }
 
@@ -48,10 +55,40 @@
 
         private void AddReports()
         {
-            new CLEMFolder(this)
+            var reports = new CLEMFolder(this)
             {
-
+                Name = "Reports"
             };
+
+            new ReportResourceBalances(reports)
+            {
+                VariableNames = new List<string>()
+                {
+                    "[Clock].Today",
+                    "AnimalFoodStore"
+                },
+                EventNames = new List<string>()
+                {
+                    "[Clock.CLEMEndOfTimeStep"
+                }
+            };
+
+            new ReportActivitiesPerformed(reports);
+            new ReportResourceShortfalls(reports);
+
+            foreach(Node child in resources.Children)
+            {
+                string name = child.GetType().Name;
+
+                new ReportResourceLedger(reports)
+                {
+                    VariableNames = new List<string>()
+                    {
+                        name
+                    },
+                    Name = name
+                };
+            }
         }
     }
 

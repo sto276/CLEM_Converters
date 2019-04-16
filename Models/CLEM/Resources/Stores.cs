@@ -5,36 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Models.CLEM.Resources
-{
-    class ProductStore : Node
-    {
-        public ProductStore(ResourcesHolder parent) : base(parent)
-        {
-            Name = "ProductStore";
-        }
-    }
-
-    class ProductStoreType : Node
-    {
-        public double StartingAmount { get; set; }
-
-        public string Units { get; set; } = "kg";
-
-        public ProductStoreType(ProductStore parent) : base(parent)
-        {
-
-        }
-    }
-
-    class AnimalFoodStore : Node
+{   
+    public class AnimalFoodStore : Node
     {
         public AnimalFoodStore(Node parent) : base(parent)
         {
             Name = "AnimalFoodStore";
+            Source.GetAnimalStoreTypes(this);
         }
     }
 
-    class AnimalFoodStoreType : Node
+    public class AnimalFoodStoreType : Node
     {
         public AnimalFoodStoreType(Node parent) : base(parent)
         {
@@ -42,7 +23,15 @@ namespace Models.CLEM.Resources
         }
     }
 
-    class GrazeFoodStore : Node
+    public class GrazeFoodStore : Node
+    {
+        public GrazeFoodStore(Node parent) : base(parent)
+        {
+            Name = "GrazeFoodStore";
+        }
+    }
+
+    public class GrazeFoodStoreType : Node
     {
         public double NToDMDCoefficient { get; set; } = 0.0;
 
@@ -70,11 +59,31 @@ namespace Models.CLEM.Resources
 
         public string Units { get; set; }
 
-        public GrazeFoodStore(Node parent) : base(parent)
+        public GrazeFoodStoreType(Node parent) : base(parent)
+        {
+            Name = "NativePasture";
+            Source.SetGrazeData(this);
+        }
+    }
+
+    public class ProductStore : Node
+    {
+        public ProductStore(ResourcesHolder parent) : base(parent)
+        {
+            Name = "ProductStore";
+            Source.GetProductStoreTypes(this);
+        }
+    }
+
+    public class ProductStoreType : Node
+    {
+        public double StartingAmount { get; set; }
+
+        public string Units { get; set; } = "kg";
+
+        public ProductStoreType(ProductStore parent) : base(parent)
         {
 
         }
     }
-
-
 }

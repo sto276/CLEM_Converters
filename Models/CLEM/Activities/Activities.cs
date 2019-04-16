@@ -27,12 +27,81 @@ namespace Models.CLEM.Activities
         public ActivitiesHolder(ZoneCLEM parent) : base(parent)
         {
             Name = "Activities";
+            GetCashFlow();
+            GetForages();
+            GetHerd();
+
+            new SummariseRuminantHerd(this);
+            new ReportRuminantHerd(this);
+        }
+
+        private void GetCashFlow()
+        {
+            ActivityFolder cashFlow = new ActivityFolder(this)
+            {
+                Name = "CashFlow"
+            };
+            
+            Source.GetMonthlyExpenses(new ActivityFolder(cashFlow) { Name = "ExpensesMonthly" });
+            Source.GetAnnualExpenses(new ActivityFolder(cashFlow) { Name = "ExpensesAnnual" });
+        }
+
+        private void GetForages()
+        {
+            ActivityFolder forages = new ActivityFolder(this)
+            {
+                Name = "Manage forages"
+            };
+
+            CropActivityManageCrop farm = new CropActivityManageCrop(forages)
+            {
+                LandItemNameToUse = "Land",
+                UseAreaAvailable = true,
+                Name = "NativePastureFarm"
+            };
+
+            new CropActivityManageProduct(farm)
+            {
+                ModelNameFileCrop = "FileForage",
+                CropName = "Native_grass",
+                StoreItemName = "AnimalFoodStore.NativePasture",
+                Name = "Cut and carry Native Pasture"
+            };
+
+            CropActivityManageCrop common = new CropActivityManageCrop(forages)
+            {
+                LandItemNameToUse = "Land",
+                Name = "Native Pasture Common Land"
+            };
+
+            new CropActivityManageProduct(common)
+            {
+                ModelNameFileCrop = "FileForage",
+                CropName = "Native_grass",
+                StoreItemName = "GrazeFoodStore.NativePasture",
+                Name = "Grazed Common Land"
+            };
+        }
+
+        private void GetHerd()
+        {
+            ActivityFolder herd = new ActivityFolder(this){Name = "Manage herd"};
+
+            Source.GetManageRuminants(herd);
+            new ActivityFolder(herd){Name = "Cut and carry"};
+            new RuminantActivityGrazeAll(herd);
+            new RuminantActivityGrow(herd);
+            new RuminantActivityBreed(herd);
+            new RuminantActivityBuySell(herd);
+            new RuminantActivityMuster(herd);
         }
     }
 
-    public class ActivitiesFolder : ActivityNode
+    public class ActivityFolder : ActivityNode
     {
-        public ActivitiesFolder(ActivityNode parent) : base(parent)
+        public int test { get; set; }
+
+        public ActivityFolder(Node parent) : base(parent)
         {
 
         }

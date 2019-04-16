@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Groupings
 {
-    class LabourFilter : Node
+    public class LabourFilter : Node
     {
         public int Parameter { get; set; }
 
@@ -20,7 +20,7 @@ namespace Models.CLEM.Groupings
         }
     }
 
-    class LabourFilterGroup : Node
+    public class LabourFilterGroup : Node
     {
         public LabourFilterGroup(Node parent) : base(parent)
         {

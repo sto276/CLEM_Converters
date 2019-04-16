@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Resources
 {
-    class ResourcePricing : Node
+    public class ResourcePricing : Node
     {
         public double PacketSize { get; set; }
 
@@ -20,11 +20,12 @@ namespace Models.CLEM.Resources
         }
     }
 
-    class AnimalPricing : Node
+    public class AnimalPricing : Node
     {
         public AnimalPricing(Node parent) : base(parent)
         {
             Name = "AnimalPricing";
+            Source.GetPricing(this);
         }
     }
     

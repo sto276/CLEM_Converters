@@ -38,7 +38,7 @@ namespace Models.CLEM.Reporting
         }
     }
 
-    class ReportResourceShortfalls : Node
+    class ReportResourceShortfalls : Report
     {
         public ReportResourceShortfalls(Node parent) : base(parent)
         {
@@ -46,7 +46,7 @@ namespace Models.CLEM.Reporting
         }
     }
 
-    class ReportResourceLedger : Node
+    class ReportResourceLedger : Report
     {
         public ReportResourceLedger(Node parent) : base(parent)
         {

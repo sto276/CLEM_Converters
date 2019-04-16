@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Resources
 {
-    class RuminantHerd : Node
+    public class RuminantHerd : Node
     {
         public RuminantHerd(Node parent) : base(parent)
         {
@@ -14,7 +14,7 @@ namespace Models.CLEM.Resources
         }
     }
 
-    class RuminantType : Node
+    public class RuminantType : Node
     {
         public string Breed { get; set; }
 
@@ -170,11 +170,12 @@ namespace Models.CLEM.Resources
 
         public RuminantType(Node parent) : base(parent)
         {
-
+            new RuminantInitialCohorts(this);
+            new AnimalPricing(this);
         }
     }
 
-    class RuminantInitialCohorts : Node
+    public class RuminantInitialCohorts : Node
     {
         public RuminantInitialCohorts(Node parent) : base(parent)
         {
@@ -182,7 +183,7 @@ namespace Models.CLEM.Resources
         }
     }
 
-    class RuminantTypeCohort : Node
+    public class RuminantTypeCohort : Node
     {
         public int Gender { get; set; }
 

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Activities
 {
+    using CLEM.Groupings;
+
     class RuminantActivityBreed : ActivityNode
     {
         public double MaximumConceptionRateUncontrolled { get; set; } = 0.0;
@@ -33,8 +35,16 @@ namespace Models.CLEM.Activities
         public RuminantActivityGrazeAll(Node parent) : base(parent)
         {
             Name = "GrazeAll";
-
             OnPartialResourcesAvailableAction = 2;
+
+            var labour = new LabourRequirement(this);
+            var group = new LabourFilterGroup(labour);
+            var filter = new LabourFilter(group)
+            {
+                Parameter = 0,
+                Operator = 0,
+                Value = "Male"
+            };
         }
     }
 

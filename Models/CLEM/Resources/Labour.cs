@@ -6,17 +6,19 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Resources
 {
-    class Labour : Node
+    public class Labour : Node
     {
         public bool AllowAging { get; set; } = true;
 
         public Labour(ResourcesHolder parent) : base(parent)
         {
             Name = "Labour";
+            Source.GetLabourTypes(this);
+            new LabourAvailabilityList(this);
         }
     }
 
-    class LabourType : Node
+    public class LabourType : Node
     {
         public double InitialAge { get; set; }
 
@@ -32,19 +34,19 @@ namespace Models.CLEM.Resources
         }
     }
 
-    class LabourAvailabilityList : Node
+    public class LabourAvailabilityList : Node
     {
         public LabourAvailabilityList(Labour parent) : base(parent)
         {
-
+            Source.GetAvailabilityItems(this);
         }
     }
 
-    class LabourAvailabilityItem : Node
+    public class LabourAvailabilityItem : Node
     {
         public LabourAvailabilityItem(Labour parent) : base(parent)
         {
-
+            Source.GetLabourFilters(this);
         }
     }
 }
