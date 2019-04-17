@@ -5,9 +5,9 @@ using System.Xml.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IAT
+namespace IATReader
 {
-    class Labour
+    class LabourData
     {
         /// <summary>
         /// 

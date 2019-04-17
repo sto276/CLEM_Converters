@@ -22,10 +22,14 @@ namespace Models.CLEM.Resources
 
     public class AnimalPricing : Node
     {
+        public string PricingStyle { get; set; } = "perKg";
+
+        public double SirePrice { get; set; } = 0.0;
+
         public AnimalPricing(Node parent) : base(parent)
         {
             Name = "AnimalPricing";
-            Source.GetPricing(this);
+            Children.AddRange(Source.GetAnimalPrices(this));
         }
     }
     

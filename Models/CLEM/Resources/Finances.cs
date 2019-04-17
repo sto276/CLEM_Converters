@@ -33,7 +33,7 @@ namespace Models.CLEM.Resources
 
         public FinanceType(Finance parent) : base(parent)
         {
-            Source.SetFinanceData(this);
+            Source.SetBankData(this);
         }
     }
 }

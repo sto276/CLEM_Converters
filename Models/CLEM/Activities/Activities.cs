@@ -37,13 +37,13 @@ namespace Models.CLEM.Activities
 
         private void GetCashFlow()
         {
-            ActivityFolder cashFlow = new ActivityFolder(this)
+            ActivityFolder cashflow = new ActivityFolder(this)
             {
                 Name = "CashFlow"
             };
-            
-            Source.GetMonthlyExpenses(new ActivityFolder(cashFlow) { Name = "ExpensesMonthly" });
-            Source.GetAnnualExpenses(new ActivityFolder(cashFlow) { Name = "ExpensesAnnual" });
+            Children.Add(Source.GetMonthlyExpenses(new ActivityFolder(cashflow) { Name = "ExpensesMonthly" }));
+            Children.AddRange(Source.GetAnnualExpenses(new ActivityFolder(cashflow) { Name = "ExpensesAnnual" }));
+            Children.Add(Source.GetInterestRates(new ActivityFolder(cashflow) { Name = "InterestRates" }));
         }
 
         private void GetForages()
@@ -87,7 +87,7 @@ namespace Models.CLEM.Activities
         {
             ActivityFolder herd = new ActivityFolder(this){Name = "Manage herd"};
 
-            Source.GetManageRuminants(herd);
+            Children.Add(Source.GetManageBreeds(herd));
             new ActivityFolder(herd){Name = "Cut and carry"};
             new RuminantActivityGrazeAll(herd);
             new RuminantActivityGrow(herd);

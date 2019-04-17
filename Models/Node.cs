@@ -14,7 +14,7 @@ namespace Models
 
         public Node Parent { get; set; }
 
-        public ICollection<Node> Children { get; set; }
+        public List<Node> Children { get; set; }
 
         public bool IncludeInDocumentation { get; set; } = true;
 

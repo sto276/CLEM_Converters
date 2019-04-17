@@ -7,13 +7,13 @@ using System.Xml.Linq;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace IAT
+namespace IATReader
 {
     /// <summary>
     /// Provides methods for reading and converting
     /// the grain crop data contained within an IAT file
     /// </summary>
-    class Grains
+    class GrainData
     {
         /// <summary>
         /// Writes the 'Manage Crops' Activity section of a CLEM simulation

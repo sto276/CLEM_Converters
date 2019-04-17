@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.CLEM.Activities
 {
-    class FinanceActivityPayExpense : Node
+    public class FinanceActivityPayExpense : Node
     {
         public double Amount { get; set; } = 0.0;
 
@@ -22,4 +22,11 @@ namespace Models.CLEM.Activities
         }
     }
     
+    public class FinanceActivityCalculateInterest : Node
+    {
+        public FinanceActivityCalculateInterest(Node parent) : base(parent)
+        {
+            Name = "CalculateInterest";
+        }
+    }
 }

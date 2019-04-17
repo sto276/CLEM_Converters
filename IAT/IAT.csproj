@@ -53,32 +53,33 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class\Properties.cs" />
     <Compile Include="Runner.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="StaticClasses\Finances.cs" />
-    <Compile Include="StaticClasses\FoodStores.cs" />
-    <Compile Include="StaticClasses\Forages.cs" />
-    <Compile Include="StaticClasses\Grains.cs" />
-    <Compile Include="ObjectClasses\IAT.cs" />
-    <Compile Include="ObjectClasses\IATable.cs" />
-    <Compile Include="StaticClasses\Labour.cs" />
-    <Compile Include="StaticClasses\Reports.cs" />
-    <Compile Include="StaticClasses\Sim.cs" />
+    <Compile Include="Class\Subclasses\FinanceData.cs" />
+    <Compile Include="Class\Subclasses\StoreData.cs" />
+    <Compile Include="Class\Subclasses\ForageData.cs" />
+    <Compile Include="Class\Subclasses\GrainData.cs" />
+    <Compile Include="Class\Constructor.cs" />
+    <Compile Include="Class\Subclasses\SubTable.cs" />
+    <Compile Include="Class\Subclasses\LabourData.cs" />
+    <Compile Include="Class\Subclasses\Reports.cs" />
+    <Compile Include="Sim.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StaticClasses\Land.cs" />
-    <Compile Include="StaticClasses\Ruminants.cs" />
+    <Compile Include="Class\Subclasses\LandData.cs" />
+    <Compile Include="Class\Subclasses\RuminantData.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="StaticClasses\Toolbox.cs" />
+    <Compile Include="Class\Errors.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="Resources\Resources_CLEM.csv" />
-    <EmbeddedResource Include="Resources\Resources_IAT.csv" />
+    <EmbeddedResource Include="Embeds\Resources_CLEM.csv" />
+    <EmbeddedResource Include="Embeds\Resources_IAT.csv" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
@@ -107,5 +108,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Models\Models.csproj">
+      <Project>{3abb82a7-60d0-4e28-a75f-d192412e5b5b}</Project>
+      <Name>Models</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

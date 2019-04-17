@@ -18,7 +18,7 @@ namespace Models
         }
     }
 
-    class Memo : Node
+    public class Memo : Node
     {
         public string Text { get; set; }
 
@@ -28,7 +28,7 @@ namespace Models
         }
     }
 
-    class Summary : Node
+    public class Summary : Node
     {
         public bool CaptureErrors { get; set; } = true;
 

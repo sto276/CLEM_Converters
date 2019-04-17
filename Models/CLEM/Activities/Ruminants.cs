@@ -8,17 +8,18 @@ namespace Models.CLEM.Activities
 {
     using CLEM.Groupings;
 
-    class RuminantActivityBreed : ActivityNode
+    public class RuminantActivityBreed : ActivityNode
     {
-        public double MaximumConceptionRateUncontrolled { get; set; } = 0.0;
+        public double MaximumConceptionRateUncontrolled { get; set; } = 0.8;
 
         public RuminantActivityBreed(Node parent) : base(parent)
         {
             Name = "Breed";
+            MaximumConceptionRateUncontrolled =
         }
     }
 
-    class RuminantActivityBuySell : ActivityNode
+    public  class RuminantActivityBuySell : ActivityNode
     {
         public string BankAccountName { get; set; } = "Finances.Bank";
 
@@ -27,8 +28,22 @@ namespace Models.CLEM.Activities
             Name = "BuySell";
         }
     }
-    
-    class RuminantActivityGrazeAll : ActivityNode
+
+    public class RuminantActivityFeed : ActivityNode
+    {
+        public string FeedTypeName { get; set; }
+
+        public double ProportionTramplingWastage { get; set; } = 0.3;
+
+        public string FeedStyle { get; set; } = "ProportionOfPotentialIntake";
+
+        public RuminantActivityFeed(Node parent) : base(parent)
+        {
+
+        }
+    }
+
+    public class RuminantActivityGrazeAll : ActivityNode
     {
         public double HoursGrazed { get; set; } = 8.0;
 
@@ -48,7 +63,7 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class RuminantActivityGrow : ActivityNode
+    public class RuminantActivityGrow : ActivityNode
     {
         public double EnergyGross { get; set; } = 0.0;
 
@@ -58,7 +73,7 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class RuminantActivityManage : ActivityNode
+    public class RuminantActivityManage : ActivityNode
     {
         public int MaximumBreedersKept { get; set; } = 0;
 
@@ -94,7 +109,17 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class RuminantActivityMuster : ActivityNode
+    public class RuminantActivityMilking : ActivityNode
+    {
+        public string ResourceTypeName { get; set; } = "HumanFoodStore.Milk";
+
+        public RuminantActivityMilking(Node parent) : base(parent)
+        {
+
+        }
+    }
+
+    public class RuminantActivityMuster : ActivityNode
     {
         public string ManagedPastureName { get; set; } = "GrazeFoodStore.NativePasture";
 
@@ -108,7 +133,7 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class RuminantActivitySellDryBreeders : ActivityNode
+    public class RuminantActivitySellDryBreeders : ActivityNode
     {
         public double MinimumConceptionBeforeSell { get; set; } = 1.0;
 
@@ -122,7 +147,7 @@ namespace Models.CLEM.Activities
         }
     }
 
-    class RuminantActivityWean : ActivityNode
+    public class RuminantActivityWean : ActivityNode
     {
         public double WeaningAge { get; set; } = 0.0;
 

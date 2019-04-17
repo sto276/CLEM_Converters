@@ -9,10 +9,12 @@ namespace Models.Interface
     using CLEM.Activities;
     public partial interface IApsimX
     {
-        void GetMonthlyExpenses(ActivityFolder parent);
+        FinanceActivityPayExpense GetMonthlyExpenses(ActivityFolder cashflow);
 
-        void GetAnnualExpenses(ActivityFolder parent);
+        IEnumerable<FinanceActivityPayExpense> GetAnnualExpenses(ActivityFolder cashflow);
 
-        void GetManageRuminants(ActivityFolder parent);
+        FinanceActivityCalculateInterest GetInterestRates(ActivityFolder cashflow);
+
+        ActivityFolder GetManageBreeds(ActivityFolder parent);
     }
 }

@@ -11,6 +11,7 @@ namespace Models.CLEM.Resources
         public RuminantHerd(Node parent) : base(parent)
         {
             Name = "RuminantHerd";
+            Children.AddRange(Source.GetRuminants(this));
         }
     }
 
@@ -180,6 +181,7 @@ namespace Models.CLEM.Resources
         public RuminantInitialCohorts(Node parent) : base(parent)
         {
             Name = "InitialCohorts";
+            Children.AddRange(Source.GetCohorts(this));
         }
     }
 

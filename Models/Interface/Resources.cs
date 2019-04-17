@@ -11,24 +11,28 @@ namespace Models.Interface
     public partial interface IApsimX
     {
         // Land methods
-        ICollection<LandType> GetLandTypes(Land parent);
+        IEnumerable<LandType> GetLandTypes(Land parent);
 
         // Labour methods
-        ICollection<LabourType> GetLabourTypes(Labour parent);
+        IEnumerable<LabourType> GetLabourTypes(Labour parent);
 
-        ICollection<LabourAvailabilityItem> GetAvailabilityItems(LabourAvailabilityList parent);
+        IEnumerable<LabourAvailabilityItem> GetAvailabilityItems(LabourAvailabilityList parent);
 
-        ICollection<LabourFilter> GetLabourFilters(Node parent);
+        IEnumerable<LabourFilter> GetLabourFilters(Node parent);
 
         // Ruminant methods
-        ICollection<RuminantType> GetRuminants(RuminantHerd parent);
+        IEnumerable<RuminantType> GetRuminants(RuminantHerd parent);
 
-        ICollection<RuminantTypeCohort> GetCohorts(RuminantType parent);
+        IEnumerable<RuminantTypeCohort> GetCohorts(RuminantInitialCohorts parent);
 
-        ICollection<AnimalPriceGroup> GetAnimalPrices(RuminantType parent);
+        IEnumerable<AnimalPriceGroup> GetAnimalPrices(AnimalPricing parent);
+
+        void SetSellDryData();
 
         // Finance methods
-        void SetFinanceData(FinanceType parent);
+        void SetFinanceData(Finance finance);
+
+        void SetBankData(FinanceType bank);
 
         // Store methods
         void GetAnimalStoreTypes(AnimalFoodStore parent);
