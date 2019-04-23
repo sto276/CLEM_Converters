@@ -1,6 +1,7 @@
 ﻿namespace Models.Core
 {
     using CLEM;
+    using Storage;
 
     public class Simulations : Node
     {
@@ -10,7 +11,7 @@
 
         public Simulations(Node parent) : base(parent)
         {
-
+            Children.Add(new DataStore(this));
         }
     }    
     
@@ -18,7 +19,7 @@
     {
         public Simulation(Node parent) : base(parent)
         {
-            new Clock(this);
+            Children.Add(Source.GetClock(this));
             new Summary(this);
             new ZoneCLEM(this);
         }

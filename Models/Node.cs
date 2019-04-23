@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    using Interface;
-
     public class Node
     {
         public string Name { get; set; }        
@@ -35,8 +33,6 @@ namespace Models
                 Source = parent.Source;
             }
             Parent = parent;
-
-            Parent.Children.Add(this);
         }        
     }
 }

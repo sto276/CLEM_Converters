@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace IATReader
+namespace ReadIAT
 {
     public partial class IAT
     {
         /// <summary>
         /// Name of the IAT file
         /// </summary>
-		public string name;
+		public string Name { get; set; }
 
         /// <summary>
         /// The directory to look for IAT files in
@@ -24,19 +23,7 @@ namespace IATReader
         /// <summary>
         /// Climate region of the simulation
         /// </summary>
-        public string climate = "1";
-
-        /// <summary>
-        /// Fodder pools used in the simulation.
-        /// Keys are the pool ID.
-        /// Values are the crop names in the pool
-        /// </summary>
-        public Dictionary<int, string> pools = new Dictionary<int, string>();
-
-        /// <summary>
-        /// Numeric ID of each grain grown
-        /// </summary>
-        public List<int> grains = new List<int>();
+        private string Climate { get; set; } = "1";               
 
         /// <summary>
         /// Object representation of the .xlsx
@@ -46,22 +33,22 @@ namespace IATReader
         /// <summary>
         /// Workbook information from the document object
         /// </summary>
-        public WorkbookPart book;
+        public WorkbookPart Book { get; set; }
 
         /// <summary>
         /// Information about the current parameter sheet
         /// </summary>
-        public Sheet sheet;
+        public Sheet ParameterSheet { get; set; }
 
         /// <summary>
         /// Data from the current parameter sheet
         /// </summary>
-        public WorksheetPart part;
+        private WorksheetPart Part;
 
         /// <summary>
         /// Contains all unique strings used in cells (accessed via numeric ID)
         /// </summary>
-        public SharedStringTablePart string_table;
+        private SharedStringTablePart string_table;
 
 
     }

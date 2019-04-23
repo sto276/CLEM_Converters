@@ -11,16 +11,45 @@ namespace Models.CLEM.Resources
         public AnimalFoodStore(Node parent) : base(parent)
         {
             Name = "AnimalFoodStore";
-            Source.GetAnimalStoreTypes(this);
+            Children.AddRange(Source.GetAnimalStoreTypes(this));
+            Children.Add(Source.GetCommonFoodStore(this));
         }
     }
 
     public class AnimalFoodStoreType : Node
     {
+        public double DMD { get; set; } = 0;
+
+        public double Nitrogen { get; set; } = 0;
+
+        public double StartingAmount { get; set; } = 0;
+
         public AnimalFoodStoreType(Node parent) : base(parent)
         {
 
         }
+    }
+
+    public class CommonLandFoodStoreType : Node
+    {
+        public double NToDMDCoefficient { get; set; } = 0;
+
+        public double NToDMDIntercept { get; set; } = 0;
+
+        public double NToDMDCrudeProteinDenominator { get; set; } = 0;
+
+        public double Nitrogen { get; set; } = 0;
+
+        public double MinimumNitrogen { get; set; } = 0;
+
+        public double MinimumDMD { get; set; } = 0;
+
+        public string PastureLink { get; set; } = "GrazeFoodStore.NativePasture";
+
+        public double NitrogenReductionFromPasture { get; set; } = 0;
+
+        public CommonLandFoodStoreType(Node parent) : base(parent)
+        { }
     }
 
     public class GrazeFoodStore : Node
@@ -28,6 +57,7 @@ namespace Models.CLEM.Resources
         public GrazeFoodStore(Node parent) : base(parent)
         {
             Name = "GrazeFoodStore";
+            Children.Add(Source.GetGrazeFoodStore(this));
         }
     }
 
@@ -62,7 +92,27 @@ namespace Models.CLEM.Resources
         public GrazeFoodStoreType(Node parent) : base(parent)
         {
             Name = "NativePasture";
-            Source.SetGrazeData(this);
+
+        }
+    }
+
+    public class HumanFoodStore : Node
+    {
+        public HumanFoodStore(Node parent) : base(parent)
+        {
+            Name = "HumanFoodStore";
+        }
+    }
+
+    public class HumanFoodStoreType : Node
+    {
+        public double StartingAge { get; set; } = 0;
+
+        public double StartingAmount { get; set; } = 0;
+
+        public HumanFoodStoreType(Node parent) : base(parent)
+        {
+
         }
     }
 
@@ -71,7 +121,7 @@ namespace Models.CLEM.Resources
         public ProductStore(ResourcesHolder parent) : base(parent)
         {
             Name = "ProductStore";
-            Source.GetProductStoreTypes(this);
+            Children.AddRange(Source.GetProductStoreTypes(this));
         }
     }
 

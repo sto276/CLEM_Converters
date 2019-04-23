@@ -8,9 +8,9 @@ namespace Models.CLEM.Groupings
 {
     public class LabourFilter : Node
     {
-        public int Parameter { get; set; }
+        public int Parameter { get; set; } = 0;
 
-        public int Operator { get; set; }
+        public int Operator { get; set; } = 0;
 
         public string Value { get; set; }
 

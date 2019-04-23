@@ -33,25 +33,25 @@ namespace Models.CLEM.Resources
 
         public double EMaintExponent { get; set; } = 0.0;
 
-        public double EMaintIntercept { get; set; } = 0.0;
+        public double EMaintIntercept { get; set; } = 0.09;
 
-        public double EMaintCoefficient { get; set; } = 0.0;
+        public double EMaintCoefficient { get; set; } = 0.26;
 
         public double EnergyMaintenanceMaximumAge { get; set; } = 0.0;
 
         public double Kme { get; set; } = 0.0;
 
-        public double GrowthEnergyIntercept1 { get; set; } = 0.0;
+        public double GrowthEnergyIntercept1 { get; set; } = 6.7;
 
-        public double GrowthEnergyIntercept2 { get; set; } = 0.0;
+        public double GrowthEnergyIntercept2 { get; set; } = 20.3;
 
-        public double GrowthEfficiency { get; set; } = 0.0;
+        public double GrowthEfficiency { get; set; } = 1.09;
 
         public double NaturalWeaningAge { get; set; } = 0.0;
 
         public double SRWFemale { get; set; } = 0.0;
 
-        public double SRWMaleMultiplier { get; set; } = 0.0;
+        public double SRWMaleMultiplier { get; set; } = 1.2;
 
         public double SRWBirth { get; set; } = 0.0;
 
@@ -67,51 +67,51 @@ namespace Models.CLEM.Resources
 
         public double ProteinDegradability { get; set; } = 0.0;
 
-        public double BaseAnimalEquivalent { get; set; } = 0.0;
+        public double BaseAnimalEquivalent { get; set; } = 450;
 
-        public double GreenDietMax { get; set; } = 0.0;
+        public double GreenDietMax { get; set; } = 0.98;
 
-        public double GreenDietCoefficient { get; set; } = 0.0;
+        public double GreenDietCoefficient { get; set; } = 0.15;
 
-        public double GreenDietZero { get; set; } = 0.0;
+        public double GreenDietZero { get; set; } = 0.04;
 
-        public double IntakeTropicalQuality { get; set; } = 0.0;
+        public double IntakeTropicalQuality { get; set; } = 0.16;
 
-        public double IntakeCoefficientQuality { get; set; } = 0.0;
+        public double IntakeCoefficientQuality { get; set; } = 1.7;
 
-        public double IntakeCoefficientBiomass { get; set; } = 0.0;
+        public double IntakeCoefficientBiomass { get; set; } = 0.01;
 
-        public bool StrictFeedingLimits { get; set; } = false;
+        public bool StrictFeedingLimits { get; set; } = true;
 
         public double MilkIntakeCoefficient { get; set; } = 0.0;
 
         public double MilkIntakeIntercept { get; set; } = 0.0;
 
-        public double MilkIntakeMaximum { get; set; } = 0.0;
+        public double MilkIntakeMaximum { get; set; } = 20;
 
-        public double MilkLWTFodderSubstitutionProportion { get; set; } = 0.0;
+        public double MilkLWTFodderSubstitutionProportion { get; set; } = 0.2;
 
-        public double MaxJuvenileIntake { get; set; } = 0.0;
+        public double MaxJuvenileIntake { get; set; } = 0.04;
 
-        public double ProportionalDiscountDueToMilk { get; set; } = 0.0;
+        public double ProportionalDiscountDueToMilk { get; set; } = 0.3;
 
-        public double ProportionOfMaxWeightToSurvive { get; set; } = 0.0;
+        public double ProportionOfMaxWeightToSurvive { get; set; } = 0.5;
 
-        public double LactatingPotentialModifierConstantA { get; set; } = 0.0;
+        public double LactatingPotentialModifierConstantA { get; set; } = 0.42;
 
-        public double LactatingPotentialModifierConstantB { get; set; } = 0.0;
+        public double LactatingPotentialModifierConstantB { get; set; } = 0.61;
 
-        public double LactatingPotentialModifierConstantC { get; set; } = 0.0;
+        public double LactatingPotentialModifierConstantC { get; set; } = 1.7;
 
-        public double MaximumSizeOfIndividual { get; set; } = 0.0;
+        public double MaximumSizeOfIndividual { get; set; } = 1.2;
 
         public double MortalityBase { get; set; } = 0.0;
 
-        public double MortalityCoefficient { get; set; } = 0.0;
+        public double MortalityCoefficient { get; set; } = 2.5;
 
-        public double MortalityIntercept { get; set; } = 0.0;
+        public double MortalityIntercept { get; set; } = 0.05;
 
-        public double MortalityExponent { get; set; } = 0.0;
+        public double MortalityExponent { get; set; } = 3;
 
         public double JuvenileMortalityCoefficient { get; set; } = 0.0;
 
@@ -145,7 +145,7 @@ namespace Models.CLEM.Resources
 
         public double MinimumSize1stMating { get; set; } = 0.0;
 
-        public double MinimumDaysBirthToConception { get; set; } = 0.0;
+        public double MinimumDaysBirthToConception { get; set; } = 270;
 
         public double MultipleBirthRate { get; set; } = 0.0;
 
@@ -157,13 +157,13 @@ namespace Models.CLEM.Resources
 
         public double ConceptionRateAsymptote { get; set; } = 0.0;
 
-        public double MaximumMaleMatingsPerDay { get; set; } = 0.0;
+        public double MaximumMaleMatingsPerDay { get; set; } = 30;
 
-        public double PrenatalMortality { get; set; } = 0.0;
+        public double PrenatalMortality { get; set; } = 0.08;
 
-        public double MaximumConceptionUncontrolledBreeding { get; set; } = 0.0;
+        public double MaximumConceptionUncontrolledBreeding { get; set; } = 0.9;
 
-        public double MethaneProductionCoefficient { get; set; } = 0.0;
+        public double MethaneProductionCoefficient { get; set; } = 20.7;
 
         public string Units { get; set; }
 

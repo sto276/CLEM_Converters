@@ -53,6 +53,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class\Methods.cs" />
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Runner.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -63,23 +64,19 @@
     <Compile Include="Class\Subclasses\FinanceData.cs" />
     <Compile Include="Class\Subclasses\StoreData.cs" />
     <Compile Include="Class\Subclasses\ForageData.cs" />
-    <Compile Include="Class\Subclasses\GrainData.cs" />
+    <Compile Include="Class\Subclasses\CropData.cs" />
     <Compile Include="Class\Constructor.cs" />
     <Compile Include="Class\Subclasses\SubTable.cs" />
     <Compile Include="Class\Subclasses\LabourData.cs" />
     <Compile Include="Class\Subclasses\Reports.cs" />
-    <Compile Include="Sim.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Class\Subclasses\LandData.cs" />
     <Compile Include="Class\Subclasses\RuminantData.cs" />
-    <Compile Include="Main.cs" />
     <Compile Include="Class\Errors.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="Embeds\Resources_CLEM.csv" />
-    <EmbeddedResource Include="Embeds\Resources_IAT.csv" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">

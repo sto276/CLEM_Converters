@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace IATReader
+namespace ReadIAT
 {
     public partial class IAT
     {
@@ -33,8 +33,8 @@ namespace IATReader
         /// <param name="finance">The base model</param>
         public void SetFinanceData(Finance finance)
         {
-            int id = Convert.ToInt32(GetCellValue(part, 4, 9));
-            finance.CurrencyName = GetCellValue(part, 4 + id, 8);
+            int id = Convert.ToInt32(GetCellValue(Part, 4, 9));
+            finance.CurrencyName = GetCellValue(Part, 4 + id, 8);
         }
 
         /// <summary>

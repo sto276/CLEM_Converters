@@ -38,15 +38,17 @@ namespace Models.CLEM.Resources
     {
         public LabourAvailabilityList(Labour parent) : base(parent)
         {
-            Source.GetAvailabilityItems(this);
+            Children.AddRange(Source.GetAvailabilityItems(this));
         }
     }
 
     public class LabourAvailabilityItem : Node
     {
-        public LabourAvailabilityItem(Labour parent) : base(parent)
+        public double Value { get; set; }
+
+        public LabourAvailabilityItem(LabourAvailabilityList parent) : base(parent)
         {
-            Source.GetLabourFilters(this);
+            
         }
     }
 }

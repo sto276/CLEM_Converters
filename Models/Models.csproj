@@ -59,9 +59,7 @@
     <Compile Include="CLEM\Resources\Ruminants.cs" />
     <Compile Include="CLEM\CLEM.cs" />
     <Compile Include="Core\Core.cs" />
-    <Compile Include="Interface\Activities.cs" />
-    <Compile Include="Interface\Properties.cs" />
-    <Compile Include="Interface\Resources.cs" />
+    <Compile Include="IApsimX.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

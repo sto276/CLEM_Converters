@@ -4,7 +4,7 @@ using System.Linq;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.RegularExpressions;
 
-namespace IATReader
+namespace ReadIAT
 {
     public partial class IAT
     {
@@ -94,7 +94,7 @@ namespace IATReader
                 // Find all non-empty cells
                 var non_empty =
                     from cells
-                    in iat.part.Worksheet.Descendants<Cell>()
+                    in iat.Part.Worksheet.Descendants<Cell>()
                     where cells.DataType != null
                     select cells;
 
@@ -136,12 +136,12 @@ namespace IATReader
                     rows++;
 
                     // Add the row name to the list, if name is missing, row is named after rank
-                    string title = iat.GetCellValue(iat.part, title_row + rows, title_col);
+                    string title = iat.GetCellValue(iat.Part, title_row + rows, title_col);
                     if (title == "") title = rows.ToString();
                     RowNames.Add(title);
                 }
                 // End of the table is marked by empty cells
-                while (iat.GetCellValue(iat.part, title_row + 1 + rows, title_col) != "");
+                while (iat.GetCellValue(iat.Part, title_row + 1 + rows, title_col) != "");
                 return;
             }
 
@@ -156,12 +156,12 @@ namespace IATReader
                     cols++;
 
                     // If title is missing, column is named after rank
-                    string title = iat.GetCellValue(iat.part, title_row, title_col + 1 + cols);
+                    string title = iat.GetCellValue(iat.Part, title_row, title_col + 1 + cols);
                     if (title == "") title = cols.ToString();
                     ColumnNames.Add(title);
                 }
                 // End of the table is marked by empty cells
-                while (iat.GetCellValue(iat.part, title_row + 1, title_col + 2 + cols) != "");
+                while (iat.GetCellValue(iat.Part, title_row + 1, title_col + 2 + cols) != "");
                 return;
             }
 
@@ -171,7 +171,7 @@ namespace IATReader
             private void LoadExtra()
             {
                 // Find rows containing the table data
-                var table_rows = iat.part.Worksheet.Descendants<Row>().Skip(title_row).Take(rows);
+                var table_rows = iat.Part.Worksheet.Descendants<Row>().Skip(title_row).Take(rows);
 
                 // Find the extra data cell in each row
                 foreach (Row row in table_rows)
@@ -191,7 +191,7 @@ namespace IATReader
                 data = new string[rows, cols];
 
                 // Select the rows which contain the table
-                var table_rows = iat.part.Worksheet.Descendants<Row>().Skip(title_row).Take(rows);
+                var table_rows = iat.Part.Worksheet.Descendants<Row>().Skip(title_row).Take(rows);
 
                 // Go over each row in the table
                 int r = 0;

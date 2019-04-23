@@ -1,194 +1,104 @@
-﻿using System;
+﻿using Models.CLEM.Resources;
+using Models.CLEM.Groupings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace IATReader
+namespace ReadIAT
 {
-    class LabourData
+    public partial class IAT
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        static readonly Dictionary<string, string> ages = new Dictionary<string, string>()
+        private static class LabourData
         {
-            {"Elderly Male", "72"},
-            {"Elderly Female", "68"},
-            {"Adult Male", "42"},
-            {"Adult Female", "31"},
-            {"Teenager Male", "13"},
-            {"Teenager Female", "12"},
-            {"Child Male", "7"},
-            {"Child Female", "7"},
-        };
+            public static SubTable Supply { get; private set; }            
 
-        /// <summary>
-        /// Creates the 'Labour' XML structure for a CLEM simulation
-        /// </summary>
-        /// <param name="iat">Source IAT</param>
-        public static XElement GetLabour(IAT iat)
-        {
-            IATable supply = iat.tables["Labour supply/hire"];
+            /// <summary>
+            /// 
+            /// </summary>
+            public static readonly Dictionary<string, int> Ages = new Dictionary<string, int>()
+            {
+                {"Elderly Male", 72},
+                {"Elderly Female", 68},
+                {"Adult Male", 42},
+                {"Adult Female", 31},
+                {"Teenager Male", 13},
+                {"Teenager Female", 12},
+                {"Child Male", 7},
+                {"Child Female", 7},
+            };
 
-            XElement labour = new XElement
-            (
-                "Labour",
-                new XElement("Name", "Labour"),            
-                GetTypes(supply),
-                GetAvailability(supply),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("AllowAging", "true")
-            );
-
-            if (labour.Elements().Count() > 3) return labour;
-            else return null;
+            public static void Construct(IAT source)
+            {
+                Supply = new SubTable("Labour supply/hire", source);
+            }        
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="supply"></param>
-        /// <returns></returns>
-        private static IEnumerable<XElement> GetTypes(IATable supply)
+        public IEnumerable<LabourType> GetLabourTypes(Labour parent)
         {
-            XElement types = new XElement("Types");
+            List<LabourType> types = new List<LabourType>();
 
             int row = -1;
-            foreach (string item in supply.GetRowNames())
+            foreach (string item in LabourData.Supply.RowNames)
             {
                 row++;
-                if (supply.GetData<string>(row, 0) != "0")
+                if (LabourData.Supply.GetData<string>(row, 0) != "0")
                 {
                     // Finds the current demographic
-                    string demo = supply.GetExtra()[row] + " " + supply.GetRowNames()[row];
+                    string demo = LabourData.Supply.ExtraNames[row] + " " + LabourData.Supply.RowNames[row];
 
                     // Tries to find an age for the demographic, defaults to 20
-                    string age = "20";
-                    ages.TryGetValue(demo, out age);
+                    int age = 20;
+                    LabourData.Ages.TryGetValue(demo, out age);
 
-                    XElement type = new XElement("LabourType",
-                        new XElement("Name", demo),
-                        new XElement("IncludeInDocumentation", "true"),
-                        new XElement("InitialAge", age),
-                        new XElement("Gender", supply.GetRowNames()[row]),
-                        new XElement("Individuals", supply.GetData<string>(row, 0))
-                    );
+                    int gender = 0;
+                    if (LabourData.Supply.RowNames[row].Contains("F")) gender = 1;
+
+                    LabourType type = new LabourType(parent)
+                    {
+                        Name = demo,
+                        InitialAge = age,
+                        Gender = gender,
+                        Individuals = LabourData.Supply.GetData<int>(row, 0)
+                    };
 
                     types.Add(type);
                 }
             }
 
-            return types.Elements();
+            return types.AsEnumerable();
         }
-
-        /// <summary>
-        /// Creates the 'Labour Availability' XML structure for a CLEM simulation
-        /// </summary>
-        /// <param name="supply">IAT table containing availability data</param>
-        /// <returns>Labour Availability XML structure</returns>
-        private static XElement GetAvailability(IATable supply)
+        
+        public IEnumerable<LabourAvailabilityItem> GetAvailabilityItems(LabourAvailabilityList parent)
         {
-            XElement availability = new XElement
-            (
-                "LabourAvailabilityList",
-                new XElement("Name", "LabourAvailabilityList"),
-                GetFilters(supply),            
-                new XElement("IncludeInDocumentation", "true")
-            );
+            List<LabourAvailabilityItem> items = new List<LabourAvailabilityItem>();
 
-            if (availability.Elements().Count() > 2) return availability;
-            else return null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public static XElement GetLabourRequirement()
-        {
-            XElement requirement = new XElement
-            (
-                "LabourRequirement",
-                new XElement("Name", "LabourRequirement"),
-                GetLabourGroup(),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("LabourPerUnit", "0.75"),
-                new XElement("UnitSize", "25"),
-                new XElement("WholeUnitBlocks", "false"),
-                new XElement("UnitType", "perKg"),
-                new XElement("MinimumPerPerson", "1"),
-                new XElement("MaximumPerPerson", "100"),
-                new XElement("LabourShortfallAffectsActivity", "false")
-            );
-            return requirement;
-        }
-
-        /// <summary>
-        /// Writes a 'Labour group' section for an Activity
-        /// </summary>
-        public static XElement GetLabourGroup()
-        {
-            XElement group = new XElement
-            (
-                "LabourFilterGroup",
-                new XElement("Name", "Male"),
-                GetFilter("Male"),
-                new XElement("IncludeInDocumentation", "true")
-            );
-            return group;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        private static XElement GetFilter(string name)
-        {
-            XElement filter = new XElement
-            (
-                "LabourFilter",
-                new XElement("Name", "LabourFilter"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("Parameter", "Name"),
-                new XElement("Operator", "Equal"),
-                new XElement("Value", name)
-            );
-            return filter;
-        }        
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="supply"></param>
-        /// <returns></returns>
-        private static IEnumerable<XElement> GetFilters(IATable supply)
-        {
-            XElement filters = new XElement("Filters");
-            int row = -1;
-            foreach (string cat in supply.GetRowNames())
+            int count = -1;
+            foreach (var row in LabourData.Supply.RowNames)
             {
-                row++;
-                if (supply.GetData<string>(row, 0) != "0")
+                count++;
+                if (LabourData.Supply.GetData<string>(count, 0) != "0")
                 {
-                    int value = (int)Math.Round(supply.GetData<double>(row, 2));
-                    string name = $"{supply.GetExtra()[row]} {cat} ";
+                    string age = LabourData.Supply.ExtraNames[count];
+                    string gender =  LabourData.Supply.RowNames[count];
 
-                    XElement item = new XElement
-                    (
-                        "LabourAvailabilityItem",
-                        new XElement("Name", name),
-                        GetFilter(name),
-                        new XElement("IncludeInDocumentation", "true"),
-                        new XElement("Value", value)
-                    );
+                    double value = Math.Round(LabourData.Supply.GetData<double>(count, 2));
 
-                    filters.Add(item);
+                    LabourAvailabilityItem item = new LabourAvailabilityItem(parent)
+                    {
+                        Name = age + gender,
+                        Value = value
+                    };
+
+                    LabourFilter filter = new LabourFilter(item)
+                    {
+                        Value = age + gender
+                    };
+                    item.Children.Add(filter);
+
+                    items.Add(item);
                 }
             }
-            return filters.Elements();
+            return items.AsEnumerable();
         }
-
-    }
+    }    
 }

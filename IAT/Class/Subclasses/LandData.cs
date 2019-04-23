@@ -1,7 +1,7 @@
 ﻿using Models.CLEM.Resources;
 using System.Collections.Generic;
 
-namespace IATReader
+namespace ReadIAT
 {
     public partial class IAT
     {

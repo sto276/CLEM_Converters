@@ -17,6 +17,7 @@ namespace Models.CLEM.Resources
             new RuminantHerd(this);
             new Finance(this);
             new AnimalFoodStore(this);
+            new HumanFoodStore(this);
             new GrazeFoodStore(this);
             new ProductStore(this);
         }

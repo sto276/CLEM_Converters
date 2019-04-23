@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Activities
+﻿namespace Models.CLEM.Activities
 {
     using CLEM.Groupings;
 
@@ -15,7 +9,6 @@ namespace Models.CLEM.Activities
         public RuminantActivityBreed(Node parent) : base(parent)
         {
             Name = "Breed";
-            MaximumConceptionRateUncontrolled =
         }
     }
 

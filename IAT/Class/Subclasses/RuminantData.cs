@@ -4,12 +4,8 @@ using Models.CLEM.Groupings;
 using Models.CLEM.Resources;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 
-namespace IATReader
+namespace ReadIAT
 {
     public partial class IAT
     {
@@ -19,11 +15,9 @@ namespace IATReader
         /// </summary>
         private static class RuminantData
         {
-            private static IAT iat;
+            public static int Col { get; set; }
 
-            public static List<int> Columns = new List<int>();
-
-            private static int col { get; set; }
+            public static List<int> Columns = new List<int>();            
 
             public static SubTable Numbers { get; private set; }
 
@@ -37,94 +31,83 @@ namespace IATReader
 
             public static SubTable Prices { get; private set; }
 
+            /// <summary>
+            /// Hardcoded mapping of IAT variables to CLEM.
+            /// See declaration for definition of items.
+            /// </summary>
+            /// <remarks>
+            ///    - Item1, Table containing data
+            ///    - Item2, Name of variable in IAT
+            ///    - Item3, Name of variable in CLEM
+            ///    - Item4, Conversion factor
+            /// </remarks>
+            private static readonly List<Tuple<SubTable, string, string, double>> maps = new List<Tuple<SubTable, string, string, double>>()
+            {
+                new Tuple<SubTable, string, string, double>(Coeffs, "SRW", "SRWFemale", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "birth_SRW", "SRWBirth", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "Critical_cow_wt", "CriticalCowWeight", 0.01),
+                new Tuple<SubTable, string, string, double>(Coeffs, "grwth_coeff1", "AgeGrowthRateCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "grwth_coeff2", "SRWGrowthScalar", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "km_coeff", "EMaintEfficiencyCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "km_incpt", "EMaintEfficiencyIntercept", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "kg_coeff", "EGrowthEfficiencyCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "kg_incpt", "EGrowthEfficiencyIntercept", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "kl_coeff", "ELactationEfficiencyCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "kl_incpt", "ELactationEfficiencyIntercept", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "kme", "Kme", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "intake_coeff", "IntakeCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "intake_incpt", "IntakeIntercept", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "IPI_coeff", "InterParturitionIntervalCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "IPI_incpt", "InterParturitionIntervalIntercept", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_coeff", "ConceptionRateCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_incpt", "ConceptionRateIntercept", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_assym", "ConceptionRateAsymptote", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_coeff", "JuvenileMortalityCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_exp", "JuvenileMortalityExponent", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_max", "JuvenileMortalityMaximum", 0.01),
+                new Tuple<SubTable, string, string, double>(Coeffs, "wool_coeff", "WoolCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "cashmere_coeff", "CashmereCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "Rum_gest_int", "GestationLength", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_offset_day", "MilkOffsetDay", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Peak_day", "MilkPeakDay", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Curve_suck", "MilkCurveSuckling", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Curve_nonsuck", "MilkCurveNonSuckling", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "protein_coeff", "ProteinCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "protein_degrad", "ProteinDegradability", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "milk_intake_coeff", "MilkIntakeCoefficient", 1),
+                new Tuple<SubTable, string, string, double>(Coeffs, "milk_intake_incpt", "MilkIntakeIntercept", 1),
+                new Tuple<SubTable, string, string, double>(Specs, "Mortality_base", "MortalityBase", 0.01),
+                new Tuple<SubTable, string, string, double>(Specs, "Twin_rate", "TwinRate", 1),
+                new Tuple<SubTable, string, string, double>(Specs, "Joining_age", "MinimumAge1stMating", 1),
+                new Tuple<SubTable, string, string, double>(Specs, "Joining_size", "MinimumSize1stMating", 0.01),
+                new Tuple<SubTable, string, string, double>(Specs, "Milk_max", "MilkPeakYield", 1),
+                new Tuple<SubTable, string, string, double>(Specs, "Milk_end", "MilkingDays", 30)
+            };
+
             public static void Construct(IAT source)
             {
-                iat = source;
-
                 Numbers = new SubTable("Startup ruminant numbers", source);
                 Ages = new SubTable("Startup ruminant ages", source);
                 Weights = new SubTable("Startup ruminant weights", source);
                 Specs = new SubTable("Ruminant specifications", source);
                 Prices = new SubTable("Ruminant prices", source);
+
+                FindRuminants();
             }
 
             /// <summary>
-            /// Writes the 'Ruminants' resource segment of an .apsimx file
+            /// If a breed has any cohorts, add its column to the master list
             /// </summary>
-            /// <param name="iat">Source IAT</param>
-            public static IEnumerable<RuminantType> GetRuminants(RuminantHerd parent)
+            private static void FindRuminants()
             {
-                List<RuminantType> ruminants = new List<RuminantType>();
-
-                // Iterate over all the present breeds
-                foreach (int id in Columns)
-                {                   
-                    string breed = Numbers.ColumnNames[col].Replace(".", "");
-
-                    RuminantType ruminant = new RuminantType(parent)
-                    {
-                        Name = breed,
-                        Breed = breed
-                    };
-
-                    GetParams(ruminant);
-                    new Memo(parent) { Text = GetMemoText() };
-
-                    ruminants.Add(ruminant);
-                }
-
-                return ruminants;
-            }
-
-            private static string GetMemoText()
-            {
-                StringBuilder text = new StringBuilder();
-                text.Append("These parameters are new and may default to incorrect values.");
-                text.Append(" Double check these numbers before attempting to run a simulation: \n\n");
-                foreach (XElement item in clems.Elements()) text.Append($"{item.Name,10} - {item.Value}\n");
-
-                return text.ToString();
-            }
-
-            public static IEnumerable<RuminantTypeCohort> GetCohorts(RuminantInitialCohorts parent)
-            {
-                List<RuminantTypeCohort> cohorts = new List<RuminantTypeCohort>();
-
-                int row = -1;
-                int col = parent.id;
-
-                foreach (string cohort in Numbers.RowNames)
+                int col = -1;
+                foreach (string breed in Numbers.ColumnNames)
                 {
-                    row++;
-                    if (Numbers.GetData<string>(row, col) != "0")
-                    {
-                        // Check gender
-                        int gender = 0;
-                        if (cohort.Contains("F")) gender = 1;
-
-                        // Check suckling
-                        bool suckling = false;
-                        if (cohort.Contains("Calf")) suckling = true;
-
-                        // Check breeding sire
-                        bool sire = false;
-                        if (cohort == "Breeding Sires") sire = true;
-
-                        cohorts.Add(new RuminantTypeCohort(parent)
-                        {
-                            Name = cohort,
-                            Gender = gender,
-                            Age = (int)Math.Ceiling(Ages.GetData<double>(row, col)),
-                            Number = (int)Math.Ceiling(Numbers.GetData<double>(row, col)),
-                            Weight = Weights.GetData<double>(row, col),
-                            Suckling = suckling,
-                            Sire = false
-                        });
-                    }
+                    col++;
+                    var n = Numbers.GetColData<double>(col);
+                    if (n.Exists(v => v > 0)) Columns.Add(col);
                 }
-
-                return cohorts;
-            }
+            }                   
 
             /// <summary>
             /// Finds the coefficients/specifications of a single breed in an IAT
@@ -132,233 +115,167 @@ namespace IATReader
             /// <param name="iat">Source IAT</param>
             /// <param name="col">Column containing desired breed data</param>
             /// <returns></returns>
-            private static XElement GetIATParams(IAT iat, int col)
-            {
-                XElement parameters = new XElement("Parameters");
-
-                // Read the .csv mapping IAT names to CLEM names
-                StreamReader csvIAT = new StreamReader($"{Directory.GetCurrentDirectory()}/IAT/Resources/Resources_IAT.csv");
-
-                // Reads the map line by line, finding IAT data (skipping the title row)
-                csvIAT.ReadLine();
-                string line;
-                while ((line = csvIAT.ReadLine()) != null)
+            public static void SetParams(RuminantType ruminant)
+            {                             
+                foreach(var map in maps)
                 {
-                    string[] items = line.Split(',');
+                    int row = map.Item1.RowNames.FindIndex(s => s == map.Item2);
+                    double value = map.Item1.GetData<double>(row, Col) * map.Item4;
+                    ruminant.GetType().GetProperty(map.Item2).SetValue(ruminant, value);
+                }                
+            }
+        }
 
-                    // First column in the map contains IAT table name
-                    IATable data = iat.tables[items[0]];
+        public IEnumerable<RuminantType> GetRuminants(RuminantHerd parent)
+        {
+            new Memo(parent)
+            {
+                Text = "Missing breed data is assigned a default value. \n" +
+                "Ensure the sensibility of data before running the simulation."
+            };
 
-                    // Second column in the map contains the standard row number for that value in IAT (shifted to 0 based array)
-                    int row = Convert.ToInt32(items[1]) - 1;
+            List<RuminantType> ruminants = new List<RuminantType>();
 
-                    double value = 0;
-                    // Different IAT versions may not contain some resources in the list, this conditional checks that
-                    if (row < data.GetRowNames().Count)
-                    {
-                        value = (data.GetData<double>(row, col)) * Convert.ToDouble(items[4]);
-                    }
-                    parameters.Add(new XElement(items[3], value.ToString()));
-                }
-                csvIAT.Close();
-                csvIAT.Dispose();
+            // Iterate over all the present breeds
+            foreach (int col in RuminantData.Columns)
+            {
+                RuminantData.Col = col;
 
-                return parameters;
+                string breed = RuminantData.Numbers.ColumnNames[col].Replace(".", "");
+
+                RuminantType ruminant = new RuminantType(parent)
+                {
+                    Name = breed,
+                    Breed = breed
+                };
+                RuminantData.SetParams(ruminant);
+
+                ruminants.Add(ruminant);
             }
 
-            private static XElement GetCLEMParams()
-            {
-                XElement parameters = new XElement("CLEMParams");
-                // Reads in parameters which are new to CLEM and don't exist in IAT (Defaults to B. Indicus values)            
-                StreamReader csvCLEM = new StreamReader($"{Directory.GetCurrentDirectory()}/IAT/Resources/Resources_CLEM.csv");
-                csvCLEM.ReadLine();
-                string line;
-                while ((line = csvCLEM.ReadLine()) != null)
-                {
-                    string[] items = line.Split(',');
-                    parameters.Add(new XElement(items[0], items[1]));
-                }
-                csvCLEM.Close();
+            return ruminants;
+        }
 
-                return parameters;
+        public IEnumerable<RuminantTypeCohort> GetCohorts(RuminantInitialCohorts parent)
+        {
+            List<RuminantTypeCohort> cohorts = new List<RuminantTypeCohort>();
+
+            int row = -1;
+
+            foreach (string cohort in RuminantData.Numbers.RowNames)
+            {
+                row++;
+                if (RuminantData.Numbers.GetData<string>(row, RuminantData.Col) != "0")
+                {
+                    // Check gender
+                    int gender = 0;
+                    if (cohort.Contains("F")) gender = 1;
+
+                    // Check suckling
+                    bool suckling = false;
+                    if (cohort.Contains("Calf")) suckling = true;
+
+                    // Check breeding sire
+                    bool sire = false;
+                    if (cohort == "Breeding Sires") sire = true;
+
+                    cohorts.Add(new RuminantTypeCohort(parent)
+                    {
+                        Name = cohort,
+                        Gender = gender,
+                        Age = (int)Math.Ceiling(RuminantData.Ages.GetData<double>(row, RuminantData.Col)),
+                        Number = (int)Math.Ceiling(RuminantData.Numbers.GetData<double>(row, RuminantData.Col)),
+                        Weight = RuminantData.Weights.GetData<double>(row, RuminantData.Col),
+                        Suckling = suckling,
+                        Sire = sire
+                    });
+                }
             }
 
-            public static IEnumerable<AnimalPriceGroup> GetAnimalPrices(AnimalPricing parent)
-            {
-                List<AnimalPriceGroup> prices = new List<AnimalPriceGroup>();
+            return cohorts;
+        }
 
-                double sire_price = 0;
-                int row = -1;
-                foreach (string cohort in Numbers.RowNames)
+        public IEnumerable<AnimalPriceGroup> GetAnimalPrices(AnimalPricing parent)
+        {
+            List<AnimalPriceGroup> prices = new List<AnimalPriceGroup>();
+
+            double sire_price = 0;
+            int row = -1;
+            foreach (string cohort in RuminantData.Numbers.RowNames)
+            {
+                row++;
+                if (RuminantData.Numbers.GetData<double>(row, RuminantData.Col) != 0)
                 {
-                    row++;
-                    if (Numbers.GetData<double>(row, col) != 0)
+                    if (!cohort.ToLower().Contains("sire")) sire_price = RuminantData.Prices.GetData<double>(row, RuminantData.Col);
+
+                    prices.Add(new AnimalPriceGroup(parent)
                     {
-                        if (!cohort.ToLower().Contains("sire")) sire_price = Prices.GetData<double>(row, col);
+                        Name = cohort,
+                        Value = RuminantData.Prices.GetData<double>(row, RuminantData.Col)
+                    });
 
-                        prices.Add(new AnimalPriceGroup(parent)
-                        {
-                            Name = cohort,
-                            Value = Prices.GetData<double>(row, col)
-                        });
-
-                    }
                 }
-                parent.SirePrice = sire_price;
+            }
+            parent.SirePrice = sire_price;
 
-                return prices;
-            }           
+            return prices;
+        }
 
-            private static ActivityFolder GetManageBreeds(ActivityFolder parent)
+        public ActivityFolder GetManageBreeds(ActivityFolder parent)
+        {
+            SubTable specs = RuminantData.Specs;
+
+            ActivityFolder breeds = new ActivityFolder(parent)
             {
-                ActivityFolder breeds = new ActivityFolder(parent)
+                Name = "Breeds"
+            };
+
+            foreach (int col in RuminantData.Columns)
+            {
+                // Add a new folder for individual breed
+                ActivityFolder breed = new ActivityFolder(breeds)
                 {
-                    Name = "Breeds"
+                    Name = "Manage " + specs.ColumnNames[col]
                 };
 
-                foreach (int col in Columns)
-                {                 
-                    // Add a new folder for individual breed
-                    ActivityFolder breed = new ActivityFolder(breeds)
-                    {
-                        Name = "Manage " + Specs.ColumnNames[col]
-                    };
-
-                    // Manage breed weaning
-                    new RuminantActivityWean(breed)
-                    {
-                        WeaningAge = Specs.GetData<double>(7, col),
-                        WeaningWeight = Specs.GetData<double>(8, col)
-                    }; 
-
-                    // Manage breed milking
-                    if (Specs.GetData<double>(18, col) > 0) new RuminantActivityMilking(breed);
-
-                    // Manage breed numbers
-                    RuminantActivityManage numbers = new RuminantActivityManage(breed)
-                    {
-                        MaximumBreedersKept = Specs.GetData<int>(2, col),
-                        MinimumBreedersKept = Specs.GetData<int>(38, col),
-                        MaximumBreedingAge = Specs.GetData<double>(3, col),
-                        MaximumBullAge = Specs.GetData<double>(25, col),
-                        MaleSellingAge = Specs.GetData<double>(5, col),
-                        MaleSellingWeight = Specs.GetData<double>(6, col)
-                    };
-
-                    new ActivityTimerInterval(numbers)
-                    {
-                        Interval = 12,
-                        MonthDue = 12
-                    };
-
-                    // Manage sale of dry breeders
-                    new RuminantActivitySellDryBreeders(breed)
-                    {
-                        MonthsSinceBirth = Specs.GetData<double>(32, col),
-                        ProportionToRemove = Specs.GetData<double>(4, col) * 0.01
-                    };
-
-                }
-
-                return breeds;
-            }
-
-            /// <summary>
-            /// Writes the 'Ruminant Manage' activity section
-            /// </summary>
-            /// <param name="iat">Source IAT</param>
-            public static XElement Manage(IAT iat)
-            {
-                // Don't need to do anything if no ruminants are present
-                if (Columns.Count == 0) return null;
-
-                //Section: ActivityFolder - Manage herd
-                XElement manage = new XElement
-                (
-                    "ActivityFolder",
-                    new XElement("Name", $"Manage herd"),
-                    GetCutAndCarry(iat),
-                    new XElement("IncludeInDocumentation", "true"),
-                    new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop")
-                );
-
-                return manage;
-            }
-
-            /// <summary>
-            /// Writes the 'Cut and carry' Activity section of a CLEM simulation
-            /// </summary>
-            /// <param name="iat"></param>
-            private static XElement GetCutAndCarry(IAT iat)
-            {
-                // Checks the feeding system for each breed, and adds cut & carry if appropriate
-
-
-                XElement cutcarry = new XElement
-                (
-                    "ActivityFolder",
-                    new XElement("Name", "Cut and carry"),
-                    GetCCFeeds(iat),
-                    new XElement("IncludeInDocumentation", "true"),
-                    new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop")
-                );
-                return cutcarry;
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="iat"></param>
-            /// <returns></returns>
-            private static IEnumerable<XElement> GetCCFeeds(IAT iat)
-            {
-                XElement feeds = new XElement("feeds");
-
-                foreach (int pool in iat.pools.Keys)
+                // Manage breed weaning
+                new RuminantActivityWean(breed)
                 {
-                    XElement feed = new XElement
-                    (
-                        "RuminantActivityFeed",
-                        new XElement("Name", $"Feed {iat.pools[pool]}"),
-                        GetFeedGroups(iat),
-                        LabourData.GetLabourRequirement(),
-                        new XElement("IncludeInDocumentation", "true"),
-                        new XElement("OnPartialResourcesAvailableAction", "UseResourcesAvailable"),
-                        new XElement("HerdFilters", ""),
-                        new XElement("FeedTypeName", $"AnimalFoodStore.{iat.pools[pool]}"),
-                        new XElement("ProportionTramplingWastage", "0.3"),
-                        new XElement("FeedStyle", "ProportionOfPotentialIntake")
-                    );
-                    feeds.Add(feed);
-                }
+                    WeaningAge = specs.GetData<double>(7, col),
+                    WeaningWeight = specs.GetData<double>(8, col)
+                };
 
-                return feeds.Elements();
+                // Manage breed milking
+                if (specs.GetData<double>(18, col) > 0) new RuminantActivityMilking(breed);
+
+                // Manage breed numbers
+                RuminantActivityManage numbers = new RuminantActivityManage(breed)
+                {
+                    MaximumBreedersKept = specs.GetData<int>(2, col),
+                    MinimumBreedersKept = specs.GetData<int>(38, col),
+                    MaximumBreedingAge = specs.GetData<double>(3, col),
+                    MaximumBullAge = specs.GetData<double>(25, col),
+                    MaleSellingAge = specs.GetData<double>(5, col),
+                    MaleSellingWeight = specs.GetData<double>(6, col)
+                };
+
+                new ActivityTimerInterval(numbers)
+                {
+                    Interval = 12,
+                    MonthDue = 12
+                };
+
+                // Manage sale of dry breeders
+                new RuminantActivitySellDryBreeders(breed)
+                {
+                    MonthsSinceBirth = specs.GetData<double>(32, col),
+                    ProportionToRemove = specs.GetData<double>(4, col) * 0.01
+                };
+
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="breed"></param>
-            /// <returns></returns>
-            private static IEnumerable<XElement> GetFeedGroups(IAT iat)
-            {
-                XElement groups = new XElement("Groups");
-
-                foreach (int col in Columns)
-                {
-                    string breed = Specs.ColumnNames[col];
-
-                    XElement group = new XElement
-                    (
-                        "RuminantFeedGroup",
-                        new XElement("Name", breed),
-                        new XElement("IncludeInDocumentation", "false")
-                    );
-                }
-
-                return groups.Elements();
-            }           
-
+            return breeds;
         }
+
     }
 }

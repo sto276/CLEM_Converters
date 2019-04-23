@@ -3,14 +3,14 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-namespace IATReader
+namespace ReadIAT
 {
     public partial class IAT
     {
         /// <summary>
         /// Contains methods for error tracking in an IAT file read
         /// </summary>
-        private static class Error
+        public static class Error
         {
             /// <summary>
             /// The error log file stream
@@ -47,7 +47,7 @@ namespace IATReader
                 count++;
                 writer.WriteLine($"Error {count}:");
                 writer.WriteLine("\t" + msg);
-                writer.WriteLine($"\tin {iat.name}: {iat.sheet.Name}\n");
+                writer.WriteLine($"\tin {iat.Name}: {iat.ParameterSheet.Name}\n");
             }
 
             /// <summary>
@@ -64,10 +64,10 @@ namespace IATReader
             }
 
             /// <summary>
-            /// Shifts invalid starting characters to the end of the XName
+            /// Shifts invalid starting characters to the end of the Name
             /// </summary>
             /// <param name="name">The name to sanitise</param>
-            public static string SanitiseXName(string name)
+            public static string SanitiseName(string name)
             {
                 // Replace all whitespace, brackets, and underscores
                 name = Regex.Replace(name, @"[\(\)\{\}\[\]_\s+]", "");

@@ -28,7 +28,14 @@ namespace Models.CLEM.Activities
         {
             Name = "Activities";
             GetCashFlow();
-            GetForages();
+
+            ActivityFolder crops = new ActivityFolder(this) { Name = "Manage crops" };
+            crops.Children.AddRange(Source.GetManageCrops(crops));
+
+            ActivityFolder forages = new ActivityFolder(this) { Name = "Manage forages" };
+            forages.Children.AddRange(Source.GetManageForages(forages));
+            if (forages.Children.Count > 0) forages.Children.Add(Source.GetNativePasture(forages));
+
             GetHerd();
 
             new SummariseRuminantHerd(this);
@@ -44,43 +51,6 @@ namespace Models.CLEM.Activities
             Children.Add(Source.GetMonthlyExpenses(new ActivityFolder(cashflow) { Name = "ExpensesMonthly" }));
             Children.AddRange(Source.GetAnnualExpenses(new ActivityFolder(cashflow) { Name = "ExpensesAnnual" }));
             Children.Add(Source.GetInterestRates(new ActivityFolder(cashflow) { Name = "InterestRates" }));
-        }
-
-        private void GetForages()
-        {
-            ActivityFolder forages = new ActivityFolder(this)
-            {
-                Name = "Manage forages"
-            };
-
-            CropActivityManageCrop farm = new CropActivityManageCrop(forages)
-            {
-                LandItemNameToUse = "Land",
-                UseAreaAvailable = true,
-                Name = "NativePastureFarm"
-            };
-
-            new CropActivityManageProduct(farm)
-            {
-                ModelNameFileCrop = "FileForage",
-                CropName = "Native_grass",
-                StoreItemName = "AnimalFoodStore.NativePasture",
-                Name = "Cut and carry Native Pasture"
-            };
-
-            CropActivityManageCrop common = new CropActivityManageCrop(forages)
-            {
-                LandItemNameToUse = "Land",
-                Name = "Native Pasture Common Land"
-            };
-
-            new CropActivityManageProduct(common)
-            {
-                ModelNameFileCrop = "FileForage",
-                CropName = "Native_grass",
-                StoreItemName = "GrazeFoodStore.NativePasture",
-                Name = "Grazed Common Land"
-            };
         }
 
         private void GetHerd()
@@ -99,8 +69,6 @@ namespace Models.CLEM.Activities
 
     public class ActivityFolder : ActivityNode
     {
-        public int test { get; set; }
-
         public ActivityFolder(Node parent) : base(parent)
         {
 
