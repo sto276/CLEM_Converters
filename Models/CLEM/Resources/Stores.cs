@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Resources
+﻿namespace Models.CLEM.Resources
 {   
     public class AnimalFoodStore : Node
     {
         public AnimalFoodStore(Node parent) : base(parent)
         {
             Name = "AnimalFoodStore";
-            Children.AddRange(Source.GetAnimalStoreTypes(this));
-            Children.Add(Source.GetCommonFoodStore(this));
+            Add(Source.GetAnimalStoreTypes(this));
+            Add(Source.GetCommonFoodStore(this));
         }
     }
 
@@ -57,7 +51,7 @@ namespace Models.CLEM.Resources
         public GrazeFoodStore(Node parent) : base(parent)
         {
             Name = "GrazeFoodStore";
-            Children.Add(Source.GetGrazeFoodStore(this));
+            Add(Source.GetGrazeFoodStore(this));
         }
     }
 
@@ -92,7 +86,6 @@ namespace Models.CLEM.Resources
         public GrazeFoodStoreType(Node parent) : base(parent)
         {
             Name = "NativePasture";
-
         }
     }
 
@@ -111,9 +104,7 @@ namespace Models.CLEM.Resources
         public double StartingAmount { get; set; } = 0;
 
         public HumanFoodStoreType(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class ProductStore : Node
@@ -121,19 +112,17 @@ namespace Models.CLEM.Resources
         public ProductStore(ResourcesHolder parent) : base(parent)
         {
             Name = "ProductStore";
-            Children.AddRange(Source.GetProductStoreTypes(this));
+            Add(Source.GetProductStoreTypes(this));
         }
     }
 
     public class ProductStoreType : Node
     {
-        public double StartingAmount { get; set; }
+        public double StartingAmount { get; set; } = 0.0;
 
         public string Units { get; set; } = "kg";
 
         public ProductStoreType(ProductStore parent) : base(parent)
-        {
-
-        }
+        { }
     }
 }

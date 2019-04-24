@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Resources
+﻿namespace Models.CLEM.Resources
 {
     public class ResourcesHolder : Node
     {      
@@ -12,14 +6,14 @@ namespace Models.CLEM.Resources
         {
             Name = "Resources";
 
-            new Land(this);
-            new Labour(this);
-            new RuminantHerd(this);
-            new Finance(this);
-            new AnimalFoodStore(this);
-            new HumanFoodStore(this);
-            new GrazeFoodStore(this);
-            new ProductStore(this);
+            Add(new Land(this));
+            Add(new Labour(this));
+            Add(new RuminantHerd(this));
+            Add(new Finance(this));
+            Add(new AnimalFoodStore(this));
+            Add(new HumanFoodStore(this));
+            Add(new GrazeFoodStore(this));
+            Add(new ProductStore(this));
         }
     }    
 }

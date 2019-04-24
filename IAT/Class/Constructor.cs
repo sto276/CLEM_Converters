@@ -21,11 +21,9 @@ namespace ReadIAT
             Directory.CreateDirectory($"{OutDir}/{Name}");
 
             // Load the .xlsx into various objects
-            doc = SpreadsheetDocument.Open(path, false);
-            Book = doc.WorkbookPart;
-            string_table = Book.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
-
-            Error.OpenLog(OutDir + "log.txt");
+            Doc = SpreadsheetDocument.Open(path, false);
+            Book = Doc.WorkbookPart;
+            StringTable = Book.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();            
 
             // Write PRN files
             WriteCropPRN();
@@ -76,8 +74,10 @@ namespace ReadIAT
             Climate = GetCellValue(Part, 4, 6);
 
             CropData.Construct(this);
-            LandData.Construct(this);
+            FinanceData.Construct(this);
+            ForageData.Construct(this);
             LabourData.Construct(this);
+            LandData.Construct(this);            
             StoreData.Construct(this);
             RuminantData.Construct(this);
         }       

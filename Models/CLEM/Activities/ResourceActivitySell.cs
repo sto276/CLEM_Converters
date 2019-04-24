@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Activities
+﻿namespace Models.CLEM.Activities
 {
     class ResourceActivitySell : Node
     {
@@ -17,8 +11,6 @@ namespace Models.CLEM.Activities
         public int OnPartialResourcesAvailableAction { get; set; }
 
         public ResourceActivitySell(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 }

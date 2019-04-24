@@ -8,16 +8,14 @@ namespace Models.CLEM.Activities
 {
     public class CropActivityManageCrop : ActivityNode
     {
-        public string LandItemNameToUse { get; set; }
+        public string LandItemNameToUse { get; set; } = "";
 
         public double AreaRequested { get; set; } = 0.0;
 
         public bool UseAreaAvailable { get; set; } = false;
 
         public CropActivityManageCrop(Node parent) : base(parent)
-        {
-
-        }
+        {  }
     }
 
     public class CropActivityManageProduct : ActivityNode
@@ -35,28 +33,22 @@ namespace Models.CLEM.Activities
         public double UnitsToHaConverter { get; set; } = 0.0;
 
         public CropActivityManageProduct(CropActivityManageCrop parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class CropActivityManageTask : ActivityNode
     {
         public CropActivityManageTask(CropActivityManageProduct parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class ActivityTimerCropHarvest : ActivityNode
     {
-        public int OffsetMonthHarvestStart { get; set; }
+        public int OffsetMonthHarvestStart { get; set; } = 0;
 
-        public int OffsetMonthHarvestStopo { get; set; }
+        public int OffsetMonthHarvestStop { get; set; } = 0;
 
         public ActivityTimerCropHarvest(ActivityNode parent) : base(parent)
-        {
-
-        }
+        { }
     }
 }

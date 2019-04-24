@@ -11,7 +11,8 @@
 
         public Simulations(Node parent) : base(parent)
         {
-            Children.Add(new DataStore(this));
+            Name = "Simulations";
+            Add(new DataStore(this));
         }
     }    
     
@@ -19,19 +20,17 @@
     {
         public Simulation(Node parent) : base(parent)
         {
-            Children.Add(Source.GetClock(this));
-            new Summary(this);
-            new ZoneCLEM(this);
+            Add(Source.GetClock(this));
+            Add(new Summary(this));
+            Add(new ZoneCLEM(this));
         }
     }
 
-    class Folder : Node
+    public class Folder : Node
     {
         public bool ShowPageOfGraphs { get; set; } = true;
 
         public Folder(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 }

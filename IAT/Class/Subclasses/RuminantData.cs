@@ -41,56 +41,59 @@ namespace ReadIAT
             ///    - Item3, Name of variable in CLEM
             ///    - Item4, Conversion factor
             /// </remarks>
-            private static readonly List<Tuple<SubTable, string, string, double>> maps = new List<Tuple<SubTable, string, string, double>>()
-            {
-                new Tuple<SubTable, string, string, double>(Coeffs, "SRW", "SRWFemale", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "birth_SRW", "SRWBirth", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "Critical_cow_wt", "CriticalCowWeight", 0.01),
-                new Tuple<SubTable, string, string, double>(Coeffs, "grwth_coeff1", "AgeGrowthRateCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "grwth_coeff2", "SRWGrowthScalar", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "km_coeff", "EMaintEfficiencyCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "km_incpt", "EMaintEfficiencyIntercept", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "kg_coeff", "EGrowthEfficiencyCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "kg_incpt", "EGrowthEfficiencyIntercept", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "kl_coeff", "ELactationEfficiencyCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "kl_incpt", "ELactationEfficiencyIntercept", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "kme", "Kme", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "intake_coeff", "IntakeCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "intake_incpt", "IntakeIntercept", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "IPI_coeff", "InterParturitionIntervalCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "IPI_incpt", "InterParturitionIntervalIntercept", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_coeff", "ConceptionRateCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_incpt", "ConceptionRateIntercept", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_assym", "ConceptionRateAsymptote", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_coeff", "JuvenileMortalityCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_exp", "JuvenileMortalityExponent", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_max", "JuvenileMortalityMaximum", 0.01),
-                new Tuple<SubTable, string, string, double>(Coeffs, "wool_coeff", "WoolCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "cashmere_coeff", "CashmereCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "Rum_gest_int", "GestationLength", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_offset_day", "MilkOffsetDay", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Peak_day", "MilkPeakDay", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Curve_suck", "MilkCurveSuckling", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Curve_nonsuck", "MilkCurveNonSuckling", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "protein_coeff", "ProteinCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "protein_degrad", "ProteinDegradability", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "milk_intake_coeff", "MilkIntakeCoefficient", 1),
-                new Tuple<SubTable, string, string, double>(Coeffs, "milk_intake_incpt", "MilkIntakeIntercept", 1),
-                new Tuple<SubTable, string, string, double>(Specs, "Mortality_base", "MortalityBase", 0.01),
-                new Tuple<SubTable, string, string, double>(Specs, "Twin_rate", "TwinRate", 1),
-                new Tuple<SubTable, string, string, double>(Specs, "Joining_age", "MinimumAge1stMating", 1),
-                new Tuple<SubTable, string, string, double>(Specs, "Joining_size", "MinimumSize1stMating", 0.01),
-                new Tuple<SubTable, string, string, double>(Specs, "Milk_max", "MilkPeakYield", 1),
-                new Tuple<SubTable, string, string, double>(Specs, "Milk_end", "MilkingDays", 30)
-            };
+            private static List<Tuple<SubTable, string, string, double>> maps;
 
             public static void Construct(IAT source)
             {
                 Numbers = new SubTable("Startup ruminant numbers", source);
                 Ages = new SubTable("Startup ruminant ages", source);
                 Weights = new SubTable("Startup ruminant weights", source);
+                Coeffs = new SubTable("Ruminant coefficients", source);
                 Specs = new SubTable("Ruminant specifications", source);
                 Prices = new SubTable("Ruminant prices", source);
+
+                maps = new List<Tuple<SubTable, string, string, double>>()
+                {
+                    new Tuple<SubTable, string, string, double>(Coeffs, "SRW", "SRWFemale", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "birth_SRW", "SRWBirth", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "Critical_cow_wt", "CriticalCowWeight", 0.01),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "grwth_coeff1", "AgeGrowthRateCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "grwth_coeff2", "SRWGrowthScalar", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "km_coeff", "EMaintEfficiencyCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "km_incpt", "EMaintEfficiencyIntercept", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "kg_coeff", "EGrowthEfficiencyCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "kg_incpt", "EGrowthEfficiencyIntercept", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "kl_coeff", "ELactationEfficiencyCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "kl_incpt", "ELactationEfficiencyIntercept", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "kme", "Kme", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "intake_coeff", "IntakeCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "intake_incpt", "IntakeIntercept", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "IPI_coeff", "InterParturitionIntervalCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "IPI_incpt", "InterParturitionIntervalIntercept", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_coeff", "ConceptionRateCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_incpt", "ConceptionRateIntercept", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "birth_rate_assym", "ConceptionRateAsymptote", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_coeff", "JuvenileMortalityCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_exp", "JuvenileMortalityExponent", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "juvenile_mort_max", "JuvenileMortalityMaximum", 0.01),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "wool_coeff", "WoolCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "cashmere_coeff", "CashmereCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "Rum_gest_int", "GestationLength", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "Milk_offset_day", "MilkOffsetDay", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Peak_day", "MilkPeakDay", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Curve_suck", "MilkCurveSuckling", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "Milk_Curve_nonsuck", "MilkCurveNonSuckling", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "protein_coeff", "ProteinCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "protein_degrad", "ProteinDegradability", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "milk_intake_coeff", "MilkIntakeCoefficient", 1),
+                    new Tuple<SubTable, string, string, double>(Coeffs, "milk_intake_incpt", "MilkIntakeIntercept", 1),
+                    new Tuple<SubTable, string, string, double>(Specs, "Mortality_base", "MortalityBase", 0.01),
+                    new Tuple<SubTable, string, string, double>(Specs, "Twin_rate", "TwinRate", 1),
+                    new Tuple<SubTable, string, string, double>(Specs, "Joining_age", "MinimumAge1stMating", 1),
+                    new Tuple<SubTable, string, string, double>(Specs, "Joining_size", "MinimumSize1stMating", 0.01),
+                    new Tuple<SubTable, string, string, double>(Specs, "Milk_max", "MilkPeakYield", 1),
+                    new Tuple<SubTable, string, string, double>(Specs, "Milk_end", "MilkingDays", 30)
+                };
 
                 FindRuminants();
             }
@@ -120,8 +123,9 @@ namespace ReadIAT
                 foreach(var map in maps)
                 {
                     int row = map.Item1.RowNames.FindIndex(s => s == map.Item2);
+                    if (row < 0) continue;
                     double value = map.Item1.GetData<double>(row, Col) * map.Item4;
-                    ruminant.GetType().GetProperty(map.Item2).SetValue(ruminant, value);
+                    ruminant.GetType().GetProperty(map.Item3).SetValue(ruminant, value);
                 }                
             }
         }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Activities
+﻿namespace Models.CLEM.Activities
 {
     public class FinanceActivityPayExpense : Node
     {
@@ -14,12 +8,10 @@ namespace Models.CLEM.Activities
 
         public bool IsOverhead { get; set; } = false;
 
-        public int OnPartialresourcesAvailableAction = 0;
+        public int OnPartialresourcesAvailableAction { get; set; } = 0;
 
         public FinanceActivityPayExpense(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
     
     public class FinanceActivityCalculateInterest : Node

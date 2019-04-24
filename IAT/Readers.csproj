@@ -38,6 +38,9 @@
     <Reference Include="DocumentFormat.OpenXml">
       <HintPath>..\Resources\DLL\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -55,12 +58,12 @@
   <ItemGroup>
     <Compile Include="Class\Methods.cs" />
     <Compile Include="Class\Properties.cs" />
-    <Compile Include="Runner.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Runner.cs" />
     <Compile Include="Class\Subclasses\FinanceData.cs" />
     <Compile Include="Class\Subclasses\StoreData.cs" />
     <Compile Include="Class\Subclasses\ForageData.cs" />
@@ -68,7 +71,6 @@
     <Compile Include="Class\Constructor.cs" />
     <Compile Include="Class\Subclasses\SubTable.cs" />
     <Compile Include="Class\Subclasses\LabourData.cs" />
-    <Compile Include="Class\Subclasses\Reports.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Class\Subclasses\LandData.cs" />
     <Compile Include="Class\Subclasses\RuminantData.cs" />

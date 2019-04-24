@@ -1,27 +1,29 @@
-﻿using Models.Core;
+﻿using Models;
+using Models.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.Xml;
+using System.IO;
 using System.Xml.Linq;
+using System;
 
 namespace ReadIAT
 {
     public static class Runner
     {
-        public static void Run(IEnumerable<string> files)
+        public static void Run(IEnumerable<string> files, bool join, bool split)
         {
+            IAT.Error.OpenLog("Simulations/log.txt");
+
             Simulations simulations = new Simulations(null);
 
             foreach (string file in files)
             {
                 IAT iat = new IAT(file);
 
-                Simulation simulation = new Simulation(simulations)
-                {
-                    Name = iat.Name,
-                    Source = iat
-                };
-                simulations.Children.Add(simulation);
+                Folder folder = new Folder(simulations) { Name = iat.Name };                                                
 
                 // Find all the parameter sheets in the IAT
                 List<string> sheets = new List<string>();
@@ -30,37 +32,69 @@ namespace ReadIAT
                     // Ensure a parameter sheet is selected
                     string name = sheet.Name.ToString();
                     if (!name.ToLower().Contains("param")) continue;
-                    
+                    iat.SetSheet(name);                    
+
                     // Write the resulting simulation to its own .apsimx file
-                    if (split) WriteApsimx(simulation, iat.name, name);
+                    if (split)
+                    {
+                        AttachIAT(simulations, iat);
+                        WriteApsimX(simulations, iat.Name);
+
+                        // Reset the simulations node after writing out
+                        simulations = new Simulations(null);
+                    }
                     // Or collect all the simulations in the IAT
                     else
                     {
-                        if (join) folder.Add(simulation);
-                        else simulations.Add(simulation);
+                        if (join) AttachIAT(folder, iat);                        
+                        else AttachIAT(simulations, iat);
                     }
                 }
 
                 // Files will already be written if split is true
                 if (split) continue;
 
-                // Write the .apsimx containing all simulations from an IAT
-                // and reset the simulations container
-                if (join)
-                {
-                    simulations.Add(folder);
-                }
+                // Collect all the IAT files in the same .apsimx file
+                if (join) simulations.Children.Add(folder);          
+                // Only gather parameter sets into the same .apsimx file
                 else
                 {
-                    WriteApsimx(simulations, null, iat.name);
-                    simulations = new XElement("name_is_ignored");
-                }
+                    WriteApsimX(simulations, iat.Name);
+                    simulations = new Simulations(null);
+                }                
             }
 
-            if (join) WriteApsimx(simulations, null, "Simulations");
+            if (join) WriteApsimX(simulations, "simulations");
 
-            Toolbox.CloseErrorLog();
+            IAT.Error.CloseLog();
         }
+
+        private static void WriteApsimX(Simulations simulations, string name)
+        {
+            StreamWriter stream = new StreamWriter(IAT.OutDir + "/" + name + ".apsimx");
+            JsonWriter writer = new JsonTextWriter(stream)
+            {
+                CloseOutput = true,
+                AutoCompleteOnClose = true
+            };
+
+            JsonSerializer serializer = new JsonSerializer()
+            {
+                Formatting = Formatting.Indented,
+                TypeNameHandling = TypeNameHandling.All
+            };
+            serializer.Serialize(writer, simulations);
+
+            writer.Close();
+        }
+
+        private static void AttachIAT(Node node, IAT iat)
+        {
+            node.Source = iat;
+            Simulation simulation = new Simulation(node);
+            simulation.Name = iat.Name;
+
+            node.Children.Add(simulation);
         }
     }
 }

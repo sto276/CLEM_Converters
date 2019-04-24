@@ -23,34 +23,39 @@ namespace Models.CLEM
 
         public ZoneCLEM(Node parent) : base(parent)
         {
-            AddFiles();
+            Name = "CLEM";
+
             resources = new ResourcesHolder(this);
             activities = new ActivitiesHolder(this);
+
+            AddFiles();            
+            Add(resources);
+            Add(activities);
             AddReports();            
         }
 
         private void AddFiles()
         {           
             // Add the crop
-            new FileCrop(this)
+            Add(new FileCrop(this)
             {
                 FileName = Source.Name + "_FileCrop.prn",
                 Name = "FileCrop"
-            };
+            });
 
             // Add the crop residue
-            new FileCrop(this)
+            Add(new FileCrop(this)
             {
                 FileName = Source.Name + "_FileCropResidue.prn",
                 Name = "FileCropResidue"
-            };
+            });
 
             // Add the forage crop
-            new FileCrop(this)
+            Add(new FileCrop(this)
             {
                 FileName = Source.Name + "_FileForage.prn",
                 Name = "FileForage"
-            };
+            });
         }
 
         private void AddReports()
@@ -60,7 +65,7 @@ namespace Models.CLEM
                 Name = "Reports"
             };
 
-            new ReportResourceBalances(reports)
+            reports.Add(new ReportResourceBalances(reports)
             {
                 VariableNames = new List<string>()
                 {
@@ -71,24 +76,26 @@ namespace Models.CLEM
                 {
                     "[Clock.CLEMEndOfTimeStep"
                 }
-            };
+            });
 
-            new ReportActivitiesPerformed(reports);
-            new ReportResourceShortfalls(reports);
+            reports.Add(new ReportActivitiesPerformed(reports));
+            reports.Add(new ReportResourceShortfalls(reports));
 
             foreach(Node child in resources.Children)
             {
                 string name = child.GetType().Name;
 
-                new ReportResourceLedger(reports)
+                reports.Add(new ReportResourceLedger(reports)
                 {
                     VariableNames = new List<string>()
                     {
                         name
                     },
                     Name = name
-                };
+                });
             }
+
+            Add(reports);
         }
     }
 
@@ -97,9 +104,7 @@ namespace Models.CLEM
         public bool ShowPageOfGraphs { get; set; } = true;
 
         public CLEMFolder(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class FileCrop : Node
@@ -109,9 +114,7 @@ namespace Models.CLEM
         public string ExcelWorkSheetName { get; set; }
 
         public FileCrop(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class SummariseRuminantHerd : Node

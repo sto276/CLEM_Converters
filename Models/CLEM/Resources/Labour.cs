@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Resources
+﻿namespace Models.CLEM.Resources
 {
     public class Labour : Node
     {
@@ -13,8 +7,8 @@ namespace Models.CLEM.Resources
         public Labour(ResourcesHolder parent) : base(parent)
         {
             Name = "Labour";
-            Source.GetLabourTypes(this);
-            new LabourAvailabilityList(this);
+            Add(Source.GetLabourTypes(this));
+            Add(new LabourAvailabilityList(this));
         }
     }
 
@@ -38,7 +32,7 @@ namespace Models.CLEM.Resources
     {
         public LabourAvailabilityList(Labour parent) : base(parent)
         {
-            Children.AddRange(Source.GetAvailabilityItems(this));
+            Add(Source.GetAvailabilityItems(this));
         }
     }
 

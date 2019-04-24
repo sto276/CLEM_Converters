@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Resources
+﻿namespace Models.CLEM.Resources
 {
     public class Land : Node
     {
@@ -15,7 +9,7 @@ namespace Models.CLEM.Resources
         public Land(ResourcesHolder parent) : base(parent)
         {
             Name = "Land";
-            Source.GetLandTypes(this);           
+            Add(Source.GetLandTypes(this));
         }
     }
 

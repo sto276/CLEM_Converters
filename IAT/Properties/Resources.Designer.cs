@@ -19,7 +19,7 @@ namespace IAT.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,51 +57,6 @@ namespace IAT.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to CLEM_TAG,VALUE
-        ///EMaintExponent,0.00082
-        ///GrowthEnergyIntercept1,6.7
-        ///GrowthEnergyIntercept2,20.3
-        ///GrowthEfficiency,1.09
-        ///BaseAnimalEquivalent,450
-        ///GreenDietMax,0.98
-        ///GreenDietCoefficient,0.15
-        ///GreenDietZero,0.04
-        ///IntakeTropicalQuality,0.16
-        ///IntakeCoefficientQuality,1.7
-        ///IntakeCoefficientBiomass,0.006
-        ///MilkIntakeMaximum,20
-        ///MilkLWTFodderSubstitutionProportion,0.2
-        ///MaxJuvenileIntake,0.035
-        ///ProportionalDiscountDueToMilk,0.3
-        ///ProportionOfMaxWeightToSurvive,0.5
-        ///LactatingPotentialModifierConstantA,0.42
-        ///Lactating [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string Resources_CLEM {
-            get {
-                return ResourceManager.GetString("Resources_CLEM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to IAT_TABLE,IAT_ROW,IAT_NAME,CLEM_TAG,PROP
-        ///Ruminant coefficients,1,SRW,SRWFemale,1
-        ///Ruminant coefficients,2,birth_SRW,SRWBirth,1
-        ///Ruminant coefficients,3,Critical_cow_wt,CriticalCowWeight,0.01
-        ///Ruminant coefficients,4,grwth_coeff1,AgeGrowthRateCoefficient,1
-        ///Ruminant coefficients,5,grwth_coeff2,SRWGrowthScalar,1
-        ///Ruminant coefficients,6,km_coeff,EMaintEfficiencyCoefficient,1
-        ///Ruminant coefficients,7,km_incpt,EMaintEfficiencyIntercept,1
-        ///Ruminant coefficients,8,kg_coeff,EGrowthEfficiencyCoefficient,1
-        ///Ruminan [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string Resources_IAT {
-            get {
-                return ResourceManager.GetString("Resources_IAT", resourceCulture);
             }
         }
     }

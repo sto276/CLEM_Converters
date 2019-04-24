@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Groupings
+﻿namespace Models.CLEM.Groupings
 {
     public class AnimalPriceGroup : Node
     {
-        public int PricingStyle { get; set; }
+        public int PricingStyle { get; set; } = 0;
 
-        public double Value { get; set; }
+        public double Value { get; set; } = 0.0;
 
-        public int PurchaseOrSale { get; set; }
+        public int PurchaseOrSale { get; set; } = 0;
 
         public AnimalPriceGroup(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 }

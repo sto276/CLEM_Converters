@@ -110,7 +110,7 @@ namespace ReadIAT
                 string value;
                 foreach (var cell in has_text)
                 {
-                    value = iat.string_table.SharedStringTable.ElementAt(int.Parse(cell.InnerText)).InnerText;
+                    value = iat.StringTable.SharedStringTable.ElementAt(int.Parse(cell.InnerText)).InnerText;
                     if (value == Name)
                     {
                         // Find the Reference of the Cell containing the title

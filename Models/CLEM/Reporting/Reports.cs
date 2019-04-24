@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Models.CLEM.Reporting
 {
@@ -15,11 +11,8 @@ namespace Models.CLEM.Reporting
         public List<string> VariableNames = new List<string>();
 
         public List<string> EventNames = new List<string>();
-
         public Report(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     class ReportResourceBalances : Report
@@ -49,8 +42,6 @@ namespace Models.CLEM.Reporting
     class ReportResourceLedger : Report
     {
         public ReportResourceLedger(Node parent) : base(parent)
-        {
-            
-        }
+        { }
     }
 }

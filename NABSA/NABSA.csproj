@@ -67,9 +67,9 @@
     <EmbeddedResource Include="Resources\Params_NABSA.csv" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IAT\IAT.csproj">
+    <ProjectReference Include="..\IAT\Readers.csproj">
       <Project>{f9922b4d-528f-458a-bbe4-f3d5a119986c}</Project>
-      <Name>IAT</Name>
+      <Name>Readers</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -89,19 +89,24 @@ namespace ReadIAT
                     string cropname = CropData.Specs.RowNames.ElementAt(id + 1);
 
                     // Check data was found
-                    if (!inputs.Any()) throw new Exception($"{cropname}: Crop not found in inputs sheet");
+                    int pool = 0;
+                    if (inputs.Any())
+                    {
+                        // Select the first row of the valid inputs
+                        var input = inputs.First().Descendants<Cell>();
 
-                    // Select the first row of the valid inputs
-                    var input = inputs.First().Descendants<Cell>();
-
-                    // Find what pool the residue uses
-                    int.TryParse(iat.ParseCell(input.ElementAt(10)), out int pool);
+                        // Find what pool the residue uses
+                        int.TryParse(iat.ParseCell(input.ElementAt(10)), out pool);
+                    }
+                    else
+                    {
+                        Error.Write($"{cropname}: Crop not found in inputs sheet, adding to general pool", iat);
+                    }
 
                     // If the pool does not exist, create a new pool with the residue in it
                     if (!Pools.ContainsKey(pool)) Pools.Add(pool, $"{cropname}_Residue");
-
                     // If the pool exists already, add the residue to it.
-                    else Pools[pool] = Pools[pool] + $", {cropname}_Residue";
+                    else Pools[pool] = Pools[pool] + $", {cropname}_Residue";                   
                 }
             }
 
@@ -164,7 +169,7 @@ namespace ReadIAT
 
         public IEnumerable<ProductStoreType> GetProductStoreTypes(ProductStore store)
         {
-            return null;
+            return new List<ProductStoreType>();
         }
 
         public GrazeFoodStoreType GetGrazeFoodStore(GrazeFoodStore store)

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Resources
+﻿namespace Models.CLEM.Resources
 {
     public class ResourcePricing : Node
     {
@@ -29,7 +23,7 @@ namespace Models.CLEM.Resources
         public AnimalPricing(Node parent) : base(parent)
         {
             Name = "AnimalPricing";
-            Children.AddRange(Source.GetAnimalPrices(this));
+            Add(Source.GetAnimalPrices(this));
         }
     }
     

@@ -13,9 +13,7 @@ namespace Models.CLEM.Activities
         public int OnPartialResourcesAvailableAction { get; set; } = 0;
 
         public ActivityNode(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class ActivitiesHolder : Node
@@ -30,16 +28,18 @@ namespace Models.CLEM.Activities
             GetCashFlow();
 
             ActivityFolder crops = new ActivityFolder(this) { Name = "Manage crops" };
-            crops.Children.AddRange(Source.GetManageCrops(crops));
+            crops.Add(Source.GetManageCrops(crops));
+            Add(crops);
 
             ActivityFolder forages = new ActivityFolder(this) { Name = "Manage forages" };
-            forages.Children.AddRange(Source.GetManageForages(forages));
-            if (forages.Children.Count > 0) forages.Children.Add(Source.GetNativePasture(forages));
+            forages.Add(Source.GetManageForages(forages));
+            if (forages.Children.Count > 0) forages.Add(Source.GetNativePasture(forages));
+            Add(forages);
 
             GetHerd();
 
-            new SummariseRuminantHerd(this);
-            new ReportRuminantHerd(this);
+            Add(new SummariseRuminantHerd(this));
+            Add(new ReportRuminantHerd(this));
         }
 
         private void GetCashFlow()
@@ -48,31 +48,31 @@ namespace Models.CLEM.Activities
             {
                 Name = "CashFlow"
             };
-            Children.Add(Source.GetMonthlyExpenses(new ActivityFolder(cashflow) { Name = "ExpensesMonthly" }));
-            Children.AddRange(Source.GetAnnualExpenses(new ActivityFolder(cashflow) { Name = "ExpensesAnnual" }));
-            Children.Add(Source.GetInterestRates(new ActivityFolder(cashflow) { Name = "InterestRates" }));
+            Add(Source.GetMonthlyExpenses(new ActivityFolder(cashflow) { Name = "ExpensesMonthly" }));
+            Add(Source.GetAnnualExpenses(new ActivityFolder(cashflow) { Name = "ExpensesAnnual" }));
+            Add(Source.GetInterestRates(new ActivityFolder(cashflow) { Name = "InterestRates" }));
         }
 
         private void GetHerd()
         {
             ActivityFolder herd = new ActivityFolder(this){Name = "Manage herd"};
 
-            Children.Add(Source.GetManageBreeds(herd));
-            new ActivityFolder(herd){Name = "Cut and carry"};
-            new RuminantActivityGrazeAll(herd);
-            new RuminantActivityGrow(herd);
-            new RuminantActivityBreed(herd);
-            new RuminantActivityBuySell(herd);
-            new RuminantActivityMuster(herd);
+            herd.Add(Source.GetManageBreeds(herd));
+            herd.Add(new ActivityFolder(herd){Name = "Cut and carry"});
+            herd.Add(new RuminantActivityGrazeAll(herd));
+            herd.Add(new RuminantActivityGrow(herd));
+            herd.Add(new RuminantActivityBreed(herd));
+            herd.Add(new RuminantActivityBuySell(herd));
+            herd.Add(new RuminantActivityMuster(herd));
+
+            Add(herd);
         }
     }
 
     public class ActivityFolder : ActivityNode
     {
         public ActivityFolder(Node parent) : base(parent)
-        {
-
-        }
+        {  }
     }
 
     public class ActivityTimerInterval : Node
@@ -82,8 +82,6 @@ namespace Models.CLEM.Activities
         public int MonthDue { get; set; } = 12;
 
         public ActivityTimerInterval(Node parent) : base(parent)
-        {
-
-        }
+        {  }
     }
 }

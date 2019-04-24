@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Resources
+﻿namespace Models.CLEM.Resources
 {
     public class Finance : Node
     {
@@ -13,7 +7,7 @@ namespace Models.CLEM.Resources
         public Finance(ResourcesHolder parent) : base(parent)
         {
             Name = "Finance";
-            new FinanceType(this);
+            Add(new FinanceType(this));
         }
     }
 

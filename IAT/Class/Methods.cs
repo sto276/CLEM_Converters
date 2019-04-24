@@ -186,7 +186,7 @@ namespace ReadIAT
                 // If the CellValue is a shared string, look through the shared table for its value
                 if (cell.DataType.Value == CellValues.SharedString)
                 {
-                    value = string_table.SharedStringTable.ElementAt(int.Parse(value)).InnerText;
+                    value = StringTable.SharedStringTable.ElementAt(int.Parse(value)).InnerText;
                 }
                 // If the CellValue is a bool, convert it into true/false text
                 else if (cell.DataType.Value == CellValues.Boolean)

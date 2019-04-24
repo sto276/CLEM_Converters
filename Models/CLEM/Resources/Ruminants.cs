@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Resources
+﻿namespace Models.CLEM.Resources
 {
     public class RuminantHerd : Node
     {
         public RuminantHerd(Node parent) : base(parent)
         {
-            Name = "RuminantHerd";
-            Children.AddRange(Source.GetRuminants(this));
+            Name = "Ruminants";
+            Add(Source.GetRuminants(this));
         }
     }
 
@@ -149,9 +143,11 @@ namespace Models.CLEM.Resources
 
         public double MultipleBirthRate { get; set; } = 0.0;
 
+        public double TwinRate { get; set; } = 0.0;
+
         public double CriticalCowWeight { get; set; } = 0.0;
 
-        public double ConceptionRateCoefficent { get; set; } = 0.0;
+        public double ConceptionRateCoefficient { get; set; } = 0.0;
 
         public double ConceptionRateIntercept { get; set; } = 0.0;
 
@@ -163,7 +159,7 @@ namespace Models.CLEM.Resources
 
         public double MaximumConceptionUncontrolledBreeding { get; set; } = 0.9;
 
-        public double MethaneProductionCoefficient { get; set; } = 20.7;
+        public double MethaneProductionCoefficient { get; set; } = 20.7;        
 
         public string Units { get; set; }
 
@@ -171,8 +167,8 @@ namespace Models.CLEM.Resources
 
         public RuminantType(Node parent) : base(parent)
         {
-            new RuminantInitialCohorts(this);
-            new AnimalPricing(this);
+            Add(new RuminantInitialCohorts(this));
+            Add(new AnimalPricing(this));
         }
     }
 
@@ -181,7 +177,7 @@ namespace Models.CLEM.Resources
         public RuminantInitialCohorts(Node parent) : base(parent)
         {
             Name = "InitialCohorts";
-            Children.AddRange(Source.GetCohorts(this));
+            Add(Source.GetCohorts(this));
         }
     }
 

@@ -11,24 +11,14 @@ namespace ReadIAT
 		public string Name { get; set; }
 
         /// <summary>
-        /// The directory to look for IAT files in
-        /// </summary>
-        public string InDir { get; set; } = "Simulations";
-
-        /// <summary>
         /// The directory to write CLEM simulations to
         /// </summary>
-        public string OutDir { get; set; } = "Simulations";
-
-        /// <summary>
-        /// Climate region of the simulation
-        /// </summary>
-        private string Climate { get; set; } = "1";               
+        public static string OutDir { get; set; } = "Simulations";                       
 
         /// <summary>
         /// Object representation of the .xlsx
         /// </summary>
-        public SpreadsheetDocument doc;
+        private SpreadsheetDocument Doc { get; set; }
 
         /// <summary>
         /// Workbook information from the document object
@@ -38,18 +28,21 @@ namespace ReadIAT
         /// <summary>
         /// Information about the current parameter sheet
         /// </summary>
-        public Sheet ParameterSheet { get; set; }
+        private Sheet ParameterSheet { get; set; }
 
         /// <summary>
         /// Data from the current parameter sheet
         /// </summary>
-        private WorksheetPart Part;
+        private WorksheetPart Part { get; set; }
 
         /// <summary>
         /// Contains all unique strings used in cells (accessed via numeric ID)
         /// </summary>
-        private SharedStringTablePart string_table;
+        private SharedStringTablePart StringTable { get; set; }
 
-
+        /// <summary>
+        /// Climate region of the simulation
+        /// </summary>
+        private string Climate { get; set; } = "1";
     }
 }

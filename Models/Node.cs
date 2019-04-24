@@ -1,18 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Models
-{
+{    
     public class Node
     {
-        public string Name { get; set; }        
+        public string Name { get; set; }      
 
-        public Node Parent { get; set; }
-
-        public List<Node> Children { get; set; }
+        public List<Node> Children { get; set; } = new List<Node>();
 
         public bool IncludeInDocumentation { get; set; } = true;
 
@@ -20,19 +15,26 @@ namespace Models
 
         public bool ReadOnly { get; set; } = false;
 
-        public IApsimX Source { get; set; }
+        [JsonIgnore]
+        public Node Parent { get; set; }
 
-        private readonly bool root;
+        [JsonIgnore]
+        public IApsimX Source { get; set; }
 
         public Node(Node parent)
         {
-            if (parent == null) root = true;
-            else
-            {
-                root = false;
-                Source = parent.Source;
-            }
             Parent = parent;
-        }        
+            if (parent != null) Source = parent?.Source;
+        }
+        
+        public void Add(Node node)
+        {
+            Children.Add(node);
+        }
+
+        public void Add(IEnumerable<Node> nodes)
+        {
+            Children.AddRange(nodes);
+        }
     }
 }

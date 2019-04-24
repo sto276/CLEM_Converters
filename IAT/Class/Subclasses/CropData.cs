@@ -15,8 +15,6 @@ namespace ReadIAT
         /// </summary>
         private static class CropData
         {
-            private static IAT iat;
-
             public static List<int> Columns { get; private set; }
 
             public static SubTable Grown { get; private set; }
@@ -25,8 +23,6 @@ namespace ReadIAT
 
             public static void Construct(IAT source)
             {
-                iat = source;
-
                 Grown = new SubTable("Grain Crops Grown", source);
                 Specs = new SubTable("Grain Crop Specifications", source);
 

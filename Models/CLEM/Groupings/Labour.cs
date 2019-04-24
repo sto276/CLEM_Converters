@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Groupings
+﻿namespace Models.CLEM.Groupings
 {
     public class LabourFilter : Node
     {
@@ -12,7 +6,7 @@ namespace Models.CLEM.Groupings
 
         public int Operator { get; set; } = 0;
 
-        public string Value { get; set; }
+        public string Value { get; set; } = "";
 
         public LabourFilter(Node parent) : base(parent)
         {
@@ -23,8 +17,6 @@ namespace Models.CLEM.Groupings
     public class LabourFilterGroup : Node
     {
         public LabourFilterGroup(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 }

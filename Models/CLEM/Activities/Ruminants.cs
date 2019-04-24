@@ -31,9 +31,7 @@
         public string FeedStyle { get; set; } = "ProportionOfPotentialIntake";
 
         public RuminantActivityFeed(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class RuminantActivityGrazeAll : ActivityNode
@@ -53,6 +51,8 @@
                 Operator = 0,
                 Value = "Male"
             };
+            group.Add(filter);
+            labour.Add(group);
         }
     }
 
@@ -107,9 +107,7 @@
         public string ResourceTypeName { get; set; } = "HumanFoodStore.Milk";
 
         public RuminantActivityMilking(Node parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
     public class RuminantActivityMuster : ActivityNode

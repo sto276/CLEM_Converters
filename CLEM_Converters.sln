@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAT", "IAT\IAT.csproj", "{F9922B4D-528F-458A-BBE4-F3D5A119986C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Readers", "IAT\Readers.csproj", "{F9922B4D-528F-458A-BBE4-F3D5A119986C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NABSA", "NABSA\NABSA.csproj", "{0B652940-5B0B-4DE6-977E-8DA40BEF745B}"
 EndProject

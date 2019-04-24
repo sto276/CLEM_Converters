@@ -1,5 +1,5 @@
 ﻿using Gtk;
-using IAT;
+using ReadIAT;
 using NABSA;
 using System;
 using System.Collections.Generic;
@@ -230,8 +230,8 @@ namespace UI
             switch (combobox.ActiveText)
             {                
                 case "IAT":
-                    Toolbox.OutDir = outentry.Text;
-                    IAT.Converter.Run(files, joincheck.Active, splitcheck.Active);
+                    ReadIAT.IAT.OutDir = outentry.Text;
+                    Runner.Run(files, joincheck.Active, splitcheck.Active);
                     break;
 
                 case "NABSA":

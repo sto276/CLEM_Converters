@@ -12,8 +12,6 @@ namespace ReadIAT
         /// </summary>
         private static class ForageData
         {
-            private static IAT iat;
-
             public static SubTable Grown { get; private set; }
 
             public static SubTable Specs { get; private set; }
@@ -22,7 +20,6 @@ namespace ReadIAT
 
             public static void Construct(IAT source)
             {
-                iat = source;
                 Grown = new SubTable("Forage Crops Grown", source);
                 Specs = new SubTable("Forage Crop Specifications", source);
 
