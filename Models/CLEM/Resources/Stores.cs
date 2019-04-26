@@ -7,6 +7,7 @@
             Name = "AnimalFoodStore";
             Add(Source.GetAnimalStoreTypes(this));
             Add(Source.GetCommonFoodStore(this));
+
         }
     }
 

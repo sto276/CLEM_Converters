@@ -81,7 +81,7 @@ namespace ReadIAT
             JsonSerializer serializer = new JsonSerializer()
             {
                 Formatting = Formatting.Indented,
-                TypeNameHandling = TypeNameHandling.All
+                TypeNameHandling = TypeNameHandling.Objects
             };
             serializer.Serialize(writer, simulations);
 
@@ -92,7 +92,7 @@ namespace ReadIAT
         {
             node.Source = iat;
             Simulation simulation = new Simulation(node);
-            simulation.Name = iat.Name;
+            simulation.Name = iat.ParameterSheet.Name;
 
             node.Children.Add(simulation);
         }

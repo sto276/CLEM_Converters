@@ -116,20 +116,11 @@ namespace Models.CLEM
         public FileCrop(Node parent) : base(parent)
         { }
     }
-
     public class SummariseRuminantHerd : Node
     {
         public SummariseRuminantHerd(Node parent) : base(parent)
         {
             Name = "SummariseHerd";
-        }
-    }
-
-    public class ReportRuminantHerd : Node
-    {
-        public ReportRuminantHerd(Node parent) : base(parent)
-        {
-            Name = "ReportHerd";
         }
     }
 }

@@ -85,15 +85,27 @@ namespace ReadIAT
 
                     LabourAvailabilityItem item = new LabourAvailabilityItem(parent)
                     {
-                        Name = age + gender,
+                        Name = age + " " + gender,
                         Value = value
                     };
 
-                    LabourFilter filter = new LabourFilter(item)
+                    LabourFilter filterA = new LabourFilter(item)
                     {
-                        Value = age + gender
+                        Name = "GenderFilter",
+                        Parameter = 1,
+                        Value = gender
                     };
-                    item.Children.Add(filter);
+
+                    LabourFilter filterB = new LabourFilter(item)
+                    {
+                        Name = "AgeFilter",
+                        Parameter = 2,
+                        Operator = 5,
+                        Value = age
+                    };
+
+                    item.Children.Add(filterA);
+                    item.Children.Add(filterB);
 
                     items.Add(item);
                 }

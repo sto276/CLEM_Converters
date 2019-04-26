@@ -11,4 +11,16 @@
         public AnimalPriceGroup(Node parent) : base(parent)
         { }
     }
+
+    public class RuminantFilter : Node
+    {
+        public int Parameter { get; set; } = 0;
+
+        public int Operator { get; set; } = 0;
+
+        public string Value { get; set; } = "";
+
+        public RuminantFilter(Node parent) : base(parent)
+        { }
+    }
 }

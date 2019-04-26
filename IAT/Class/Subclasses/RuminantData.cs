@@ -17,7 +17,7 @@ namespace ReadIAT
         {
             public static int Col { get; set; }
 
-            public static List<int> Columns = new List<int>();            
+            public static List<int> Columns { get; private set; }            
 
             public static SubTable Numbers { get; private set; }
 
@@ -45,6 +45,8 @@ namespace ReadIAT
 
             public static void Construct(IAT source)
             {
+                Columns = new List<int>();
+
                 Numbers = new SubTable("Startup ruminant numbers", source);
                 Ages = new SubTable("Startup ruminant ages", source);
                 Weights = new SubTable("Startup ruminant weights", source);
@@ -131,13 +133,7 @@ namespace ReadIAT
         }
 
         public IEnumerable<RuminantType> GetRuminants(RuminantHerd parent)
-        {
-            new Memo(parent)
-            {
-                Text = "Missing breed data is assigned a default value. \n" +
-                "Ensure the sensibility of data before running the simulation."
-            };
-
+        {          
             List<RuminantType> ruminants = new List<RuminantType>();
 
             // Iterate over all the present breeds
@@ -212,12 +208,28 @@ namespace ReadIAT
                 {
                     if (!cohort.ToLower().Contains("sire")) sire_price = RuminantData.Prices.GetData<double>(row, RuminantData.Col);
 
-                    prices.Add(new AnimalPriceGroup(parent)
+                    var group = new AnimalPriceGroup(parent)
                     {
                         Name = cohort,
                         Value = RuminantData.Prices.GetData<double>(row, RuminantData.Col)
+                    };
+
+                    group.Add(new RuminantFilter(group)
+                    { 
+                        Name = "GenderFilter",
+                        Parameter = 2,
+                        Value = cohort.ToLower().Contains("f") ? "Female" : "Male"
                     });
 
+                    group.Add(new RuminantFilter(group)
+                    {
+                        Name = "AgeFilter",
+                        Parameter = 2,
+                        Operator = 5,
+                        Value = RuminantData.Ages.GetData<string>(row, RuminantData.Col)
+                    });
+
+                    prices.Add(group);
                 }
             }
             parent.SirePrice = sire_price;
@@ -225,32 +237,29 @@ namespace ReadIAT
             return prices;
         }
 
-        public ActivityFolder GetManageBreeds(ActivityFolder parent)
+        public IEnumerable<ActivityFolder> GetManageBreeds(ActivityFolder herd)
         {
             SubTable specs = RuminantData.Specs;
 
-            ActivityFolder breeds = new ActivityFolder(parent)
-            {
-                Name = "Breeds"
-            };
+            List<ActivityFolder> breeds = new List<ActivityFolder>();
 
             foreach (int col in RuminantData.Columns)
             {
                 // Add a new folder for individual breed
-                ActivityFolder breed = new ActivityFolder(breeds)
+                ActivityFolder breed = new ActivityFolder(herd)
                 {
                     Name = "Manage " + specs.ColumnNames[col]
                 };
 
                 // Manage breed weaning
-                new RuminantActivityWean(breed)
+                breed.Add(new RuminantActivityWean(breed)
                 {
                     WeaningAge = specs.GetData<double>(7, col),
                     WeaningWeight = specs.GetData<double>(8, col)
-                };
+                });
 
                 // Manage breed milking
-                if (specs.GetData<double>(18, col) > 0) new RuminantActivityMilking(breed);
+                if (specs.GetData<double>(18, col) > 0) breed.Add(new RuminantActivityMilking(breed));
 
                 // Manage breed numbers
                 RuminantActivityManage numbers = new RuminantActivityManage(breed)
@@ -263,19 +272,22 @@ namespace ReadIAT
                     MaleSellingWeight = specs.GetData<double>(6, col)
                 };
 
-                new ActivityTimerInterval(numbers)
+                numbers.Add(new ActivityTimerInterval(numbers)
                 {
                     Interval = 12,
                     MonthDue = 12
-                };
+                });
+
+                breed.Add(numbers);
 
                 // Manage sale of dry breeders
-                new RuminantActivitySellDryBreeders(breed)
+                breed.Add(new RuminantActivitySellDryBreeders(breed)
                 {
                     MonthsSinceBirth = specs.GetData<double>(32, col),
                     ProportionToRemove = specs.GetData<double>(4, col) * 0.01
-                };
+                });
 
+                breeds.Add(breed);
             }
 
             return breeds;

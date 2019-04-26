@@ -7,6 +7,7 @@
         public Finance(ResourcesHolder parent) : base(parent)
         {
             Name = "Finance";
+            Source.SetFinanceData(this);
             Add(new FinanceType(this));
         }
     }

@@ -52,22 +52,32 @@ namespace ReadIAT
         /// Gets the monthly living expenses from the IAT data
         /// </summary>
         /// <param name="cashflow">The model to attach the data to</param>
-        public FinanceActivityPayExpense GetMonthlyExpenses(ActivityFolder cashflow)
+        public ActivityFolder GetMonthlyExpenses(ActivityFolder cashflow)
         {
-            return new FinanceActivityPayExpense(cashflow)
+            var monthly = new ActivityFolder(cashflow)
+            {
+                Name = "MonthlyExpenses"
+            };
+
+            monthly.Add(new FinanceActivityPayExpense(monthly)
             {
                 Name = "LivingCost",
                 Amount = FinanceData.Overheads.GetData<double>(13, 0)
-            };
+            });
+
+            return monthly;
         }
 
         /// <summary>
         /// Return a collection of the annual expenses from the IAT data
         /// </summary>
         /// <param name="cashflow">The base model</param>
-        public IEnumerable<FinanceActivityPayExpense> GetAnnualExpenses(ActivityFolder cashflow)
+        public ActivityFolder GetAnnualExpenses(ActivityFolder cashflow)
         {
-            List<FinanceActivityPayExpense> expenses = new List<FinanceActivityPayExpense>();
+            var annual = new ActivityFolder(cashflow)
+            {
+                Name = "AnnualExpenses"
+            };
 
             // Names of the expenses
             var rows = FinanceData.Overheads.RowNames;
@@ -89,7 +99,7 @@ namespace ReadIAT
                 // Only need to add the element if its a non-zero expenditure
                 if (amount > 0)
                 {
-                    expenses.Add(new FinanceActivityPayExpense(cashflow)
+                    annual.Add(new FinanceActivityPayExpense(annual)
                     {
                         Name = row.Replace("_", ""),
                         Amount = amount
@@ -97,7 +107,7 @@ namespace ReadIAT
                 }
             }
 
-            return expenses;
+            return annual;
         }
 
         /// <summary>
@@ -105,7 +115,7 @@ namespace ReadIAT
         /// </summary>
         /// <param name="cashflow">The base model</param>
         public FinanceActivityCalculateInterest GetInterestRates(ActivityFolder cashflow)
-        {
+        {           
             // Find the interest amount
             int row = FinanceData.Overheads.RowNames.FindIndex(s => s == "Int_rate");
 

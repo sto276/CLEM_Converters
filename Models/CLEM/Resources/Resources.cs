@@ -10,10 +10,10 @@
             Add(new Labour(this));
             Add(new RuminantHerd(this));
             Add(new Finance(this));
-            Add(new AnimalFoodStore(this));
-            Add(new HumanFoodStore(this));
+            Add(new AnimalFoodStore(this));            
             Add(new GrazeFoodStore(this));
             Add(new ProductStore(this));
+            Add(new HumanFoodStore(this));
         }
     }    
 }

@@ -29,11 +29,13 @@ namespace Models
         
         public void Add(Node node)
         {
+            if (node is null) return;
             Children.Add(node);
         }
 
         public void Add(IEnumerable<Node> nodes)
         {
+            if (nodes is null) return;
             Children.AddRange(nodes);
         }
     }

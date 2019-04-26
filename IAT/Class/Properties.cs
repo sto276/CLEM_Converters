@@ -28,7 +28,7 @@ namespace ReadIAT
         /// <summary>
         /// Information about the current parameter sheet
         /// </summary>
-        private Sheet ParameterSheet { get; set; }
+        public Sheet ParameterSheet { get; set; }
 
         /// <summary>
         /// Data from the current parameter sheet

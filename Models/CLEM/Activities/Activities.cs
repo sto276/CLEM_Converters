@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Activities
+﻿namespace Models.CLEM.Activities
 {
+    using CLEM.Reporting;
+
     public class ActivityNode : Node
     {
         public object SelectedTab { get; set; } = null;
@@ -48,9 +44,11 @@ namespace Models.CLEM.Activities
             {
                 Name = "CashFlow"
             };
-            Add(Source.GetMonthlyExpenses(new ActivityFolder(cashflow) { Name = "ExpensesMonthly" }));
-            Add(Source.GetAnnualExpenses(new ActivityFolder(cashflow) { Name = "ExpensesAnnual" }));
-            Add(Source.GetInterestRates(new ActivityFolder(cashflow) { Name = "InterestRates" }));
+            cashflow.Add(Source.GetMonthlyExpenses(cashflow));
+            cashflow.Add(Source.GetAnnualExpenses(cashflow));
+            cashflow.Add(Source.GetInterestRates(cashflow));
+
+            Add(cashflow);
         }
 
         private void GetHerd()
@@ -58,7 +56,6 @@ namespace Models.CLEM.Activities
             ActivityFolder herd = new ActivityFolder(this){Name = "Manage herd"};
 
             herd.Add(Source.GetManageBreeds(herd));
-            herd.Add(new ActivityFolder(herd){Name = "Cut and carry"});
             herd.Add(new RuminantActivityGrazeAll(herd));
             herd.Add(new RuminantActivityGrow(herd));
             herd.Add(new RuminantActivityBreed(herd));

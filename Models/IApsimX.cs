@@ -49,9 +49,9 @@ namespace Models
 
         // ACTIVITIES
         // Finance activities
-        FinanceActivityPayExpense GetMonthlyExpenses(ActivityFolder cashflow);
+        ActivityFolder GetMonthlyExpenses(ActivityFolder cashflow);
 
-        IEnumerable<FinanceActivityPayExpense> GetAnnualExpenses(ActivityFolder cashflow);
+        ActivityFolder GetAnnualExpenses(ActivityFolder cashflow);
 
         FinanceActivityCalculateInterest GetInterestRates(ActivityFolder cashflow);
 
@@ -60,9 +60,9 @@ namespace Models
 
         IEnumerable<CropActivityManageCrop> GetManageForages(ActivityFolder forages);
 
-        ActivityFolder GetNativePasture(ActivityFolder forages);
+        IEnumerable<CropActivityManageCrop> GetNativePasture(ActivityFolder forages);
 
         // Ruminant activities
-        ActivityFolder GetManageBreeds(ActivityFolder parent);
+        IEnumerable<ActivityFolder> GetManageBreeds(ActivityFolder parent);
     }
 }

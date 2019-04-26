@@ -62,7 +62,7 @@
 
         public RuminantActivityGrow(Node parent) : base(parent)
         {
-            Name = "Grow all ruminants";
+            Name = "GrowAll";
         }
     }
 

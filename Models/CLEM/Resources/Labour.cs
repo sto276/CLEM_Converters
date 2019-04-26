@@ -32,6 +32,7 @@
     {
         public LabourAvailabilityList(Labour parent) : base(parent)
         {
+            Name = "LabourAvailabilityList";
             Add(Source.GetAvailabilityItems(this));
         }
     }

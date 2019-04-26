@@ -56,13 +56,14 @@ namespace ReadIAT
                         AreaRequested = ForageData.Grown.GetData<double>(2, col)
                     };
 
-                    new CropActivityManageProduct(crop)
+                    crop.Add(new CropActivityManageProduct(crop)
                     {
                         Name = "Cut and carry " + name,
                         ModelNameFileCrop = "FileForage",
                         CropName = name,
                         StoreItemName = "AnimalFoodStore"
-                    };
+                    });
+
                     manage.Add(crop);
                 }
                 col++;
@@ -76,8 +77,10 @@ namespace ReadIAT
         /// </summary>
         /// <param name="parent"></param>
         /// <returns></returns>
-        public ActivityFolder GetNativePasture(ActivityFolder forages)
+        public IEnumerable<CropActivityManageCrop> GetNativePasture(ActivityFolder forages)
         {
+            List<CropActivityManageCrop> pastures = new List<CropActivityManageCrop>();
+
             // Check if there are native pasture feeds before proceeding
             var feed_type = RuminantData.Specs.GetRowData<int>(28);
             var feeds = from breed in feed_type
@@ -93,13 +96,13 @@ namespace ReadIAT
                 Name = "NativePastureFarm"
             };
 
-            new CropActivityManageProduct(farm)
+            farm.Add(new CropActivityManageProduct(farm)
             {
                 ModelNameFileCrop = "FileForage",
                 CropName = "Native_grass",
                 StoreItemName = "AnimalFoodStore.NativePasture",
                 Name = "Cut and carry Native Pasture"
-            };
+            });
 
             CropActivityManageCrop common = new CropActivityManageCrop(forages)
             {
@@ -107,15 +110,17 @@ namespace ReadIAT
                 Name = "Native Pasture Common Land"
             };
 
-            new CropActivityManageProduct(common)
+            common.Add(new CropActivityManageProduct(common)
             {
                 ModelNameFileCrop = "FileForage",
                 CropName = "Native_grass",
                 StoreItemName = "GrazeFoodStore.NativePasture",
                 Name = "Grazed Common Land"
-            };
+            });
 
-            return forages;
+            pastures.Add(farm);
+            pastures.Add(common);
+            return pastures.AsEnumerable();
         }
     }
 }

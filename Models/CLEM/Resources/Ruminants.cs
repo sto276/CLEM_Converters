@@ -5,6 +5,14 @@
         public RuminantHerd(Node parent) : base(parent)
         {
             Name = "Ruminants";
+
+            Add(new Memo(this)
+            {
+                Name = "Check parameter values",
+                Text = "Missing breed parameters are assigned a default values. \n" +
+                "Ensure the sensibility of data before running the simulation."
+            });
+            
             Add(Source.GetRuminants(this));
         }
     }
@@ -141,8 +149,6 @@
 
         public double MinimumDaysBirthToConception { get; set; } = 270;
 
-        public double MultipleBirthRate { get; set; } = 0.0;
-
         public double TwinRate { get; set; } = 0.0;
 
         public double CriticalCowWeight { get; set; } = 0.0;
@@ -163,7 +169,6 @@
 
         public string Units { get; set; }
 
-        public string SelectedTab { get; set; }
 
         public RuminantType(Node parent) : base(parent)
         {

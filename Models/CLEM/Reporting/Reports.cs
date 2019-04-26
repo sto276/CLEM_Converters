@@ -44,4 +44,14 @@ namespace Models.CLEM.Reporting
         public ReportResourceLedger(Node parent) : base(parent)
         { }
     }
+
+    
+
+    public class ReportRuminantHerd : Node
+    {
+        public ReportRuminantHerd(Node parent) : base(parent)
+        {
+            Name = "ReportHerd";
+        }
+    }
 }
