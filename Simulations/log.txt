@@ -1,8 +1,0 @@
-Error 1:
-	Maize-N0: Crop not found in inputs sheet, adding to general pool
-	in Dodoma_Goats: Param
-
-Error 2:
-	Table 'Overheads' contains an empty cell.
-	in Dodoma_Goats: Param
-
