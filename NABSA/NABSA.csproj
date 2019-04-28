@@ -45,15 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\Finances.cs" />
-    <Compile Include="Classes\Foodstores.cs" />
-    <Compile Include="Classes\Forages.cs" />
-    <Compile Include="Classes\Labour.cs" />
-    <Compile Include="Classes\Land.cs" />
-    <Compile Include="Classes\Queries.cs" />
-    <Compile Include="Classes\Ruminants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Classes\Simulation.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -64,7 +56,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="Resources\Params_NABSA.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IAT\Readers.csproj">
