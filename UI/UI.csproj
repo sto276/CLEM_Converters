@@ -120,10 +120,6 @@
     <None Include="UI_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IAT\Reader.csproj">
-      <Project>{f9922b4d-528f-458a-bbe4-f3d5a119986c}</Project>
-      <Name>Reader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Models\Models.csproj">
       <Project>{3abb82a7-60d0-4e28-a75f-d192412e5b5b}</Project>
       <Name>Models</Name>

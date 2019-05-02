@@ -48,6 +48,7 @@
     <Compile Include="CLEM\Activities\Crop.cs" />
     <Compile Include="CLEM\Activities\Finances.cs" />
     <Compile Include="CLEM\Activities\Labour.cs" />
+    <Compile Include="CLEM\Activities\Land.cs" />
     <Compile Include="CLEM\Activities\ResourceActivitySell.cs" />
     <Compile Include="CLEM\Activities\Ruminants.cs" />
     <Compile Include="CLEM\Groupings\Ruminants.cs" />

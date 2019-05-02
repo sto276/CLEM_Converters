@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Models.CLEM.Activities;
+using Models.CLEM.Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,138 +9,59 @@ using System.Xml.Linq;
 
 namespace Reader
 {
-    using static Queries;
-    static class Land
+    public partial class NABSA
     {
         /// <summary>
         /// Builds the 'Land' subsection 
         /// </summary>
         /// <param name="nab">Source NABSA</param>
-        public static XElement GetLand(XElement nabsa)
+        public IEnumerable<LandType> GetLandTypes(Land land)
         {
-            XElement land = new XElement("Land", new XElement("Name", "Land"));
+            List<LandType> types = new List<LandType>();
 
-            XElement specs = nabsa.Element("LandSpecs");
-            var items = specs.Elements().ToArray();
+            var items = LandSpecs.Elements().ToArray();
 
             for (int i = 2; i < items.Length; i++)
             {
                 var data = items[i].Elements().ToArray();
                 if (data[0].Value != "0")
                 {
-                    XElement type = new XElement
-                    (
-                        "LandType",
-                        new XElement("Name", items[i].Name),
-                        new XElement("IncludeInDocumentation", "true"),
-                        new XElement("LandArea", data[0].Value),
-                        new XElement("SoilType", data[3].Value)
-                    );
+                    LandType type = new LandType(land)
+                    {
+                        Name = items[i].Name.LocalName,
+                        LandArea = Convert.ToDouble(data[0].Value),
+                        SoilType = Convert.ToInt32(data[3].Value)
+                    };
 
-                    land.Add(type);
+                    types.Add(type);
                 }
             }
-
-            land.Add(new XElement("IncludeInDocumentation", "true"));
-
-            return land;
+            return types;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nabsa"></param>
-        /// <returns></returns>
-        public static XElement GetPastureManage(XElement nabsa)
+        public PastureActivityManage GetManagePasture(ActivitiesHolder folder)
         {
-            XElement pasture = new XElement
-            (
-                "PastureActivityManage",
-                new XElement("Name", "PastureActivityManage"),
-                GetConditionIndex(nabsa),
-                GetBasalArea(nabsa),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("OnPartialResourcesAvailableAction", "ReportErrorAndStop"),
-                new XElement("LandTypeNameToUse", ""),
-                new XElement("FeedTypeName", "GrazeFoodStore.NativePasture"),
-                new XElement("StartingAmount", "0"),
-                new XElement("StartingStockingRate", "0"),
-                new XElement("AreaRequested", "0"),
-                new XElement("UseAreaAvailable", "true")
-            );
-                       
-            return pasture;
-        }
+            PastureActivityManage pasture = new PastureActivityManage(folder){};
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private static XElement GetConditionIndex(XElement nabsa)
-        {
-            string start = FindFirst(nabsa, "Land_con").Value;
-
-            string[] xdata = new[] { "0", "20", "30", "100" };
-            string[] ydata = new[] { "-0.625", "-0.125", "0", "0.75" };
-
-            XElement index = new XElement
-            (
-                "Relationship",
-                new XElement("LandConditionIndex"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("StartingValue", start),
-                new XElement("Minimum", "1"),
-                new XElement("Maximum", "8"),
-                GetDoubles("XValues", xdata),
-                GetDoubles("YValues", ydata)
-            );
-
-            return index;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private static XElement GetBasalArea(XElement nabsa)
-        {
-            string start = FindFirst(nabsa, "Grass_BA").Value;
-            string max = FindFirst(nabsa, "GBAmax").Value;
-
-            string[] xdata = new[] { "0", "20", "30", "100" };
-            string[] ydata = new[] { "-0.95", "-0.15", "0", "1.05" };
-
-            XElement basal = new XElement
-            (
-                "Relationship",
-                new XElement("GrassBasalArea"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("StartingValue", start),
-                new XElement("Minimum", max),
-                new XElement("Maximum", "8"),
-                GetDoubles("XValues", xdata),
-                GetDoubles("YValues", ydata)
-            );
-
-            return basal;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private static XElement GetDoubles(string name, IEnumerable<string> data)
-        {
-            XElement doubles = new XElement(name);
-
-            foreach (string d in data)
+            pasture.Add(new Relationship(pasture)
             {
-                doubles.Add(new XElement("double", d));
-            }
+                Name = "LandConditionIndex",
+                StartingValue = Convert.ToDouble(FindFirst(Source, "Land_con").Value),
+                Minimum = 1,
+                Maximum = 8 
+            });
 
-            return doubles;
-        }
+            pasture.Add(new Relationship(pasture)
+            {
+                Name = "GrassBasalArea",
+                StartingValue = Convert.ToDouble(FindFirst(Source, "Grass_BA").Value),
+                Minimum = 1,
+                Maximum = Convert.ToDouble(FindFirst(Source, "GBAmax").Value),
+                YValues = new[] { -0.95, -0.15, 0, 1.05 }
+            });
+
+            return pasture;
+        } 
+
     }
 }

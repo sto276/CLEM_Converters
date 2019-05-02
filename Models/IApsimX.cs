@@ -3,6 +3,7 @@
 namespace Models
 {
     using Core;
+    using CLEM;
     using CLEM.Activities;
     using CLEM.Resources;
     using CLEM.Groupings;
@@ -16,20 +17,22 @@ namespace Models
         // Metadata methods
         Clock GetClock(Simulation simulation);
 
+        IEnumerable<Node> GetFiles(ZoneCLEM clem);
+
         // Land methods
-        IEnumerable<LandType> GetLandTypes(Land parent);
+        IEnumerable<LandType> GetLandTypes(Land land);
 
         // Labour methods
-        IEnumerable<LabourType> GetLabourTypes(Labour parent);
+        IEnumerable<LabourType> GetLabourTypes(Labour labour);
 
-        IEnumerable<LabourAvailabilityItem> GetAvailabilityItems(LabourAvailabilityList parent);
+        IEnumerable<LabourAvailabilityItem> GetAvailabilityItems(LabourAvailabilityList list);
 
         // Ruminant methods
-        IEnumerable<RuminantType> GetRuminants(RuminantHerd parent);
+        IEnumerable<RuminantType> GetRuminants(RuminantHerd herd);
 
-        IEnumerable<RuminantTypeCohort> GetCohorts(RuminantInitialCohorts parent);
+        IEnumerable<RuminantTypeCohort> GetCohorts(RuminantInitialCohorts cohorts);
 
-        IEnumerable<AnimalPriceGroup> GetAnimalPrices(AnimalPricing parent);
+        IEnumerable<AnimalPriceGroup> GetAnimalPrices(AnimalPricing pricing);
 
         // Finance methods
         void SetFinanceData(Finance finance);
@@ -56,13 +59,15 @@ namespace Models
         FinanceActivityCalculateInterest GetInterestRates(ActivityFolder cashflow);
 
         // Crop/Forage activities
-        IEnumerable<CropActivityManageCrop> GetManageCrops(ActivityFolder parent);
+        IEnumerable<CropActivityManageCrop> GetManageCrops(ActivityFolder folder);
 
         IEnumerable<CropActivityManageCrop> GetManageForages(ActivityFolder forages);
 
         IEnumerable<CropActivityManageCrop> GetNativePasture(ActivityFolder forages);
 
+        PastureActivityManage GetManagePasture(ActivitiesHolder folder);
+
         // Ruminant activities
-        IEnumerable<ActivityFolder> GetManageBreeds(ActivityFolder parent);
+        IEnumerable<ActivityFolder> GetManageBreeds(ActivityFolder folder);
     }
 }

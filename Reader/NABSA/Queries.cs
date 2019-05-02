@@ -5,10 +5,10 @@ using System.Xml.Linq;
 namespace Reader
 {   
     /// <summary>
-    /// A collection of methods for searching
-    /// through an XElement object
+    /// A collection of methods for querying
+    /// an XElement object for specific data
     /// </summary>
-    public static class Queries
+    public partial class NABSA
     {
         /// <summary>
         /// Selects the first descendant with the given name
@@ -31,7 +31,7 @@ namespace Reader
         /// </summary>
         /// <param name="xml"></param>
         /// <param name="name"></param>
-        public static XElement FindByName(XElement xml, string name)
+        public static XElement FindByNameTag(XElement xml, string name)
         {
             var q =
                 from el

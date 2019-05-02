@@ -34,6 +34,7 @@
 
             GetHerd();
 
+            Add(Source.GetManagePasture(this));
             Add(new SummariseRuminantHerd(this));
             Add(new ReportRuminantHerd(this));
         }
@@ -80,5 +81,21 @@
 
         public ActivityTimerInterval(Node parent) : base(parent)
         {  }
+    }
+
+    public class Relationship : Node
+    {
+        public double StartingValue { get; set; } = 0;
+
+        public double Minimum { get; set; } = 0;
+
+        public double Maximum { get; set; } = 0;
+
+        public double[] XValues { get; set; } = new[] { 0.0, 20.0, 30.0, 100.0 };
+
+        public double[] YValues { get; set; } = new[] { -0.625, -0.125, 0, 0.75 };
+
+        public Relationship(Node parent) : base(parent)
+        { }
     }
 }

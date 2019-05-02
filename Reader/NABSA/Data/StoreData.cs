@@ -1,144 +1,115 @@
-﻿using System;
+﻿using Models.CLEM.Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Reader
 {
-    using static Queries;
-    static class Foodstores
+    public partial class NABSA
     {
-        /// <summary>
-        /// Builds the 'Graze Food Store' subsection
-        /// </summary>
-        /// <param name="nabsa">Source NABSA element</param>
-        public static XElement GetGraze(XElement nabsa)
-        {
-            // Element containing individual parameter data in NABSA
-            XElement param = nabsa.Element("SingleParams");
-
-            // Picking out specific parameters from the element
-            XElement type = new XElement
-            (
-                "GrazeFoodStoreType",
-                new XElement("Name", "NativePasture"),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("NToDMDCoefficient", param.Element("Coeff_DMD").Value),
-                new XElement("NToDMDIntercept", param.Element("Incpt_DMD").Value),
-                new XElement("NToDMDCrudeProteinDenominator", "0"),
-                new XElement("GreenNitrogen", param.Element("Native_N").Value),
-                new XElement("DecayNitrogen", param.Element("Decay_N").Value),
-                new XElement("MinimumNitrogen", param.Element("Native_N_min").Value),
-                new XElement("DecayDMD", param.Element("Decay_DMD").Value),
-                new XElement("MinimumDMD", param.Element("Native_DMD_min").Value),
-                new XElement("DetachRate", param.Element("Native_detach").Value),
-                new XElement("CarryoverDetachRate", param.Element("Carryover_detach").Value),
-                new XElement("IntakeTropicalQualityCoefficient", param.Element("Intake_trop_quality").Value),
-                new XElement("IntakeQualityCoefficient", param.Element("Intake_coeff_quality").Value)
-            );
-
-            // Adding the parameters to the food store
-            XElement store = new XElement(
-                "GrazeFoodStore",
-                new XElement("Name", "GrazeFoodStore"),
-                type,
-                new XElement("IncludeInDocumentation", "true")
-                );
-
-            return store;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nabsa"></param>
-        /// <returns></returns>
-        public static XElement GetAnimal(XElement nabsa)
-        {
-            XElement animal = new XElement
-            (
-                "AnimalFoodStore",
-                new XElement("Name", "AnimalFoodStore"),
-                GetSupplements(nabsa),
-                GetBought(nabsa),
-                new XElement("IncludeInDocumentation", "true")
-            );
-
-            return animal;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nabsa"></param>
-        /// <returns></returns>
-        private static IEnumerable<XElement> GetSupplements(XElement nabsa)
-        {
-            var allocs = FindByName(nabsa, "Supplement allocations").Elements().Skip(2);
-            var specs = FindByName(nabsa, "Supplement specifications").Elements().Skip(2);
-
-            XElement supplements = new XElement("Supplements");
-
-            foreach (XElement supplement in allocs)
+        public GrazeFoodStoreType GetGrazeFoodStore(GrazeFoodStore store)
+        {                        
+            return new GrazeFoodStoreType(store)
             {
-                specs = specs.Skip(1);
+                NToDMDCoefficient = GetValue<double>(SingleParams, "Coeff_DMD"),
+                NToDMDIntercept = GetValue<double>(SingleParams, "Incpt_DMD"),
+                GreenNitrogen = GetValue<double>(SingleParams, "Native_N"),
+                DecayNitrogen = GetValue<double>(SingleParams, "Decay_N"),
+                MinimumNitrogen = GetValue<double>(SingleParams, "Native_N_min"),
+                DecayDMD = GetValue<double>(SingleParams, "Decay_DMD"),
+                MinimumDMD = GetValue<double>(SingleParams, "Native_DMD_min"),
+                DetachRate = GetValue<double>(SingleParams, "Native_detach"),
+                CarryoverDetachRate = GetValue<double>(SingleParams, "Carryover_detach"),
+                IntakeTropicalQualityCoefficient = GetValue<double>(SingleParams, "Intake_trop_quality"),
+                IntakeQualityCoefficient = GetValue<double>(SingleParams, "Intake_coeff_quality")
+            };
+        }
 
-                var amounts = GetElementValues(supplement).ToList();
-                if (!amounts.Exists(s => s != "0")) continue;
-                
-                XElement type = GetAnimalFoodStoreType(specs.First());
-                supplements.Add(type);                                   
-            }
-
-            return supplements.Elements();
-        }        
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nabsa"></param>
-        /// <returns></returns>
-        private static IEnumerable<XElement> GetBought(XElement nabsa)
+        public IEnumerable<AnimalFoodStoreType> GetAnimalStoreTypes(AnimalFoodStore store)
         {
-            var fodder = FindByName(nabsa, "Bought fodder").Elements().Skip(2);
-            var specs = FindByName(nabsa, "Bought fodder specs").Elements().Skip(2);
+            List<AnimalFoodStoreType> types = new List<AnimalFoodStoreType>();
+            AddSupplements(types, store);
+            AddBought(types, store);
+            return types;
+        }       
 
-            XElement bought = new XElement("Bought");
+        private void AddSupplements(List<AnimalFoodStoreType> types, AnimalFoodStore store)
+        {
+            // List of all supplement allocations (skipping metadata)
+            var allocs = SuppAllocs.Elements().Skip(2).ToList();
 
-            foreach (var item in fodder)
+            // Indices of non-zero allocations
+            var indices = from alloc in allocs
+                         where alloc.Elements().Select(e => e.Value).ToList().Exists(v => v != "0")
+                         select allocs.IndexOf(alloc);
+
+            // List of all supplement specifications (skipping metadata)
+            var supps = SuppSpecs.Elements().Skip(3).ToList();
+
+            // Collection of specifications with allocations
+            var specs = from spec in supps
+                        where indices.Contains(supps.IndexOf(spec))
+                        select new string[3] 
+                        {
+                            spec.Name.LocalName,
+                            spec.Elements().ElementAt(1).Value,
+                            spec.Elements().ElementAt(2).Value
+                        };
+
+            foreach (var spec in specs)
             {
-                specs = specs.Skip(1);
-
-                if (item.Elements().ElementAt(3).Value == "FALSE") continue;
-
-                XElement type = GetAnimalFoodStoreType(specs.First());
-                bought.Add(type);
+                types.Add(new AnimalFoodStoreType(store)
+                {
+                    Name = spec[0],
+                    DMD = Convert.ToDouble(spec[1]),
+                    Nitrogen = Convert.ToDouble(spec[2])
+                });
             }
-
-            return bought.Elements();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private static XElement GetAnimalFoodStoreType(XElement data)
+        private void AddBought(List<AnimalFoodStoreType> types, AnimalFoodStore store)
         {
-            XElement type = new XElement
-            (
-                "AnimalFoodStoreType",
-                new XElement("Name", data.Name.LocalName),
-                new XElement("IncludeInDocumentation", "true"),
-                new XElement("DMD", data.Elements().ElementAt(1).Value),
-                new XElement("Nitrogen", data.Elements().ElementAt(2).Value),
-                new XElement("StartingAmount", "0")
-            );
+            var fodders = Fodder.Elements().Skip(2).ToList();            
 
-            return type;
+            var indices = from fodder in fodders
+                          where fodder.Elements().ElementAt(3).Value == "TRUE"
+                          select fodders.IndexOf(fodder);
+
+            var slist = FodderSpecs.Elements().Skip(3).ToList();
+            var specs = from spec in slist
+                        where indices.Contains(slist.IndexOf(spec))
+                        select new string[3]
+                        {
+                            spec.Name.LocalName,
+                            spec.Elements().ElementAt(1).Value,
+                            spec.Elements().ElementAt(2).Value
+                        };
+
+            foreach (var spec in specs)
+            {
+                types.Add(new AnimalFoodStoreType(store)
+                {
+                    Name = spec[0],
+                    DMD = Convert.ToDouble(spec[1]),
+                    Nitrogen = Convert.ToDouble(spec[2])
+                });
+            }
         }
 
+        public IEnumerable<HumanFoodStoreType> GetHumanStoreTypes(HumanFoodStore store)
+        {
+            return null;
+        }
+
+        public IEnumerable<ProductStoreType> GetProductStoreTypes(ProductStore store)
+        {
+            return null;
+        }
+
+        public CommonLandFoodStoreType GetCommonFoodStore(AnimalFoodStore store)
+        {
+            return null;
+        }
     }
 }

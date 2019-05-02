@@ -28,34 +28,10 @@ namespace Models.CLEM
             resources = new ResourcesHolder(this);
             activities = new ActivitiesHolder(this);
 
-            AddFiles();            
+            Add(Source.GetFiles(this));          
             Add(resources);
             Add(activities);
             AddReports();            
-        }
-
-        private void AddFiles()
-        {           
-            // Add the crop
-            Add(new FileCrop(this)
-            {
-                FileName = Source.Name + "_FileCrop.prn",
-                Name = "FileCrop"
-            });
-
-            // Add the crop residue
-            Add(new FileCrop(this)
-            {
-                FileName = Source.Name + "_FileCropResidue.prn",
-                Name = "FileCropResidue"
-            });
-
-            // Add the forage crop
-            Add(new FileCrop(this)
-            {
-                FileName = Source.Name + "_FileForage.prn",
-                Name = "FileForage"
-            });
         }
 
         private void AddReports()
@@ -116,6 +92,15 @@ namespace Models.CLEM
         public FileCrop(Node parent) : base(parent)
         { }
     }
+
+    public class FileSQLiteGrasp : Node
+    {
+        public string FileName { get; set; } = "";
+
+        public FileSQLiteGrasp(Node parent) : base(parent)
+        { }
+    }
+
     public class SummariseRuminantHerd : Node
     {
         public SummariseRuminantHerd(Node parent) : base(parent)

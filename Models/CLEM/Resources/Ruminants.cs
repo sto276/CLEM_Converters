@@ -169,7 +169,6 @@
 
         public string Units { get; set; }
 
-
         public RuminantType(Node parent) : base(parent)
         {
             Add(new RuminantInitialCohorts(this));

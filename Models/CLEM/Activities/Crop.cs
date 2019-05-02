@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.CLEM.Activities
+﻿namespace Models.CLEM.Activities
 {
+    public class ActivityTimerCropHarvest : ActivityNode
+    {
+        public int OffsetMonthHarvestStart { get; set; } = 0;
+
+        public int OffsetMonthHarvestStop { get; set; } = 0;
+
+        public ActivityTimerCropHarvest(ActivityNode parent) : base(parent)
+        { }
+    }
+
     public class CropActivityManageCrop : ActivityNode
     {
         public string LandItemNameToUse { get; set; } = "";
@@ -41,14 +45,5 @@ namespace Models.CLEM.Activities
         public CropActivityManageTask(CropActivityManageProduct parent) : base(parent)
         { }
     }
-
-    public class ActivityTimerCropHarvest : ActivityNode
-    {
-        public int OffsetMonthHarvestStart { get; set; } = 0;
-
-        public int OffsetMonthHarvestStop { get; set; } = 0;
-
-        public ActivityTimerCropHarvest(ActivityNode parent) : base(parent)
-        { }
-    }
+    
 }

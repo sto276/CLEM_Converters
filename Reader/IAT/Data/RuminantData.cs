@@ -120,7 +120,7 @@ namespace Reader
             /// <param name="iat">Source IAT</param>
             /// <param name="col">Column containing desired breed data</param>
             /// <returns></returns>
-            public static void SetParams(RuminantType ruminant)
+            public static void SetParameters(RuminantType ruminant)
             {                             
                 foreach(var map in maps)
                 {
@@ -148,7 +148,7 @@ namespace Reader
                     Name = breed,
                     Breed = breed
                 };
-                RuminantData.SetParams(ruminant);
+                RuminantData.SetParameters(ruminant);
 
                 ruminants.Add(ruminant);
             }
@@ -224,7 +224,7 @@ namespace Reader
                     group.Add(new RuminantFilter(group)
                     {
                         Name = "AgeFilter",
-                        Parameter = 2,
+                        Parameter = 3,
                         Operator = 5,
                         Value = RuminantData.Ages.GetData<string>(row, RuminantData.Col)
                     });

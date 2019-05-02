@@ -1,6 +1,8 @@
 ﻿using Models;
+using Models.CLEM;
 using Models.Core;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml.Packaging;
@@ -24,6 +26,37 @@ namespace Reader
                 StartDate = start,
                 EndDate = end
             };
+        }
+
+        /// <summary>
+        /// IAT does not use GRASP files, so an empty element is returned
+        /// </summary>
+        public IEnumerable<Node> GetFiles(ZoneCLEM clem)
+        {
+            List<Node> files = new List<Node>();
+
+            // Add the crop
+            files.Add(new FileCrop(clem)
+            {
+                FileName = clem.Source.Name + "_FileCrop.prn",
+                Name = "FileCrop"
+            });
+
+            // Add the crop residue
+            files.Add(new FileCrop(clem)
+            {
+                FileName = clem.Source.Name + "_FileCropResidue.prn",
+                Name = "FileCropResidue"
+            });
+
+            // Add the forage crop
+            files.Add(new FileCrop(clem)
+            {
+                FileName = clem.Source.Name + "_FileForage.prn",
+                Name = "FileForage"
+            });
+
+            return files.AsEnumerable();
         }
 
         /// <summary>
