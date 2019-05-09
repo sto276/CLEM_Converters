@@ -13,7 +13,21 @@ namespace Reader
     {
         public static void Run(IEnumerable<string> files)
         {
-            
+            Shared.OpenLog("log.txt");
+
+            foreach (string file in files)
+            {
+                NABSA nabsa = new NABSA(file);
+
+                Simulations simulations = new Simulations(null)
+                {
+                    Source = nabsa
+                };
+
+                Simulation simulation = new Simulation(simulations) { Name = nabsa.Name };
+            }
+
+            Shared.CloseLog();
         }
 
         public Clock GetClock(Simulation simulation)

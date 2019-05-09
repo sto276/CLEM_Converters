@@ -2,7 +2,7 @@
 {
     public class FinanceActivityPayExpense : Node
     {
-        public double Amount { get; set; } = 0.0;
+        public double Amount { get; set; } = 1;
 
         public string AccountName { get; set; } = "Finances.Bank";
 

@@ -20,8 +20,7 @@
     {
         public Simulation(Node parent) : base(parent)
         {
-            Add(Source.GetClock(this));
-            Add(Source.GetFiles(this));
+            Add(Source.GetClock(this));            
             Add(new Summary(this));
             Add(new ZoneCLEM(this));
         }

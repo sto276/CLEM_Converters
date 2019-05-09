@@ -12,6 +12,70 @@ namespace Reader
 {
     public partial class IAT
     {
+        public static void Run(IEnumerable<string> files, bool join, bool split)
+        {
+            Shared.OpenLog("log.txt");
+
+            Simulations simulations = new Simulations(null);
+
+            foreach (string file in files)
+            {
+                IAT iat = new IAT(file);
+
+                Folder folder = new Folder(simulations) { Name = iat.Name };
+
+                // Find all the parameter sheets in the IAT
+                List<string> sheets = new List<string>();
+                foreach (Sheet sheet in iat.Book.Workbook.Sheets)
+                {
+                    // Ensure a parameter sheet is selected
+                    string name = sheet.Name.ToString();
+                    if (!name.ToLower().Contains("param")) continue;
+                    iat.SetSheet(name);
+
+                    // Write the resulting simulation to its own .apsimx file
+                    if (split)
+                    {
+                        AttachIAT(simulations, iat);
+                        Shared.WriteApsimX(simulations, iat.Name);
+
+                        // Reset the simulations node after writing out
+                        simulations = new Simulations(null);
+                    }
+                    // Or collect all the simulations in the IAT
+                    else
+                    {
+                        if (join) AttachIAT(folder, iat);
+                        else AttachIAT(simulations, iat);
+                    }
+                }
+
+                // Files will already be written if split is true
+                if (split) continue;
+
+                // Collect all the IAT files in the same .apsimx file
+                if (join) simulations.Children.Add(folder);
+                // Only gather parameter sets into the same .apsimx file
+                else
+                {
+                    Shared.WriteApsimX(simulations, iat.Name);
+                    simulations = new Simulations(null);
+                }
+            }
+            if (join) Shared.WriteApsimX(simulations, "Simulations");
+            simulations = null;
+
+            Shared.CloseLog();
+        }
+
+        private static void AttachIAT(Node node, IAT iat)
+        {
+            node.Source = iat;
+            Simulation simulation = new Simulation(node);
+            simulation.Name = iat.ParameterSheet.Name;
+            node.Children.Add(simulation);
+        }
+
         public Clock GetClock(Simulation simulation)
         {
             int start_year = Convert.ToInt32(GetCellValue(Part, 44, 4));
@@ -38,21 +102,21 @@ namespace Reader
             // Add the crop
             files.Add(new FileCrop(clem)
             {
-                FileName = clem.Source.Name + "_FileCrop.prn",
+                FileName = clem.Source.Name + "\\FileCrop.prn",
                 Name = "FileCrop"
             });
 
             // Add the crop residue
             files.Add(new FileCrop(clem)
             {
-                FileName = clem.Source.Name + "_FileCropResidue.prn",
+                FileName = clem.Source.Name + "\\FileCropResidue.prn",
                 Name = "FileCropResidue"
             });
 
             // Add the forage crop
             files.Add(new FileCrop(clem)
             {
-                FileName = clem.Source.Name + "_FileForage.prn",
+                FileName = clem.Source.Name + "\\FileForage.prn",
                 Name = "FileForage"
             });
 
@@ -69,7 +133,7 @@ namespace Reader
             try
             {
                 // Overwrite any exisiting PRN file
-                FileStream stream = new FileStream($"{OutDir}/{Name}/{Name}_FileCrop.prn", FileMode.Create);
+                FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileCrop.prn", FileMode.Create);
                 StreamWriter swriter = new StreamWriter(stream);
 
                 // Find the data set
@@ -117,7 +181,7 @@ namespace Reader
         {
             try
             {
-                FileStream stream = new FileStream($"{OutDir}/{Name}/{Name}_FileCropResidue.prn", FileMode.Create);
+                FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileCropResidue.prn", FileMode.Create);
                 StreamWriter swriter = new StreamWriter(stream);
                 WorksheetPart residue = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
 
@@ -164,7 +228,7 @@ namespace Reader
         {
             try
             {
-                FileStream stream = new FileStream($"{OutDir}/{Name}/{Name}_FileForage.prn", FileMode.Create);
+                FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileForage.prn", FileMode.Create);
                 StreamWriter swriter = new StreamWriter(stream);
                 WorksheetPart forage = (WorksheetPart)Book.GetPartById(SearchSheets("forage_inputs").Id);
 
@@ -202,8 +266,7 @@ namespace Reader
             }
             // Need to add additional error handling here            
         }
-
-
+        
         /// <summary>
         /// Parses a cell and returns its value in string representation
         /// </summary>

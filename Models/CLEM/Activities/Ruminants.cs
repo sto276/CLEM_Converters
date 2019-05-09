@@ -58,7 +58,7 @@
 
     public class RuminantActivityGrow : ActivityNode
     {
-        public double EnergyGross { get; set; } = 0.0;
+        public double EnergyGross { get; set; } = 18.4;
 
         public RuminantActivityGrow(Node parent) : base(parent)
         {
@@ -68,33 +68,33 @@
 
     public class RuminantActivityManage : ActivityNode
     {
-        public int MaximumBreedersKept { get; set; } = 0;
+        public int MaximumBreedersKept { get; set; } = 8;
 
-        public int MinimumBreedersKept { get; set; } = 0;
+        public int MinimumBreedersKept { get; set; } = 4;
 
-        public double MaximumBreedingAge { get; set; } = 0.0;
+        public int MaximumBreedingAge { get; set; } = 144;
 
-        public double MaximumProportionBreedersPerPurchase { get; set; } = 0.0;
+        public double MaximumProportionBreedersPerPurchase { get; set; } = 1;
 
-        public double MaximumSiresKept { get; set; } = 0.0;
+        public int NumberOfBreederPurchaseAgeClasses { get; set; } = 1;
 
-        public double MaximumBullAge { get; set; } = 0.0;
+        public double MaximumSiresKept { get; set; } = 0;
+
+        public double MaximumBullAge { get; set; } = 96;
 
         public bool AllowSireReplacement { get; set; } = false;
 
         public int MaximumSiresPerPurchase { get; set; } = 0;
 
-        public double MaleSellingAge { get; set; } = 0.0;
+        public double MaleSellingAge { get; set; } = 1;
 
-        public double MaleSellingWeight { get; set; } = 0.0;
+        public double MaleSellingWeight { get; set; } = 450;
 
-        public string GrazeFoodStoreName { get; set; } = "GrazeFoodStore";
+        public string GrazeFoodStoreName { get; set; } = "GrazeFoodStore.NativePasture";
 
         public bool SellFemalesLikeMales { get; set; } = false;
 
         public bool ContinuousMaleSales { get; set; } = false;
-
-        public string HerdFilters { get; set; } = null;
 
         public RuminantActivityManage(Node parent) : base(parent)
         {

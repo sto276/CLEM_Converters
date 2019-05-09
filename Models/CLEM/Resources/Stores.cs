@@ -7,17 +7,18 @@
             Name = "AnimalFoodStore";
             Add(Source.GetAnimalStoreTypes(this));
             Add(Source.GetCommonFoodStore(this));
-
         }
     }
 
     public class AnimalFoodStoreType : Node
     {
-        public double DMD { get; set; } = 0;
+        public double DMD { get; set; } = 0.01;
 
-        public double Nitrogen { get; set; } = 0;
+        public string Units { get; set; } = "kg";
 
-        public double StartingAmount { get; set; } = 0;
+        public double Nitrogen { get; set; } = 0.01;
+
+        public double StartingAmount { get; set; } = 0.01;
 
         public AnimalFoodStoreType(Node parent) : base(parent)
         {
@@ -95,6 +96,7 @@
         public HumanFoodStore(Node parent) : base(parent)
         {
             Name = "HumanFoodStore";
+            Add(Source.GetHumanStoreTypes(this));
         }
     }
 

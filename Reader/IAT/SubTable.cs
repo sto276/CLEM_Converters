@@ -11,7 +11,7 @@ namespace Reader
         /// <summary>
         /// Contains data from one of the sub tables in an IAT file
         /// </summary>
-        private class SubTable
+        public class SubTable
         {
             /// <summary>
             /// The IAT object which owns the table
@@ -227,23 +227,23 @@ namespace Reader
                 }
                 catch (FormatException)
                 {
-                    Error.Write($"Table '{Name}' contains an empty cell.", iat);
+                    Shared.Write($"Table '{Name}' contains an empty cell.", iat);
                     return default(T);
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    Error.Write($"Table '{Name}' tried to access data outside the table.", iat);
+                    Shared.Write($"Table '{Name}' tried to access data outside the table.", iat);
                     return default(T);
                 }
                 catch (InvalidCastException)
                 {
                     T t = default(T);
-                    Error.Write($"Table '{Name}' expected type {t.GetType().Name}, but did not find it.", iat);
+                    Shared.Write($"Table '{Name}' expected type {t.GetType().Name}, but did not find it.", iat);
                     return default(T);
                 }
                 catch
                 {
-                    Error.Write($"Table '{Name}' contains an unknown error.", iat);
+                    Shared.Write($"Table '{Name}' contains an unknown error.", iat);
                     return default(T);
                 }
                 

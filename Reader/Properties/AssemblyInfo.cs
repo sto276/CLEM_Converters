@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("IAT")]
+[assembly: AssemblyTitle("Reader")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("CSIRO")]
-[assembly: AssemblyProduct("IAT")]
+[assembly: AssemblyProduct("Reader")]
 [assembly: AssemblyCopyright("Copyright © CSIRO 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -25,9 +25,18 @@ namespace Models.CLEM
         {
             Name = "CLEM";
 
+            Add(new Memo(this)
+            {
+                Name = "Default parameters",
+                Text = "In the case that the source file is missing values, " +
+                "most parameters in the simulation have default values. " +
+                "It is recommended to ensure the validity of all parameters before " +
+                "running the simulation."
+            });
+
             resources = new ResourcesHolder(this);
             activities = new ActivitiesHolder(this);
-
+            
             Add(Source.GetFiles(this));          
             Add(resources);
             Add(activities);
@@ -50,7 +59,7 @@ namespace Models.CLEM
                 },
                 EventNames = new List<string>()
                 {
-                    "[Clock.CLEMEndOfTimeStep"
+                    "[Clock].CLEMEndOfTimeStep"
                 }
             });
 
@@ -59,7 +68,7 @@ namespace Models.CLEM
 
             foreach(Node child in resources.Children)
             {
-                string name = child.GetType().Name;
+                string name = child.Name;
 
                 reports.Add(new ReportResourceLedger(reports)
                 {

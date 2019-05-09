@@ -1,6 +1,5 @@
 ﻿using Gtk;
 using Reader;
-using NABSA;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -225,17 +224,18 @@ namespace UI
                 {
                     files.Add(path + "/" + child.Label);
                 }                
-            }           
+            }
+
+            Shared.OutDir = outentry.Text;
 
             switch (combobox.ActiveText)
             {                
-                case "IAT":
-                    Reader.IAT.OutDir = outentry.Text;
-                    Runner.Run(files, joincheck.Active, splitcheck.Active);
+                case "IAT":                    
+                    IAT.Run(files, joincheck.Active, splitcheck.Active);
                     break;
 
                 case "NABSA":
-                    NABSA.Converter.Run(files);
+                    NABSA.Run(files);
                     break;
 
                 default:

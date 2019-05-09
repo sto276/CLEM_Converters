@@ -9,25 +9,6 @@ namespace Reader
     public partial class IAT
     {
         /// <summary>
-        /// Contains the Finance data from a source IAT file
-        /// </summary>
-        private static class FinanceData
-        {
-            /// <summary>
-            /// IAT sub table containing overhead data
-            /// </summary>
-            public static SubTable Overheads { get; private set; }            
-
-            /// <summary>
-            /// Pseudo constructor
-            /// </summary>
-            public static void Construct(IAT source)
-            {
-                Overheads = new SubTable("Overheads", source);
-            }            
-        }
-
-        /// <summary>
         /// Sets the currency data for a Finance model using the IAT data
         /// </summary>
         /// <param name="finance">The base model</param>
@@ -44,8 +25,8 @@ namespace Reader
         public void SetBankData(FinanceType bank)
         {
             bank.Name = "Bank";
-            bank.OpeningBalance = FinanceData.Overheads.GetData<double>(12, 0);
-            bank.InterestRateCharged = FinanceData.Overheads.GetData<double>(11, 0);
+            bank.OpeningBalance = Overheads.GetData<double>(12, 0);
+            bank.InterestRateCharged = Overheads.GetData<double>(11, 0);
         }
 
         /// <summary>
@@ -59,10 +40,13 @@ namespace Reader
                 Name = "MonthlyExpenses"
             };
 
+            double amount = Overheads.GetData<double>(13, 0);
+            if (amount == 0) return null;
+
             monthly.Add(new FinanceActivityPayExpense(monthly)
             {
                 Name = "LivingCost",
-                Amount = FinanceData.Overheads.GetData<double>(13, 0)
+                Amount = amount
             });
 
             return monthly;
@@ -80,10 +64,10 @@ namespace Reader
             };
 
             // Names of the expenses
-            var rows = FinanceData.Overheads.RowNames;
+            var rows = Overheads.RowNames;
 
             // Amounts of the expenses
-            var amounts = FinanceData.Overheads.GetColData<double>(0);
+            var amounts = Overheads.GetColData<double>(0);
 
             // Look at each row in the overheads table
             foreach (string row in rows)
@@ -106,7 +90,7 @@ namespace Reader
                     });
                 }
             }
-
+            if (annual.Children.Count == 0) return null;
             return annual;
         }
 
@@ -117,10 +101,10 @@ namespace Reader
         public FinanceActivityCalculateInterest GetInterestRates(ActivityFolder cashflow)
         {           
             // Find the interest amount
-            int row = FinanceData.Overheads.RowNames.FindIndex(s => s == "Int_rate");
+            int row = Overheads.RowNames.FindIndex(s => s == "Int_rate");
 
             // If the interest is 0, don't add the element
-            if (FinanceData.Overheads.GetData<int>(row, 0) != 0) return new FinanceActivityCalculateInterest(cashflow);
+            if (Overheads.GetData<int>(row, 0) != 0) return new FinanceActivityCalculateInterest(cashflow);
 
             return null;
         }

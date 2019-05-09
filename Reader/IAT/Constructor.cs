@@ -1,4 +1,5 @@
 ﻿using Models;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml.Packaging;
@@ -18,11 +19,12 @@ namespace Reader
         public IAT(string path)
         {
             Name = Path.GetFileNameWithoutExtension(path);
-            Directory.CreateDirectory($"{OutDir}/{Name}");
+            Directory.CreateDirectory($"{Shared.OutDir}/{Name}");
 
-            // Load the .xlsx into various objects
-            Doc = SpreadsheetDocument.Open(path, false);
-            Book = Doc.WorkbookPart;
+            // Load the workbook
+            Book = SpreadsheetDocument.Open(path, false).WorkbookPart;
+
+            // Find the string table
             StringTable = Book.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();            
 
             // Write PRN files
@@ -69,17 +71,37 @@ namespace Reader
         }
 
         public void PrepareData()
-        {
+        {           
+            // Load all the sub tables
+            CropsGrown = new SubTable("Grain Crops Grown", this);
+            CropSpecs = new SubTable("Grain Crop Specifications", this);
+            ForagesGrown = new SubTable("Forage Crops Grown", this);
+            ForageSpecs = new SubTable("Forage Crop Specifications", this);
+            LandSpecs = new SubTable("Land specifications", this);
+            LabourSupply = new SubTable("Labour supply/hire", this);
+            RumNumbers = new SubTable("Startup ruminant numbers", this);
+            RumAges = new SubTable("Startup ruminant ages", this);
+            RumWeights = new SubTable("Startup ruminant weights", this);
+            RumCoeffs = new SubTable("Ruminant coefficients", this);
+            RumSpecs = new SubTable("Ruminant specifications", this);
+            RumPrices = new SubTable("Ruminant prices", this);
+            Overheads = new SubTable("Overheads", this);
+            Fodder = new SubTable("Bought fodder", this);
+            FodderSpecs = new SubTable("Bought fodder specs", this);
+
             // Find climate data (assumed to exist in specific cell)
             Climate = GetCellValue(Part, 4, 6);
 
-            CropData.Construct(this);
-            FinanceData.Construct(this);
-            ForageData.Construct(this);
-            LabourData.Construct(this);
-            LandData.Construct(this);            
-            StoreData.Construct(this);
-            RuminantData.Construct(this);
+            // Find total land area
+            TotalArea = LandSpecs.GetColData<double>(0).Sum();
+
+            // Set values            
+            SetGrains();
+            SetRuminants();
+
+            Pools = new Dictionary<int, string>();            
+            GetGrownFodderPools();
+            GetBoughtFodderPools();
         }       
     } 
 }
