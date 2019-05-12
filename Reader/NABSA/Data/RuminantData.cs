@@ -54,10 +54,11 @@ namespace Reader
                 new Tuple<string, string, double>("wool_coeff", "WoolCoefficient", 1)
             };
 
-            int index = Breeds.FindIndex(b => b == ruminant.Name);
+            int index = Breeds.IndexOf(ruminant.Breed);
+            
             foreach (var parameter in parameters)
             {
-                double value = GetValue<double>(RumSpecs.Element(parameter.Item1), index) * parameter.Item3;
+                double value = GetValue<double>(FindFirst(Source, parameter.Item1), index) * parameter.Item3;
                 ruminant.GetType().GetProperty(parameter.Item2).SetValue(ruminant, value);
             }
         }
@@ -69,11 +70,7 @@ namespace Reader
             // Iterate over all breeds, adding cohorts and pricing to each
             foreach (string breed in PresentBreeds)
             {
-                RuminantType type = new RuminantType(herd)
-                {
-                    Name = breed,
-                    Breed = breed
-                };
+                RuminantType type = new RuminantType(herd, breed);
                 SetParameters(type);
                 types.Add(type);
             }
@@ -85,7 +82,7 @@ namespace Reader
         {
             List<RuminantTypeCohort> list = new List<RuminantTypeCohort>();
 
-            int index = Breeds.FindIndex(b => b == initials.Parent.Name);
+            int index = Breeds.IndexOf((initials.Parent as RuminantType).Breed);
             var cohorts = GetElementNames(Numbers).Skip(1);
 
             foreach (string cohort in cohorts)
@@ -114,7 +111,7 @@ namespace Reader
 
             foreach (string breed in PresentBreeds)
             {
-                string name = breed.Replace(".", "");
+                string name = breed.Replace(".", " ");
                 int index = Breeds.IndexOf(breed);
 
                 ActivityFolder manage = new ActivityFolder(folder)
@@ -165,7 +162,7 @@ namespace Reader
         {
             List<AnimalPriceGroup> prices = new List<AnimalPriceGroup>();
 
-            int index = Breeds.FindIndex(b => b == pricing.Parent.Name);
+            int index = Breeds.IndexOf((pricing.Parent as RuminantType).Breed);
 
             // List of all the present cohorts
             var cohorts = pricing.Parent.Children.First().Children;

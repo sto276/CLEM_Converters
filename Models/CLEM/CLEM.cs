@@ -102,11 +102,11 @@ namespace Models.CLEM
         { }
     }
 
-    public class FileSQLiteGrasp : Node
+    public class FileSQLiteGRASP : Node
     {
         public string FileName { get; set; } = "";
 
-        public FileSQLiteGrasp(Node parent) : base(parent)
+        public FileSQLiteGRASP(Node parent) : base(parent)
         { }
     }
 

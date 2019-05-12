@@ -51,11 +51,11 @@ namespace UI
             outentry = (Entry)builder.GetObject("outentry");
 
             path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            outentry.Text = path + "\\IAT_Stuff\\ExampleOutputs";
-            path += "\\IAT_Stuff\\ExampleInputs";
-            inentry.Text = path;            
+            inentry.Text = path;
+            outentry.Text = path;                        
 
             inentry.Changed += OnInentryChanged;
+            outentry.Changed += OnOutentryChanged;
 
             // Buttons
             aboutbtn = (Button)builder.GetObject("aboutbtn");
@@ -93,6 +93,8 @@ namespace UI
             SetListItems(null, null);            
         }
 
+        
+
         private void OnJoinToggled(object sender, EventArgs e)
         {
             if (joincheck.Active)
@@ -121,9 +123,18 @@ namespace UI
         {
             if (Directory.Exists(inentry.Text))
             {
+                Shared.InDir = inentry.Text;
                 path = inentry.Text;               
 
                 SetListItems(null, null);
+            }
+        }
+
+        private void OnOutentryChanged(object sender, EventArgs e)
+        {
+            if (Directory.Exists(outentry.Text))
+            {
+                Shared.OutDir = outentry.Text;
             }
         }
 
@@ -226,8 +237,6 @@ namespace UI
                 }                
             }
 
-            Shared.OutDir = outentry.Text;
-
             switch (combobox.ActiveText)
             {                
                 case "IAT":                    
@@ -286,6 +295,7 @@ namespace UI
         {
             window.Destroyed -= OnQuitClicked;
             inentry.Changed -= OnInentryChanged;
+            outentry.Changed -= OnOutentryChanged;
             aboutbtn.Clicked -= OnAboutClicked;
             convertbtn.Clicked -= OnConvertClicked;
             quitbtn.Clicked -= OnQuitClicked;

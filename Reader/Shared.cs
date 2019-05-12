@@ -10,6 +10,8 @@ namespace Reader
 {
     public static class Shared
     {
+        public static string InDir { get; set; } = "";
+
         public static string OutDir { get; set; } = "Simulations";
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace Reader
 
         public static void WriteApsimX(Simulations simulations, string name)
         {
-            StreamWriter stream = new StreamWriter(OutDir + "/" + name + ".apsimx");
+            StreamWriter stream = new StreamWriter($"{OutDir}\\{name}.apsimx");
             JsonWriter writer = new JsonTextWriter(stream)
             {
                 CloseOutput = true,

@@ -166,11 +166,19 @@
             Add(new RuminantInitialCohorts(this));
             Add(new AnimalPricing(this));
         }
+
+        public RuminantType(Node parent, string breed) : base(parent)
+        {
+            Name = breed.Replace(".", " ");
+            Breed = breed;
+            Add(new RuminantInitialCohorts(this));
+            Add(new AnimalPricing(this));
+        }
     }
 
     public class RuminantInitialCohorts : Node
     {
-        public RuminantInitialCohorts(Node parent) : base(parent)
+        public RuminantInitialCohorts(RuminantType parent) : base(parent)
         {
             Name = "InitialCohorts";
             Add(Source.GetCohorts(this));

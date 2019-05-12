@@ -23,8 +23,9 @@ namespace Reader
                 {
                     Source = nabsa
                 };
+                simulations.Add(new Simulation(simulations) { Name = nabsa.Name });
 
-                Simulation simulation = new Simulation(simulations) { Name = nabsa.Name };
+                Shared.WriteApsimX(simulations, Path.GetFileNameWithoutExtension(file));
             }
 
             Shared.CloseLog();
@@ -50,22 +51,25 @@ namespace Reader
         {
             List<Node> files = new List<Node>();
 
-            files.Add(new FileSQLiteGrasp(clem)
+            files.Add(new FileSQLiteGRASP(clem)
             {
                 Name = "FileGrasp",
                 FileName = Source.Name.LocalName + ".db"
             });
 
             XElement forages = FindByNameTag(Source, "Forages File");
-            string path = FindFirst(forages, "string").Value;
+            string file = FindFirst(forages, "string").Value;
 
-            CSVtoPRN(path);
-
-            files.Add(new FileCrop(clem)
+            if (file != "")
             {
-                Name = "FileForage",
-                FileName = Path.ChangeExtension(path, "prn")
-            });
+                CSVtoPRN(Shared.InDir + "/" + file);
+
+                files.Add(new FileCrop(clem)
+                {
+                    Name = "FileForage",
+                    FileName = Path.ChangeExtension(file, "prn")
+                });
+            }
 
             return files;
         }
@@ -77,7 +81,7 @@ namespace Reader
             FileStream csv = new FileStream(path, FileMode.Open);
             StreamReader reader = new StreamReader(csv);
 
-            FileStream prn = new FileStream($"Simulations/{filename}.prn", FileMode.Create);
+            FileStream prn = new FileStream($"{Shared.OutDir}/{filename}.prn", FileMode.Create);
             StreamWriter writer = new StreamWriter(prn);
 
             // Add header to document

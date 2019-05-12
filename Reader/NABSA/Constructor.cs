@@ -1,6 +1,7 @@
 ﻿using Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace Reader
         public NABSA(string path)
         {
             Source = XElement.Load(path);
+
+            Name = Path.GetFileNameWithoutExtension(path); 
 
             // General Data
             SingleParams = Source.Element("SingleParams");
