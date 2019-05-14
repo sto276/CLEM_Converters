@@ -6,18 +6,25 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Reader
-{
+{    
+    // Implements all methods related to IAT grain crops   
     public partial class IAT
     {               
+        /// <summary>
+        /// Search the grown crops for all valid crop types, and track
+        /// them in the GrainIDs list
+        /// </summary>
         private void SetGrains()
         {
             GrainIDs = new List<int>();
 
+            // Row of crop IDs
             var crops = CropsGrown.GetRowData<int>(0);
-            var areas = CropsGrown.GetRowData<double>(2);
-            var residue = CropsGrown.GetRowData<double>(4);
 
-            // Select crop ID and the index of the ID
+            // Row of area allocated to crop
+            var areas = CropsGrown.GetRowData<double>(2);
+                        
+            // Select all non-zero IDs
             var ids =
                 from id in crops
                 where id != 0
@@ -36,9 +43,8 @@ namespace Reader
         }       
 
         /// <summary>
-        /// Writes the 'Manage Crops' Activity section of a CLEM simulation
+        /// Finds all crops in the source IAT which require management
         /// </summary>
-        /// <param name="iat"></param>
         public IEnumerable<CropActivityManageCrop> GetManageCrops(ActivityFolder manage)
         {
             List<CropActivityManageCrop> crops = new List<CropActivityManageCrop>();
@@ -50,14 +56,19 @@ namespace Reader
                 // Find the name of the crop in the file
                 Sheet sheet = SearchSheets("crop_inputs");
                 WorksheetPart inputs = (WorksheetPart)Book.GetPartById(sheet.Id);
-                string inputname = "Unknown";
+
+                // Find the name of the crop
+                IEnumerable<Row> rows = sheet.Elements<Row>();
+                string name = "Unknown";               
                 int row = 1;
 
-                IEnumerable<Row> rows = sheet.Elements<Row>();
                 while (row < rows.Count())
                 {
                     if (GetCellValue(inputs, row, 3) == id.ToString())
-                        inputname = GetCellValue(inputs, row, 4);
+                    {
+                        name = GetCellValue(inputs, row, 4);
+                        break;
+                    }
                     row++;
                 }
 
@@ -68,6 +79,7 @@ namespace Reader
                 int land = CropsGrown.GetData<int>(1, col);
                 string cropname = CropSpecs.RowNames[id + 1];
 
+                // Model the crop management
                 CropActivityManageCrop crop = new CropActivityManageCrop(manage)
                 {
                     Name = "Manage " + cropname,
@@ -75,28 +87,28 @@ namespace Reader
                     AreaRequested = CropsGrown.GetData<double>(2, col)
                 };
 
-                // Find the storage pool
+                // Find the storage pool which the crop uses
                 string pool = Pools.Values.ToList().Find(s => s.Contains(cropname));
 
-                // Add the crop management
-                new CropActivityManageProduct(crop)
+                // Add the product management model
+                crop.Add(new CropActivityManageProduct(crop)
                 {
                     Name = "Manage grain",
                     ModelNameFileCrop = "FileCrop",
-                    CropName = inputname,
+                    CropName = name,
                     ProportionKept = 1.0 - CropsGrown.GetData<double>(5, col) / 100.0,
                     StoreItemName = "HumanFoodStore." + pool
-                };
+                });
 
                 // Add the residue management
-                new CropActivityManageProduct(crop)
+                crop.Add(new CropActivityManageProduct(crop)
                 {
                     Name = "Manage residue",
                     ModelNameFileCrop = "FileCropResidue",
-                    CropName = inputname,
+                    CropName = name,
                     ProportionKept = CropsGrown.GetData<double>(4, col) / 100.0,
                     StoreItemName = "AnimalFoodStore." + pool
-                };
+                });
 
                 crops.Add(crop);
             }

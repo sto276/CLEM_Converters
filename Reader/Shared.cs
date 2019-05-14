@@ -1,6 +1,7 @@
 ﻿using Models;
 using Models.Core;
 using Newtonsoft.Json;
+using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -54,21 +55,20 @@ namespace Reader
         /// <param name="filename">The name of the error log</param>
         public static void OpenLog(string filename)
         {
-            ErrorStream = new FileStream(OutDir + "/" + filename, FileMode.Create);
+            ErrorStream = new FileStream($"{OutDir}/{filename}.csv", FileMode.Create);
             ErrorWriter = new StreamWriter(ErrorStream);
+            ErrorWriter.WriteLine("Error #, File name, Message, Severity, Table, Sheet, Date");
             ErrorCount = 0;
         }
 
         /// <summary>
         /// Writes an error to the log
         /// </summary>
-        /// <param name="msg">The message to be written</param>
-        public static void Write(string msg, IAT iat)
-        {
+        /// <param name="message">The message to be written</param>
+        public static void Write(ConversionError CE)
+        {            
+            ErrorWriter.WriteLine($"{ErrorCount}, {CE.FileName}, {CE.Message}, {CE.Severity}, {CE.Table}, {CE.Sheet}, {DateTime.Now}\n");
             ErrorCount++;
-            ErrorWriter.WriteLine($"Error {ErrorCount}:");
-            ErrorWriter.WriteLine("\t" + msg);
-            ErrorWriter.WriteLine($"\tin {iat.Name}: {iat.ParameterSheet.Name}\n");
         }
 
         /// <summary>
@@ -84,30 +84,21 @@ namespace Reader
             return;
         }
 
-        /// <summary>
-        /// Shifts invalid starting characters to the end of the Name
-        /// </summary>
-        /// <param name="name">The name to sanitise</param>
-        public static string SanitiseName(string name)
-        {
-            // Replace all whitespace, brackets, and underscores
-            name = Regex.Replace(name, @"[\(\)\{\}\[\]_\s+]", "");
 
-            // Matches non letter characters
-            Regex reg = new Regex("[^a-zA-Z]");
+    }
 
-            // Move invalid starting characters (like numbers) to the tail of the name
-            // (preserving order to keep information where possible)
-            string suffix = "";
-            while (reg.IsMatch(name[0].ToString()))
-            {
-                suffix += name[0];
-                name = name.Remove(0, 1);
-            }
-            name += suffix;
+    public struct ConversionError
+    {
+        public string FileName;
 
-            return name;
-        }
+        public string FileType;
 
+        public string Message;
+
+        public string Severity;
+
+        public string Table;
+
+        public string Sheet;
     }
 }

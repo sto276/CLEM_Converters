@@ -79,7 +79,15 @@ namespace Reader
                 }
                 else
                 {
-                    Shared.Write($"{cropname}: Crop not found in inputs sheet, adding to general pool", this);
+                    Shared.Write(new ConversionError()
+                    {
+                        FileName = Name,
+                        FileType = "IAT",
+                        Message = $"Crop type {cropname} wasn't found in the inputs sheet",
+                        Severity = "Low",
+                        Table = "N/A",
+                        Sheet = "crop_inputs"
+                    });
                 }
 
                 // If the pool does not exist, create a new pool with the residue in it

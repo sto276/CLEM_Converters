@@ -14,7 +14,7 @@ namespace Reader
     {
         public static void Run(IEnumerable<string> files, bool join, bool split)
         {
-            Shared.OpenLog("log.txt");
+            Shared.OpenLog("ErrorLog");
 
             Simulations simulations = new Simulations(null);
 
@@ -63,7 +63,6 @@ namespace Reader
                 }
             }
             if (join) Shared.WriteApsimX(simulations, "Simulations");
-            simulations = null;
 
             Shared.CloseLog();
         }
@@ -167,9 +166,28 @@ namespace Reader
             {
                 // Will only be caught if the file exists and is in use by another program;
                 // Alerts the user then safely continues with the program.
-                Console.WriteLine("FileCrop.prn is open in another application and couldn't be overwritten.");
+                Shared.Write(new ConversionError()
+                {
+                    FileName = Name,
+                    FileType = "IAT",
+                    Message = "FileCrop.prn was open in another application.",
+                    Severity = "Low",
+                    Table = "N/A",
+                    Sheet = "crop_inputs"
+                });
             }
-            // Need to add additional error handling here     
+            catch (Exception e)
+            {
+                Shared.Write(new ConversionError()
+                {
+                    FileName = Name,
+                    FileType = "IAT",
+                    Message = e.Message,
+                    Severity = "Moderate",
+                    Table = "N/A",
+                    Sheet = "crop_inputs"
+                });
+            }    
         }
 
         /// <summary>

@@ -6,10 +6,11 @@ using System.Linq;
 
 namespace Reader
 {
+    // Implements all methods related to IAT finance
     public partial class IAT
     {
         /// <summary>
-        /// Sets the currency data for a Finance model using the IAT data
+        /// Sets the currency data for a Finance model using IAT data
         /// </summary>
         /// <param name="finance">The base model</param>
         public void SetFinanceData(Finance finance)
@@ -19,7 +20,7 @@ namespace Reader
         }
 
         /// <summary>
-        /// Sets the data for a FinanceType model using the IAT data
+        /// Sets the data for a FinanceType model using IAT data
         /// </summary>
         /// <param name="bank">The base model</param>
         public void SetBankData(FinanceType bank)
@@ -40,7 +41,10 @@ namespace Reader
                 Name = "MonthlyExpenses"
             };
 
+            // Find the monthly living cost
             double amount = Overheads.GetData<double>(13, 0);
+
+            // Only include if non-zero
             if (amount == 0) return null;
 
             monthly.Add(new FinanceActivityPayExpense(monthly)
@@ -90,12 +94,13 @@ namespace Reader
                     });
                 }
             }
+            // If there are no annual expenses, ignore this folder
             if (annual.Children.Count == 0) return null;
             return annual;
         }
 
         /// <summary>
-        /// Return the interest rate calculation model (if any)
+        /// Return the interest rate calculation model
         /// </summary>
         /// <param name="cashflow">The base model</param>
         public FinanceActivityCalculateInterest GetInterestRates(ActivityFolder cashflow)
@@ -103,10 +108,10 @@ namespace Reader
             // Find the interest amount
             int row = Overheads.RowNames.FindIndex(s => s == "Int_rate");
 
-            // If the interest is 0, don't add the element
-            if (Overheads.GetData<int>(row, 0) != 0) return new FinanceActivityCalculateInterest(cashflow);
+            // If the interest is 0, ignore the model
+            if (Overheads.GetData<int>(row, 0) == 0) return null;
 
-            return null;
+            return new FinanceActivityCalculateInterest(cashflow);
         }
 
     }
