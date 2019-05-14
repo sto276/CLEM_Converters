@@ -55,10 +55,10 @@ namespace Reader
         /// <param name="filename">The name of the error log</param>
         public static void OpenLog(string filename)
         {
-            ErrorStream = new FileStream($"{OutDir}/{filename}.csv", FileMode.Create);
+            ErrorStream = new FileStream($"{OutDir}/{filename}.csv", FileMode.Append);
             ErrorWriter = new StreamWriter(ErrorStream);
             ErrorWriter.WriteLine("Error #, File name, Message, Severity, Table, Sheet, Date");
-            ErrorCount = 0;
+            ErrorCount = 0;            
         }
 
         /// <summary>

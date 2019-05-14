@@ -220,6 +220,16 @@ namespace Reader
             /// <returns></returns>
             private T ConvertData<T>(string s)
             {
+                var CE = new ConversionError()
+                {
+                    FileName = iat.Name,
+                    FileType = "IAT",
+                    Message = $"Unknown",
+                    Severity = "Unknown",
+                    Table = Name,
+                    Sheet = iat.ParameterSheet.Name
+                };
+
                 try
                 {
                     T value = (T)Convert.ChangeType(s, typeof(T));
@@ -227,34 +237,84 @@ namespace Reader
                 }
                 catch (FormatException)
                 {
-                    Shared.Write($"Table '{Name}' contains an empty cell.", iat);
-                    return default(T);
+                    CE.Message = "Empty cell";
+                    CE.Severity = "Low";
+                    Shared.Write(CE);
+                    return default;
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    Shared.Write($"Table '{Name}' tried to access data outside the table.", iat);
-                    return default(T);
+                    CE.Message = "Index out of range";
+                    CE.Severity = "Moderate";
+                    Shared.Write(CE);                    
+                    return default;
                 }
                 catch (InvalidCastException)
                 {
-                    T t = default(T);
-                    Shared.Write($"Table '{Name}' expected type {t.GetType().Name}, but did not find it.", iat);
-                    return default(T);
+                    T t = default;
+                    CE.Message = $"Type mismatch, expected {t.GetType().Name}";
+                    CE.Severity = "Moderate";
+                    Shared.Write(CE);
+                    return default;
                 }
                 catch
                 {
-                    Shared.Write($"Table '{Name}' contains an unknown error.", iat);
-                    return default(T);
-                }
-                
+                    Shared.Write(CE);
+                    return default;
+                }                
             }
 
             /// <summary>
             /// Accesses the data at the given location
             /// </summary>
-            /// <param name="r">Row position</param>
-            /// <param name="c">Column position</param>
-            public T GetData<T>(int r, int c) => ConvertData<T>(data[r, c]);
+            /// <param name="row">Row position</param>
+            /// <param name="column">Column position</param>
+            public T GetData<T>(int row, int column)
+            {
+                string s = data[row, column];
+                var CE = new ConversionError()
+                {
+                    FileName = iat.Name,
+                    FileType = "IAT",
+                    Message = $"Unknown",
+                    Severity = "Unknown",
+                    Table = Name,
+                    Sheet = iat.ParameterSheet.Name
+                };
+
+                try
+                {
+                    T value = (T)Convert.ChangeType(s, typeof(T));
+                    return value;
+                }
+                catch (FormatException)
+                {
+                    CE.Message = "Empty cell";
+                    CE.Severity = "Low";
+                    Shared.Write(CE);
+                    return default;
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    CE.Message = "Index out of range";
+                    CE.Severity = "Moderate";
+                    Shared.Write(CE);
+                    return default;
+                }
+                catch (InvalidCastException)
+                {
+                    T t = default;
+                    CE.Message = $"Type mismatch, expected {t.GetType().Name}";
+                    CE.Severity = "Moderate";
+                    Shared.Write(CE);
+                    return default;
+                }
+                catch
+                {
+                    Shared.Write(CE);
+                    return default;
+                }
+            }
 
             /// <summary>
             /// Selects a row of data from the table in the given type.
