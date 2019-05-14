@@ -3,6 +3,9 @@
     using CLEM;
     using Storage;
 
+    /// <summary>
+    /// Container for a series of simulations
+    /// </summary>
     public class Simulations : Node
     {
         public int ExplorerWidth { get; set; } = 300;
@@ -16,6 +19,9 @@
         }
     }    
     
+    /// <summary>
+    /// Models a single simulation
+    /// </summary>
     public class Simulation : Node
     {
         public Simulation(Node parent) : base(parent)
@@ -26,6 +32,9 @@
         }
     }
 
+    /// <summary>
+    /// Generic container for models
+    /// </summary>
     public class Folder : Node
     {
         public bool ShowPageOfGraphs { get; set; } = true;

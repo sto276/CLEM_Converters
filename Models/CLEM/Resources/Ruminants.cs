@@ -1,5 +1,8 @@
 ﻿namespace Models.CLEM.Resources
 {
+    /// <summary>
+    /// Container for all ruminants
+    /// </summary>
     public class RuminantHerd : Node
     {
         public RuminantHerd(Node parent) : base(parent)
@@ -9,6 +12,9 @@
         }
     }
 
+    /// <summary>
+    /// Models an arbitrary type of ruminant
+    /// </summary>
     public class RuminantType : Node
     {
         public string Breed { get; set; }
@@ -176,6 +182,9 @@
         }
     }
 
+    /// <summary>
+    /// Container for ruminants within a type
+    /// </summary>
     public class RuminantInitialCohorts : Node
     {
         public RuminantInitialCohorts(RuminantType parent) : base(parent)
@@ -185,6 +194,9 @@
         }
     }
 
+    /// <summary>
+    /// Models a cohort of similar ruminants for a given type
+    /// </summary>
     public class RuminantTypeCohort : Node
     {
         public int Gender { get; set; }

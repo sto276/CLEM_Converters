@@ -1,15 +1,8 @@
 ﻿namespace Models.CLEM.Activities
 {
-    public class ActivityTimerCropHarvest : ActivityNode
-    {
-        public int OffsetMonthHarvestStart { get; set; } = 0;
-
-        public int OffsetMonthHarvestStop { get; set; } = 0;
-
-        public ActivityTimerCropHarvest(ActivityNode parent) : base(parent)
-        { }
-    }
-
+    /// <summary>
+    /// Models the management of crops
+    /// </summary>
     public class CropActivityManageCrop : ActivityNode
     {
         public string LandItemNameToUse { get; set; } = "";
@@ -22,6 +15,9 @@
         {  }
     }
 
+    /// <summary>
+    /// Models the management of crop products
+    /// </summary>
     public class CropActivityManageProduct : ActivityNode
     {
         public string ModelNameFileCrop { get; set; } = "";
@@ -38,12 +34,5 @@
 
         public CropActivityManageProduct(CropActivityManageCrop parent) : base(parent)
         { }
-    }
-
-    public class CropActivityManageTask : ActivityNode
-    {
-        public CropActivityManageTask(CropActivityManageProduct parent) : base(parent)
-        { }
-    }
-    
+    }    
 }

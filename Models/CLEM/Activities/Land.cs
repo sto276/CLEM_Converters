@@ -1,5 +1,9 @@
-﻿namespace Models.CLEM.Activities
-{    public class PastureActivityManage : Node
+﻿namespace Models.CLEM.Activities   
+{
+    /// <summary>
+    /// Models the management of pastoral land
+    /// </summary>
+    public class PastureActivityManage : Node
     {
         public string LandTypeNameToUse { get; set; } = "";
 

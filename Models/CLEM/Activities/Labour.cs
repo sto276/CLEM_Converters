@@ -1,6 +1,8 @@
-﻿
-namespace Models.CLEM.Activities
+﻿namespace Models.CLEM.Activities
 {
+    /// <summary>
+    /// Models the labour requirement for an activity
+    /// </summary>
     class LabourRequirement : Node
     {
         public double LabourPerUnit { get; set; } = 0.75;

@@ -1,5 +1,8 @@
 ﻿namespace Models.CLEM.Resources
 {
+    /// <summary>
+    /// Container for land resources
+    /// </summary>
     public class Land : Node
     {
         public string UnitsOfArea { get; set; } = "hectares";
@@ -13,6 +16,9 @@
         }
     }
 
+    /// <summary>
+    /// Models a generic land resource type
+    /// </summary>
     public class LandType : Node
     {
         public double LandArea { get; set; }
@@ -24,9 +30,6 @@
         public int SoilType { get; set; }
 
         public LandType(Land parent) : base(parent)
-        {
-
-        }
+        { }
     }
-
 }

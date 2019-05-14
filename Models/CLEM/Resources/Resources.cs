@@ -1,5 +1,8 @@
 ﻿namespace Models.CLEM.Resources
 {
+    /// <summary>
+    /// Container for all resources
+    /// </summary>
     public class ResourcesHolder : Node
     {      
         public ResourcesHolder(ZoneCLEM parent) : base(parent)

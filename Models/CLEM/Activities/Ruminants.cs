@@ -2,6 +2,9 @@
 {
     using CLEM.Groupings;
 
+    /// <summary>
+    /// Models the breeding of ruminants
+    /// </summary>
     public class RuminantActivityBreed : ActivityNode
     {
         public double MaximumConceptionRateUncontrolled { get; set; } = 0.8;
@@ -12,6 +15,9 @@
         }
     }
 
+    /// <summary>
+    /// Models the sale and purchase of ruminants
+    /// </summary>
     public  class RuminantActivityBuySell : ActivityNode
     {
         public string BankAccountName { get; set; } = "Finances.Bank";
@@ -22,6 +28,9 @@
         }
     }
 
+    /// <summary>
+    /// Models the feeding of ruminants
+    /// </summary>
     public class RuminantActivityFeed : ActivityNode
     {
         public string FeedTypeName { get; set; }
@@ -34,6 +43,9 @@
         { }
     }
 
+    /// <summary>
+    /// Models ruminants grazing
+    /// </summary>
     public class RuminantActivityGrazeAll : ActivityNode
     {
         public double HoursGrazed { get; set; } = 8.0;
@@ -56,6 +68,9 @@
         }
     }
 
+    /// <summary>
+    /// Models the growth of ruminants
+    /// </summary>
     public class RuminantActivityGrow : ActivityNode
     {
         public double EnergyGross { get; set; } = 18.4;
@@ -66,6 +81,9 @@
         }
     }
 
+    /// <summary>
+    /// Models the management of herd numbers/size
+    /// </summary>
     public class RuminantActivityManage : ActivityNode
     {
         public int MaximumBreedersKept { get; set; } = 8;
@@ -102,6 +120,9 @@
         }
     }
 
+    /// <summary>
+    /// Models the milking of ruminants
+    /// </summary>
     public class RuminantActivityMilking : ActivityNode
     {
         public string ResourceTypeName { get; set; } = "HumanFoodStore.Milk";
@@ -110,6 +131,9 @@
         { }
     }
 
+    /// <summary>
+    /// Models the mustering of ruminants
+    /// </summary>
     public class RuminantActivityMuster : ActivityNode
     {
         public string ManagedPastureName { get; set; } = "GrazeFoodStore.NativePasture";
@@ -124,6 +148,9 @@
         }
     }
 
+    /// <summary>
+    /// Models the sale of dry breeders
+    /// </summary>
     public class RuminantActivitySellDryBreeders : ActivityNode
     {
         public double MinimumConceptionBeforeSell { get; set; } = 1.0;
@@ -138,6 +165,9 @@
         }
     }
 
+    /// <summary>
+    /// Models the weaning of calves
+    /// </summary>
     public class RuminantActivityWean : ActivityNode
     {
         public double WeaningAge { get; set; } = 0.0;

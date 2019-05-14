@@ -2,6 +2,9 @@
 
 namespace Models
 {
+    /// <summary>
+    /// Models the simulation clock
+    /// </summary>
     public class Clock : Node
     {
         public DateTime StartDate { get; set; }
@@ -14,6 +17,9 @@ namespace Models
         }
     }
 
+    /// <summary>
+    /// A memorandum for the user
+    /// </summary>
     public class Memo : Node
     {
         public string Text { get; set; }
@@ -22,6 +28,9 @@ namespace Models
         { }
     }
 
+    /// <summary>
+    /// A summary of the entire simulation
+    /// </summary>
     public class Summary : Node
     {
         public bool CaptureErrors { get; set; } = true;

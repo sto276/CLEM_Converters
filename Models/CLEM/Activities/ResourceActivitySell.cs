@@ -1,5 +1,8 @@
 ﻿namespace Models.CLEM.Activities
 {
+    /// <summary>
+    /// Models the sale of an arbitrary resource
+    /// </summary>
     class ResourceActivitySell : Node
     {
         public string AccountName { get; set; }

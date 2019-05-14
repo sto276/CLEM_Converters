@@ -2,6 +2,10 @@
 {
     using CLEM.Reporting;
 
+    /// <summary>
+    /// Generic base node for all activity models. 
+    /// This node should not be instantiated directly.
+    /// </summary>
     public class ActivityNode : Node
     {
         public object SelectedTab { get; set; } = null;
@@ -12,6 +16,9 @@
         { }
     }
 
+    /// <summary>
+    /// The activities holder is the model which contains all other activities.
+    /// </summary>
     public class ActivitiesHolder : Node
     {
         public string LastShortfallResourceRequest { get; set; }
@@ -21,24 +28,35 @@
         public ActivitiesHolder(ZoneCLEM parent) : base(parent)
         {
             Name = "Activities";
+
+            // Model the finance activities
             GetCashFlow();
 
+            // Model the crop growth activities
             ActivityFolder crops = new ActivityFolder(this) { Name = "Manage crops" };
             crops.Add(Source.GetManageCrops(crops));
             Add(crops);
 
+            // Model the forage growth activities
             ActivityFolder forages = new ActivityFolder(this) { Name = "Manage forages" };
             forages.Add(Source.GetManageForages(forages));
             if (forages.Children.Count > 0) forages.Add(Source.GetNativePasture(forages));
             Add(forages);
 
+            // Model the ruminant activities
             GetHerd();
 
+            // Model the pasture management
             Add(Source.GetManagePasture(this));
+
+            // Attach summary/report
             Add(new SummariseRuminantHerd(this));
             Add(new ReportRuminantHerd(this));
         }
 
+        /// <summary>
+        /// Models the finances in the simulation
+        /// </summary>
         private void GetCashFlow()
         {
             ActivityFolder cashflow = new ActivityFolder(this)
@@ -52,6 +70,9 @@
             Add(cashflow);
         }
 
+        /// <summary>
+        /// Models the management of the ruminant herd in the simulation
+        /// </summary>
         private void GetHerd()
         {
             ActivityFolder herd = new ActivityFolder(this){Name = "Manage herd"};
@@ -67,12 +88,18 @@
         }
     }
 
+    /// <summary>
+    /// A miscellaneous container for activities
+    /// </summary>
     public class ActivityFolder : ActivityNode
     {
         public ActivityFolder(Node parent) : base(parent)
         {  }
     }
 
+    /// <summary>
+    /// Models the frequency with which an activity is performed
+    /// </summary>
     public class ActivityTimerInterval : Node
     {
         public int Interval { get; set; } = 12;
@@ -83,6 +110,9 @@
         {  }
     }
 
+    /// <summary>
+    /// Models the relationship between two variables
+    /// </summary>
     public class Relationship : Node
     {
         public double StartingValue { get; set; } = 0;

@@ -1,5 +1,8 @@
 ﻿namespace Models.CLEM.Activities
 {
+    /// <summary>
+    /// Models the payment of an arbitrary expenditure
+    /// </summary>
     public class FinanceActivityPayExpense : Node
     {
         public double Amount { get; set; } = 1;
@@ -14,6 +17,9 @@
         { }
     }
     
+    /// <summary>
+    /// Models the calculation of interest
+    /// </summary>
     public class FinanceActivityCalculateInterest : Node
     {
         public FinanceActivityCalculateInterest(Node parent) : base(parent)

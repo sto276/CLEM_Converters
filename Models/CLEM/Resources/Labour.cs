@@ -1,5 +1,8 @@
 ﻿namespace Models.CLEM.Resources
 {
+    /// <summary>
+    /// Container for labour resources
+    /// </summary>
     public class Labour : Node
     {
         public bool AllowAging { get; set; } = true;
@@ -12,22 +15,26 @@
         }
     }
 
+    /// <summary>
+    /// Models a generic labour resource type
+    /// </summary>
     public class LabourType : Node
     {
         public double InitialAge { get; set; }
 
-        public int Gender { get; set; }
+        public int Gender { get; set; } = 0;
 
-        public int Individuals { get; set; }
+        public int Individuals { get; set; } = 1;
 
         public string Units { get; set; }
 
         public LabourType(Labour parent) : base(parent)
-        {
-
-        }
+        { }
     }
 
+    /// <summary>
+    /// Models the availability of a given labour resource
+    /// </summary>
     public class LabourAvailabilityList : Node
     {
         public LabourAvailabilityList(Labour parent) : base(parent)
@@ -37,6 +44,9 @@
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class LabourAvailabilityItem : Node
     {
         public double Value { get; set; }

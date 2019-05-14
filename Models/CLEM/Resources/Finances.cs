@@ -1,5 +1,8 @@
 ﻿namespace Models.CLEM.Resources
 {
+    /// <summary>
+    /// Container for financial resources
+    /// </summary>
     public class Finance : Node
     {
         public string CurrencyName { get; set; }
@@ -12,6 +15,9 @@
         }
     }
 
+    /// <summary>
+    /// Models a generic financial resource type
+    /// </summary>
     public class FinanceType : Node
     {
         public double OpeningBalance { get; set; }

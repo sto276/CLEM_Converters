@@ -5,6 +5,10 @@ namespace Models.CLEM
     using Resources;
     using Activities;
     using Reporting;
+
+    /// <summary>
+    /// Container for a CLEM model
+    /// </summary>
     public class ZoneCLEM : Node
     {
         public int RandomSeed { get; set; } = 1;
@@ -24,6 +28,8 @@ namespace Models.CLEM
         public ZoneCLEM(Node parent) : base(parent)
         {
             Name = "CLEM";
+            resources = new ResourcesHolder(this);
+            activities = new ActivitiesHolder(this);
 
             Add(new Memo(this)
             {
@@ -32,17 +38,16 @@ namespace Models.CLEM
                 "most parameters in the simulation have default values. " +
                 "It is recommended to ensure the validity of all parameters before " +
                 "running the simulation."
-            });
-
-            resources = new ResourcesHolder(this);
-            activities = new ActivitiesHolder(this);
-            
+            });                     
             Add(Source.GetFiles(this));          
             Add(resources);
             Add(activities);
             AddReports();            
         }
 
+        /// <summary>
+        /// Adds a series of reports to the CLEM model
+        /// </summary>
         private void AddReports()
         {
             var reports = new CLEMFolder(this)
@@ -62,7 +67,6 @@ namespace Models.CLEM
                     "[Clock].CLEMEndOfTimeStep"
                 }
             });
-
             reports.Add(new ReportActivitiesPerformed(reports));
             reports.Add(new ReportResourceShortfalls(reports));
 
@@ -84,6 +88,9 @@ namespace Models.CLEM
         }
     }
 
+    /// <summary>
+    /// A generic container for models inside CLEM
+    /// </summary>
     public class CLEMFolder : Node
     {
         public bool ShowPageOfGraphs { get; set; } = true;
@@ -92,6 +99,9 @@ namespace Models.CLEM
         { }
     }
 
+    /// <summary>
+    /// Contains reference to source data
+    /// </summary>
     public class FileCrop : Node
     {
         public string FileName { get; set; }
@@ -102,6 +112,9 @@ namespace Models.CLEM
         { }
     }
 
+    /// <summary>
+    /// Contains reference to source data
+    /// </summary>
     public class FileSQLiteGRASP : Node
     {
         public string FileName { get; set; } = "";
@@ -110,6 +123,9 @@ namespace Models.CLEM
         { }
     }
 
+    /// <summary>
+    /// Summary of the ruminant herd
+    /// </summary>
     public class SummariseRuminantHerd : Node
     {
         public SummariseRuminantHerd(Node parent) : base(parent)

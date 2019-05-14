@@ -2,6 +2,9 @@
 
 namespace Models.CLEM.Reporting
 {
+    /// <summary>
+    /// The base node for a report, this should not be instantiated directly
+    /// </summary>
     class Report : Node
     {
         public List<string> ExperimentFactorNames = new List<string>();
@@ -15,6 +18,9 @@ namespace Models.CLEM.Reporting
         { }
     }
 
+    /// <summary>
+    /// Report the balance of resources
+    /// </summary>
     class ReportResourceBalances : Report
     {       
         public ReportResourceBalances(Node parent) : base(parent)
@@ -23,6 +29,9 @@ namespace Models.CLEM.Reporting
         }
     }
 
+    /// <summary>
+    /// Report the activities performed
+    /// </summary>
     class ReportActivitiesPerformed : Report
     {
         public ReportActivitiesPerformed(Node parent) : base(parent)
@@ -31,6 +40,9 @@ namespace Models.CLEM.Reporting
         }
     }
 
+    /// <summary>
+    /// Report any shortfalls of a particular resource
+    /// </summary>
     class ReportResourceShortfalls : Report
     {
         public ReportResourceShortfalls(Node parent) : base(parent)
@@ -39,14 +51,18 @@ namespace Models.CLEM.Reporting
         }
     }
 
+    /// <summary>
+    /// Report the status of an arbitrary resource
+    /// </summary>
     class ReportResourceLedger : Report
     {
         public ReportResourceLedger(Node parent) : base(parent)
         { }
     }
-
-    
-
+        
+    /// <summary>
+    /// Report the status of the ruminant herd
+    /// </summary>
     public class ReportRuminantHerd : Node
     {
         public ReportRuminantHerd(Node parent) : base(parent)

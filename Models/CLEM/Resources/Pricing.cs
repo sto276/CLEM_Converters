@@ -1,19 +1,8 @@
 ﻿namespace Models.CLEM.Resources
 {
-    public class ResourcePricing : Node
-    {
-        public double PacketSize { get; set; }
-
-        public bool UseWholePackets { get; set; } = true;
-
-        public double PricePerPacket { get; set; }
-
-        public ResourcePricing(Node parent) : base(parent)
-        {
-            Name = "Pricing";
-        }
-    }
-
+    /// <summary>
+    /// Container for animal prices
+    /// </summary>
     public class AnimalPricing : Node
     {
         public string PricingStyle { get; set; } = "perKg";
