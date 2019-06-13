@@ -16,11 +16,21 @@ namespace Windows
 {
     public partial class Converter : Form
     {
-        public Panel Panel { get { return panel; } }        
+        public Panel Panel { get { return panel; } }
+
+        private IEnumerable<string> iat;
+
+        private IEnumerable<string> nabsa;
 
         public Converter()
         {
             InitializeComponent();
+            backgroundConverter.WorkerReportsProgress = true;
+            backgroundConverter.WorkerSupportsCancellation = true;
+
+            backgroundConverter.DoWork += new DoWorkEventHandler(BeginConversion);
+            backgroundConverter.ProgressChanged += new ProgressChangedEventHandler(ProgressUpdate);
+            backgroundConverter.RunWorkerCompleted += new RunWorkerCompletedEventHandler(CompletedConversion);
         }
 
         public void UpdateFileList()
@@ -76,21 +86,12 @@ namespace Windows
 
         private void Converter_Load(object sender, EventArgs e)
         {
-            IAT.Progress += Update_Progress;
-            NABSA.Progress += Update_Progress;
-
             btnInput.ToolTipText = "Directory containing files to convert:\n" + Shared.InDir;
             btnOutput.ToolTipText = "Directory where output is saved:\n" + Shared.OutDir;
 
             UpdateFileList();
         }
-
-        private void Update_Progress(object sender, EventArgs e)
-        {
-            progressBar.PerformStep();
-            progressBar.Refresh();
-        }
-
+        
         private void BtnInput_Click(object sender, EventArgs e)
         {
             DialogResult result = folderBrowserDialog.ShowDialog();
@@ -115,21 +116,6 @@ namespace Windows
             }
         }
 
-        private void BtnConvert_Click(object sender, EventArgs e)
-        {
-            var selected = panel.Controls.OfType<FileListItem>()
-                .Where(i => i.Check.Checked)
-                .Select(i => Shared.InDir + "/" + i.Check.Text);
-            
-            var iat = selected.Where(s => s.EndsWith(".xlsx"));
-            var nabsa = selected.Where(s => s.EndsWith(".nabsa"));
-
-            progressBar.Maximum = iat.Count() * 5 + nabsa.Count();
-
-            IAT.Run(iat, groupSheets.Checked, groupSimulations.Checked);
-            NABSA.Run(nabsa);
-        }
-
         private void BtnSelect_Click(object sender, EventArgs e)
         {
             var items = panel.Controls.OfType<FileListItem>();
@@ -138,6 +124,72 @@ namespace Windows
             if (!items.Any(i => i.Check.Checked == false)) check = false;
 
             foreach (var item in items) item.Check.Checked = check;
+        }
+
+        private void BtnConvert_Click(object sender, EventArgs e)
+        {
+            ToggleEnabled();
+
+            var selected = panel.Controls.OfType<FileListItem>()
+                .Where(i => i.Check.Checked);                
+
+            var files = selected.Select(i => Shared.InDir + "/" + i.Check.Text);
+
+            iat = files.Where(s => s.EndsWith(".xlsx"));
+            nabsa = files.Where(s => s.EndsWith(".nabsa"));
+
+            int sheets = selected
+                .Select(i => i.Combo.Items
+                    .OfType<string>()
+                    .Where(
+                        s => s 
+                        .ToLower()
+                        .Contains("param"))
+                    .Count())
+                .Sum();
+
+            progressBar.Value = 0;
+            progressBar.Maximum = 2 * iat.Count() + sheets + nabsa.Count();
+
+            // Start the asynchronous operation.
+            backgroundConverter.RunWorkerAsync();                        
+        }
+
+        private void BtnCancel_Click(object sender, EventArgs e)
+        {
+            ToggleEnabled();
+
+            progressBar.Value = 0;
+
+            // Cancel the asynchronous operation.
+            backgroundConverter.CancelAsync();            
+        }
+
+        private void BeginConversion(object sender, EventArgs e)
+        {
+            Shared.Worker = sender as BackgroundWorker;            
+            IAT.Run(iat, groupSheets.Checked, groupSimulations.Checked);
+            NABSA.Run(nabsa);
+        }
+
+        private void ProgressUpdate(object sender, EventArgs e)
+        {
+            progressBar.PerformStep();
+            progressBar.Refresh();
+        }
+
+        private void CompletedConversion(object sender, EventArgs e)
+        {
+            ToggleEnabled();
+        }
+
+        private void ToggleEnabled()
+        {
+            btnCancel.Enabled = !btnCancel.Enabled;
+            btnConvert.Enabled = !btnConvert.Enabled;
+            toolStrip.Enabled = !toolStrip.Enabled;
+            menuStrip.Enabled = !menuStrip.Enabled;
+            panel.Enabled = !panel.Enabled;
         }
     }
 }

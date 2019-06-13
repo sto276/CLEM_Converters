@@ -34,7 +34,7 @@ namespace Reader
             WriteResiduePRN();
 
             // Update the Progress bar
-            Progress?.Invoke(this, EventArgs.Empty);
+            Shared.Worker?.ReportProgress(0);
 
             // Find a parameter sheet to use
             SetSheet("param");                      

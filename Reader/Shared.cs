@@ -2,6 +2,7 @@
 using Models.Core;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -11,6 +12,8 @@ namespace Reader
 {
     public static class Shared
     {
+        public static BackgroundWorker Worker = null;
+
         public static string InDir { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
         public static string OutDir { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
@@ -83,7 +86,6 @@ namespace Reader
             ErrorWriter.Close();
             return;
         }
-
 
     }
 

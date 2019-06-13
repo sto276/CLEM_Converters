@@ -27,7 +27,8 @@ namespace Reader
 
                 Shared.WriteApsimX(simulations, Path.GetFileNameWithoutExtension(file));
 
-                Progress?.Invoke(nabsa, EventArgs.Empty);
+                // Update the Progress bar
+                Shared.Worker?.ReportProgress(0);
             }
 
             Shared.CloseLog();

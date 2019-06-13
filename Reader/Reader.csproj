@@ -70,7 +70,6 @@
     <Compile Include="IAT\Data\LandData.cs" />
     <Compile Include="IAT\Data\RuminantData.cs" />
     <Compile Include="IAT\Data\StoreData.cs" />
-    <Compile Include="IAT\Events.cs" />
     <Compile Include="IAT\Methods.cs" />
     <Compile Include="IAT\Properties.cs" />
     <Compile Include="NABSA\Data\CropData.cs" />
@@ -79,7 +78,6 @@
     <Compile Include="NABSA\Data\LandData.cs" />
     <Compile Include="NABSA\Data\RuminantData.cs" />
     <Compile Include="NABSA\Data\StoreData.cs" />
-    <Compile Include="NABSA\Events.cs" />
     <Compile Include="NABSA\Methods.cs" />
     <Compile Include="NABSA\Constructor.cs" />
     <Compile Include="NABSA\Properties.cs" />

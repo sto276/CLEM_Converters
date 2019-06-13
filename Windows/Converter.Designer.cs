@@ -15,9 +15,6 @@ namespace Windows
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            IAT.Progress -= Update_Progress;
-            NABSA.Progress -= Update_Progress;
-
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -54,6 +51,7 @@ namespace Windows
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.panel = new System.Windows.Forms.Panel();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.backgroundConverter = new System.ComponentModel.BackgroundWorker();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.SuspendLayout();
@@ -192,12 +190,14 @@ namespace Windows
             // 
             // btnCancel
             // 
+            this.btnCancel.Enabled = false;
             this.btnCancel.Location = new System.Drawing.Point(397, 426);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // btnConvert
             // 
@@ -275,5 +275,6 @@ namespace Windows
         private System.Windows.Forms.Panel panel;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.ToolStripMenuItem includeNABSA;
+        private System.ComponentModel.BackgroundWorker backgroundConverter;
     }
 }

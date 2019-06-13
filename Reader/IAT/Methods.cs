@@ -23,8 +23,8 @@ namespace Reader
                 // Read in the IAT
                 IAT iat = new IAT(file);
 
-                // Update the progress bar
-                Progress?.Invoke(iat, EventArgs.Empty);
+                // Update the Progress bar
+                Shared.Worker?.ReportProgress(0);
 
                 Folder folder = new Folder(simulations) { Name = iat.Name };
 
@@ -52,10 +52,10 @@ namespace Reader
                         if (groupSheets) AttachIAT(folder, iat);
                         else AttachIAT(simulations, iat);
                     }
-                }
 
-                // Update the progress bar
-                Progress?.Invoke(iat, EventArgs.Empty);
+                    // Update the Progress bar
+                    Shared.Worker?.ReportProgress(0);
+                }                
 
                 // Files will already be written if groupSims is false
                 if (!groupSims) continue;
