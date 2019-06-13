@@ -1,4 +1,5 @@
 ﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,6 +32,9 @@ namespace Reader
             WriteCropPRN();
             WriteForagePRN();
             WriteResiduePRN();
+
+            // Update the Progress bar
+            Progress?.Invoke(this, EventArgs.Empty);
 
             // Find a parameter sheet to use
             SetSheet("param");                      

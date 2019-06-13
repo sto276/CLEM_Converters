@@ -11,8 +11,8 @@ using DocumentFormat.OpenXml.Spreadsheet;
 namespace Reader
 {
     public partial class IAT
-    {
-        public static void Run(IEnumerable<string> files, bool join, bool split)
+    {    
+        public static void Run(IEnumerable<string> files, bool groupSheets, bool groupSims)
         {
             Shared.OpenLog("ErrorLog");
 
@@ -20,7 +20,11 @@ namespace Reader
 
             foreach (string file in files)
             {
+                // Read in the IAT
                 IAT iat = new IAT(file);
+
+                // Update the progress bar
+                Progress?.Invoke(iat, EventArgs.Empty);
 
                 Folder folder = new Folder(simulations) { Name = iat.Name };
 
@@ -34,7 +38,7 @@ namespace Reader
                     iat.SetSheet(name);
 
                     // Write the resulting simulation to its own .apsimx file
-                    if (split)
+                    if (!groupSims)
                     {
                         AttachIAT(simulations, iat);
                         Shared.WriteApsimX(simulations, iat.Name);
@@ -45,24 +49,27 @@ namespace Reader
                     // Or collect all the simulations in the IAT
                     else
                     {
-                        if (join) AttachIAT(folder, iat);
+                        if (groupSheets) AttachIAT(folder, iat);
                         else AttachIAT(simulations, iat);
                     }
                 }
 
-                // Files will already be written if split is true
-                if (split) continue;
+                // Update the progress bar
+                Progress?.Invoke(iat, EventArgs.Empty);
+
+                // Files will already be written if groupSims is false
+                if (!groupSims) continue;
 
                 // Collect all the IAT files in the same .apsimx file
-                if (join) simulations.Children.Add(folder);
+                if (groupSheets) simulations.Children.Add(folder);
                 // Only gather parameter sets into the same .apsimx file
                 else
                 {
                     Shared.WriteApsimX(simulations, iat.Name);
                     simulations = new Simulations(null);
-                }
+                }                
             }
-            if (join) Shared.WriteApsimX(simulations, "Simulations");
+            if (groupSheets) Shared.WriteApsimX(simulations, "Simulations");
 
             Shared.CloseLog();
         }

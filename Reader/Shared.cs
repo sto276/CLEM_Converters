@@ -11,9 +11,9 @@ namespace Reader
 {
     public static class Shared
     {
-        public static string InDir { get; set; } = "";
+        public static string InDir { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
-        public static string OutDir { get; set; } = "Simulations";
+        public static string OutDir { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
         /// <summary>
         /// The error log file stream

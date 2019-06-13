@@ -26,6 +26,8 @@ namespace Reader
                 simulations.Add(new Simulation(simulations) { Name = nabsa.Name });
 
                 Shared.WriteApsimX(simulations, Path.GetFileNameWithoutExtension(file));
+
+                Progress?.Invoke(nabsa, EventArgs.Empty);
             }
 
             Shared.CloseLog();

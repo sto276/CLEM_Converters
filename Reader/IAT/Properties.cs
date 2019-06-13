@@ -4,6 +4,7 @@
 
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Collections.Generic;
 
 namespace Reader
@@ -13,7 +14,7 @@ namespace Reader
         /// <summary>
         /// Name of the IAT
         /// </summary>
-		public string Name { get; set; }
+		public string Name { get; set; }        
 
         /// <summary>
         /// Workbook information derived from a document

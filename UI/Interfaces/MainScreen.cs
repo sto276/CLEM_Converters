@@ -168,8 +168,8 @@ namespace UI
                 listbox.Remove(child);
             }
 
-            string[] items = Directory.GetFiles(inentry.Text, pattern, SearchOption.TopDirectoryOnly);
-            foreach (string item in items)
+            string[] files = Directory.GetFiles(inentry.Text, pattern, SearchOption.TopDirectoryOnly);
+            foreach (string item in files)
             {
                 string label = Path.GetFileName(item);
 
