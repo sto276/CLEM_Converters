@@ -173,10 +173,12 @@ namespace Reader
                 // Find rows containing the table data
                 var table_rows = iat.Part.Worksheet.Descendants<Row>().Skip(title_row).Take(rows);
 
+                Cell cell = null;
+
                 // Find the extra data cell in each row
                 foreach (Row row in table_rows)
                 {
-                    Cell cell = row.Descendants<Cell>().ElementAt(title_col);
+                    cell = row.Descendants<Cell>().ElementAt(title_col);
                     ExtraNames.Add(iat.ParseCell(cell));
                 }
                 return;
@@ -195,10 +197,11 @@ namespace Reader
 
                 // Go over each row in the table
                 int r = 0;
+                IEnumerable<Cell> cells;
                 foreach (Row row in table_rows)
                 {
                     // Select the cells in the row which are part of the table
-                    var cells = row.Descendants<Cell>().Skip(title_col + 1).Take(cols);
+                    cells = row.Descendants<Cell>().Skip(title_col + 1).Take(cols);
 
                     // Find the value of the cell data and store it
                     int c = 0;

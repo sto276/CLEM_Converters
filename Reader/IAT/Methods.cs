@@ -12,7 +12,7 @@ namespace Reader
 {
     public partial class IAT
     {    
-        public static void Run(IEnumerable<string> files, bool groupSheets, bool groupSims)
+        public static void Run(IEnumerable<string> files)
         {
             Shared.OpenLog("ErrorLog");
 
@@ -22,10 +22,6 @@ namespace Reader
             {
                 // Read in the IAT
                 IAT iat = new IAT(file);
-
-                // Update the Progress bar
-                Shared.Worker?.ReportProgress(0);
-
                 Folder folder = new Folder(simulations) { Name = iat.Name };
 
                 // Find all the parameter sheets in the IAT
@@ -36,32 +32,13 @@ namespace Reader
                     string name = sheet.Name.ToString();
                     if (!name.ToLower().Contains("param")) continue;
                     iat.SetSheet(name);
-
-                    // Write the resulting simulation to its own .apsimx file
-                    if (!groupSims)
-                    {
-                        AttachIAT(simulations, iat);
-                        Shared.WriteApsimX(simulations, iat.Name);
-
-                        // Reset the simulations node after writing out
-                        simulations = new Simulations(null);
-                    }
-                    // Or collect all the simulations in the IAT
-                    else
-                    {
-                        if (groupSheets) AttachIAT(folder, iat);
-                        else AttachIAT(simulations, iat);
-                    }
-
-                    // Update the Progress bar
-                    Shared.Worker?.ReportProgress(0);
-                }                
+                }               
 
                 // Files will already be written if groupSims is false
-                if (!groupSims) continue;
+                if (!GroupSims) continue;
 
                 // Collect all the IAT files in the same .apsimx file
-                if (groupSheets) simulations.Children.Add(folder);
+                if (GroupSheets) simulations.Children.Add(folder);
                 // Only gather parameter sets into the same .apsimx file
                 else
                 {
@@ -69,16 +46,91 @@ namespace Reader
                     simulations = new Simulations(null);
                 }                
             }
-            if (groupSheets) Shared.WriteApsimX(simulations, "Simulations");
+            if (GroupSheets) Shared.WriteApsimX(simulations, "Simulations");
 
             Shared.CloseLog();
         }
 
-        private static void AttachIAT(Node node, IAT iat)
+        public static void Run(IEnumerable<Tuple<string, string>> files)
+        {
+            Shared.OpenLog("ErrorLog");
+
+            Simulations simulations = new Simulations(null);
+
+            foreach (var file in files)
+            {
+                // Cancel the conversion
+                if (Shared.Worker.CancellationPending)
+                {
+                    Shared.CloseLog();
+                    return;
+                }
+
+                // Read in the IAT
+                IAT iat = new IAT(file.Item1);
+
+                // Update the Progress bar
+                Shared.Worker?.ReportProgress(0);
+
+                Folder folder = new Folder(simulations) { Name = iat.Name };
+
+                if(file.Item2 != "All")
+                {
+                    iat.SetSheet(file.Item2);
+                    AttachParameterSheet(simulations, iat);                    
+
+                    // Update the Progress bar
+                    Shared.Worker?.ReportProgress(0);
+                }
+                else
+                {
+                    // Find all the parameter sheets in the IAT                    
+                    foreach (Sheet sheet in iat.Book.Workbook.Sheets)
+                    {
+                        // Cancel the conversion
+                        if (Shared.Worker.CancellationPending)
+                        {
+                            Shared.CloseLog();
+                            return;
+                        }
+
+                        // Ensure a parameter sheet is selected
+                        string name = sheet.Name.ToString();
+                        if (!name.ToLower().Contains("param")) continue;
+
+                        iat.SetSheet(name);
+
+                        if (GroupSims && GroupSheets) AttachParameterSheet(folder, iat);
+                        else AttachParameterSheet(simulations, iat);
+
+                        // Update the Progress bar
+                        Shared.Worker?.ReportProgress(0);
+                    }                    
+                }
+
+                if (!GroupSims)
+                {
+                    Shared.WriteApsimX(simulations, iat.Name);
+                    simulations = new Simulations(null);
+                }
+                else if (GroupSheets) simulations.Add(folder);
+
+                iat.Dispose();
+            }
+            if (GroupSims) Shared.WriteApsimX(simulations, "Simulations");
+
+            simulations = null;
+            Shared.CloseLog();
+        }
+
+        // Creates a node structure from the IAT, using the set Sheet
+        private static void AttachParameterSheet(Node node, IAT iat)
         {
             node.Source = iat;
-            Simulation simulation = new Simulation(node);
-            simulation.Name = iat.ParameterSheet.Name;
+            Simulation simulation = new Simulation(node)
+            {
+                Name = iat.ParameterSheet.Name
+            };
             node.Children.Add(simulation);
         }
 
@@ -140,15 +192,15 @@ namespace Reader
             {
                 // Overwrite any exisiting PRN file
                 FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileCrop.prn", FileMode.Create);
-                StreamWriter swriter = new StreamWriter(stream);
+                StreamWriter writer = new StreamWriter(stream);
 
                 // Find the data set
                 WorksheetPart crop = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
                 var rows = crop.Worksheet.Descendants<Row>().Skip(1);
 
                 // Write file header to output stream
-                swriter.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}");
-                swriter.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
+                writer.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}");
+                writer.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
 
                 // Iterate over data, writing to output stream
                 string SoilNum, CropName, YEAR, Month, AmtKg;
@@ -165,9 +217,12 @@ namespace Reader
 
                     // Writing row to file
                     if (AmtKg == "") AmtKg = "0";
-                    swriter.WriteLine($"{SoilNum,-35}{CropName,-35}{YEAR,-35}{Month,-35}{AmtKg}");
+                    writer.WriteLine($"{SoilNum,-35}{CropName,-35}{YEAR,-35}{Month,-35}{AmtKg}");
                 }
-                swriter.Close();
+
+                // Cleanup                
+                writer.Dispose();
+                stream.Dispose();
             }
             catch (IOException)
             {
@@ -207,12 +262,12 @@ namespace Reader
             try
             {
                 FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileCropResidue.prn", FileMode.Create);
-                StreamWriter swriter = new StreamWriter(stream);
+                StreamWriter writer = new StreamWriter(stream);
                 WorksheetPart residue = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
 
                 // Add header to document
-                swriter.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}Npct");
-                swriter.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
+                writer.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}Npct");
+                writer.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
 
                 // Iterate over spreadsheet data and copy to output stream
                 string SoilNum, ForageName, YEAR, Month, AmtKg, Npct;
@@ -231,9 +286,12 @@ namespace Reader
 
                     // Writing row to file
                     if (AmtKg == "") AmtKg = "0";
-                    swriter.WriteLine($"{SoilNum,-35}{ForageName,-35}{YEAR,-35}{Month,-35}{AmtKg,-35}{Npct}");
+                    writer.WriteLine($"{SoilNum,-35}{ForageName,-35}{YEAR,-35}{Month,-35}{AmtKg,-35}{Npct}");
                 }
-                swriter.Close();
+
+                // Cleanup
+                writer.Dispose();
+                stream.Dispose();
             }
             catch (IOException)
             {
@@ -254,12 +312,12 @@ namespace Reader
             try
             {
                 FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileForage.prn", FileMode.Create);
-                StreamWriter swriter = new StreamWriter(stream);
+                StreamWriter writer = new StreamWriter(stream);
                 WorksheetPart forage = (WorksheetPart)Book.GetPartById(SearchSheets("forage_inputs").Id);
 
                 // Add header to document
-                swriter.WriteLine($"{"SoilNum",-36}{"CropName",-36}{"YEAR",-36}{"Month",-36}{"AmtKg",-36}Npct");
-                swriter.WriteLine($"{"()",-36}{"()",-36}{"()",-36}{"()",-36}{"()",-36}()");
+                writer.WriteLine($"{"SoilNum",-36}{"CropName",-36}{"YEAR",-36}{"Month",-36}{"AmtKg",-36}Npct");
+                writer.WriteLine($"{"()",-36}{"()",-36}{"()",-36}{"()",-36}{"()",-36}()");
 
                 // Iterate over spreadsheet data and copy to output stream
                 string SoilNum, ForageName, YEAR, Month, AmtKg, Npct;
@@ -278,10 +336,12 @@ namespace Reader
 
                     // Write row to file
                     if (AmtKg == "") AmtKg = "0";
-                    swriter.WriteLine($"{SoilNum,-36}{ForageName,-36}{YEAR,-36}{Month,-36}{AmtKg,-36}{Npct}");
+                    writer.WriteLine($"{SoilNum,-36}{ForageName,-36}{YEAR,-36}{Month,-36}{AmtKg,-36}{Npct}");
                 }
 
-                swriter.Close();
+                // Cleanup
+                writer.Dispose();
+                stream.Dispose();
             }
             catch (IOException)
             {

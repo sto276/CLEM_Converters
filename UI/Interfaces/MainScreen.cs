@@ -239,8 +239,10 @@ namespace UI
 
             switch (combobox.ActiveText)
             {                
-                case "IAT":                    
-                    IAT.Run(files, joincheck.Active, splitcheck.Active);
+                case "IAT":
+                    IAT.GroupSheets = joincheck.Active;
+                    IAT.GroupSims = splitcheck.Active;
+                    IAT.Run(files);
                     break;
 
                 case "NABSA":

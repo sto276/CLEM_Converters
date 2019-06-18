@@ -11,7 +11,7 @@ namespace Reader
     /// <summary>
     /// Data sourced from an IAT file
     /// </summary>
-    public partial class IAT : IApsimX
+    public partial class IAT : IApsimX, IDisposable
 	{       
         /// <summary>
         ///Constructs a new IAT object with the given name
@@ -22,8 +22,11 @@ namespace Reader
             Name = Path.GetFileNameWithoutExtension(path);
             Directory.CreateDirectory($"{Shared.OutDir}/{Name}");
 
+            // Read the document
+            Document = SpreadsheetDocument.Open(path, false);
+
             // Load the workbook
-            Book = SpreadsheetDocument.Open(path, false).WorkbookPart;
+            Book = Document.WorkbookPart;
 
             // Find the string table
             StringTable = Book.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();            
@@ -34,10 +37,7 @@ namespace Reader
             WriteResiduePRN();
 
             // Update the Progress bar
-            Shared.Worker?.ReportProgress(0);
-
-            // Find a parameter sheet to use
-            SetSheet("param");                      
+            Shared.Worker?.ReportProgress(0);                     
         }
         
         /// <summary>
@@ -106,6 +106,43 @@ namespace Reader
             Pools = new Dictionary<int, string>();            
             GetGrownFodderPools();
             GetBoughtFodderPools();
-        }       
+        }
+
+        public void Dispose()
+        {
+            // Dispose of unmanaged resources.
+            Dispose(true);
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if(disposing)
+            {
+                Document.Dispose();
+            }
+
+            CropsGrown = null;
+            CropSpecs = null;
+            ForagesGrown = null;
+            ForageSpecs = null;
+            LandSpecs = null;
+            LabourSupply = null;
+            RumNumbers = null;
+            RumAges = null;
+            RumWeights = null;
+            RumCoeffs = null;
+            RumSpecs = null;
+            RumPrices = null;
+            Overheads = null;
+            Fodder = null;
+            FodderSpecs = null;
+
+            disposed = true;
+        }
     } 
 }

@@ -73,7 +73,7 @@
             this.comboBox.Name = "comboBox";
             this.comboBox.Size = new System.Drawing.Size(198, 21);
             this.comboBox.TabIndex = 0;
-            this.comboBox.Text = "Select sheet . . .";
+            this.comboBox.Text = "All";
             // 
             // FileListItem
             // 

@@ -18,9 +18,9 @@ namespace Windows
     {
         public Panel Panel { get { return panel; } }
 
-        private IEnumerable<string> iat;
+        private List<string> nabsa = new List<string>();
 
-        private IEnumerable<string> nabsa;
+        private List<Tuple<string, string>> iat = new List<Tuple<string, string>>();
 
         public Converter()
         {
@@ -79,7 +79,7 @@ namespace Windows
                 .Select(s => s.Name.ToString())
                 .ToArray();
 
-            doc.Close();
+            doc.Dispose();
 
             return sheets;
         }
@@ -131,22 +131,38 @@ namespace Windows
             ToggleEnabled();
 
             var selected = panel.Controls.OfType<FileListItem>()
-                .Where(i => i.Check.Checked);                
+                .Where(i => i.Check.Checked);
 
-            var files = selected.Select(i => Shared.InDir + "/" + i.Check.Text);
+            int sheets = 0;
 
-            iat = files.Where(s => s.EndsWith(".xlsx"));
-            nabsa = files.Where(s => s.EndsWith(".nabsa"));
+            foreach (var selection in selected)
+            {
+                string file = Shared.InDir + "/" + selection.Check.Text;
 
-            int sheets = selected
-                .Select(i => i.Combo.Items
-                    .OfType<string>()
-                    .Where(
-                        s => s 
-                        .ToLower()
-                        .Contains("param"))
-                    .Count())
-                .Sum();
+                if (file.EndsWith(".nabsa"))
+                {
+                    nabsa.Add(file);
+                }
+                else if(file.EndsWith(".xlsx"))
+                {
+                    string sheet = selection.Combo.Text;
+                    iat.Add(new Tuple<string, string>(file, sheet));
+
+                    if (sheet == "All") sheets++;
+                    else
+                    {
+                        int count = selection.Combo.Items
+                            .OfType<string>()
+                            .Where(
+                                s => s
+                                .ToLower()
+                                .Contains("param"))
+                            .Count();
+
+                        sheets += count;
+                    }
+                }
+            }
 
             progressBar.Value = 0;
             progressBar.Maximum = 2 * iat.Count() + sheets + nabsa.Count();
@@ -156,19 +172,18 @@ namespace Windows
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
-        {
-            ToggleEnabled();
-
-            progressBar.Value = 0;
-
+        {         
             // Cancel the asynchronous operation.
             backgroundConverter.CancelAsync();            
         }
 
         private void BeginConversion(object sender, EventArgs e)
         {
-            Shared.Worker = sender as BackgroundWorker;            
-            IAT.Run(iat, groupSheets.Checked, groupSimulations.Checked);
+            Shared.Worker = sender as BackgroundWorker;
+
+            IAT.GroupSheets = groupSheets.Checked;
+            IAT.GroupSims = groupSimulations.Checked;
+            IAT.Run(iat);
             NABSA.Run(nabsa);
         }
 
@@ -180,6 +195,7 @@ namespace Windows
 
         private void CompletedConversion(object sender, EventArgs e)
         {
+            progressBar.Value = 0;
             ToggleEnabled();
         }
 
