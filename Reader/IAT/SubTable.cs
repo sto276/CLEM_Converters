@@ -16,7 +16,7 @@ namespace Reader
             /// <summary>
             /// The IAT object which owns the table
             /// </summary>
-            private IAT iat;
+            private readonly IAT iat;
 
             /// <summary>
             /// Table name

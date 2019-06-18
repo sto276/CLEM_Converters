@@ -1,4 +1,5 @@
 ﻿using Reader;
+using System.Web.Script.Serialization;
 
 namespace Windows
 {
@@ -256,25 +257,37 @@ namespace Windows
         #endregion
 
         private System.Windows.Forms.MenuStrip menuStrip;
+
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+
         private System.Windows.Forms.ToolStripMenuItem iATToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem includeIAT;
         private System.Windows.Forms.ToolStripMenuItem groupSheets;
         private System.Windows.Forms.ToolStripMenuItem groupSimulations;
+
         private System.Windows.Forms.ToolStripMenuItem nABSAToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem includeNABSA;
+
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+
         private System.Windows.Forms.ToolStrip toolStrip;
+
         private System.Windows.Forms.ToolStripButton btnSelect;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton btnInput;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton btnOutput;
+
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;        
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+
+        private System.Windows.Forms.ProgressBar progressBar;
+
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnConvert;
-        private System.Windows.Forms.ProgressBar progressBar;
+        
         private System.Windows.Forms.Panel panel;
+
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
-        private System.Windows.Forms.ToolStripMenuItem includeNABSA;
+        
         private System.ComponentModel.BackgroundWorker backgroundConverter;
     }
 }

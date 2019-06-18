@@ -14,7 +14,7 @@ namespace Reader
     {    
         public static void Run(IEnumerable<string> files)
         {
-            Shared.OpenLog("ErrorLog");
+            Shared.OpenLog();
 
             Simulations simulations = new Simulations(null);
 
@@ -53,7 +53,7 @@ namespace Reader
 
         public static void Run(IEnumerable<Tuple<string, string>> files)
         {
-            Shared.OpenLog("ErrorLog");
+            Shared.OpenLog();
 
             Simulations simulations = new Simulations(null);
 

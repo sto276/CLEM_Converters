@@ -13,7 +13,7 @@ namespace Reader
     {
         public static void Run(IEnumerable<string> files)
         {
-            Shared.OpenLog("log.txt");
+            Shared.OpenLog();
 
             foreach (string file in files)
             {

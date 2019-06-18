@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -15,9 +16,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 namespace Windows
 {
     public partial class Converter : Form
-    {
-        public Panel Panel { get { return panel; } }
-
+    {        
         private List<string> nabsa = new List<string>();
 
         private List<Tuple<string, string>> iat = new List<Tuple<string, string>>();
@@ -31,6 +30,20 @@ namespace Windows
             backgroundConverter.DoWork += new DoWorkEventHandler(BeginConversion);
             backgroundConverter.ProgressChanged += new ProgressChangedEventHandler(ProgressUpdate);
             backgroundConverter.RunWorkerCompleted += new RunWorkerCompletedEventHandler(CompletedConversion);
+
+            FormClosed += new FormClosedEventHandler(CloseConverter);
+        }
+
+        public void UpdateSettings()
+        {
+            var settings = ConverterSettings.Read();
+
+            Shared.InDir = settings.InDirectory;
+            Shared.OutDir = settings.OutDirectory;
+            includeIAT.Checked = settings.IncludeIAT;
+            groupSheets.Checked = settings.GroupSheets;
+            groupSimulations.Checked = settings.GroupSims;
+            includeNABSA.Checked = settings.IncludeNABSA;
         }
 
         public void UpdateFileList()
@@ -68,7 +81,7 @@ namespace Windows
             panel.Controls.AddRange(items.ToArray());
             panel.Refresh();
         }
-
+        
         private string[] GetSheets(string file)
         {
             SpreadsheetDocument doc = SpreadsheetDocument.Open(file, false);
@@ -85,16 +98,18 @@ namespace Windows
         }
 
         private void Converter_Load(object sender, EventArgs e)
-        {
+        {            
+            UpdateSettings();
+            UpdateFileList();
+
             btnInput.ToolTipText = "Directory containing files to convert:\n" + Shared.InDir;
             btnOutput.ToolTipText = "Directory where output is saved:\n" + Shared.OutDir;
-
-            UpdateFileList();
         }
-        
+
         private void BtnInput_Click(object sender, EventArgs e)
         {
-            DialogResult result = folderBrowserDialog.ShowDialog();
+            folderBrowserDialog.SelectedPath = Shared.InDir;
+            DialogResult result = folderBrowserDialog.ShowDialog();             
 
             if(result == DialogResult.OK)
             {
@@ -107,6 +122,7 @@ namespace Windows
 
         private void BtnOutput_Click(object sender, EventArgs e)
         {
+            folderBrowserDialog.SelectedPath = Shared.OutDir;
             DialogResult result = folderBrowserDialog.ShowDialog();
 
             if (result == DialogResult.OK)
@@ -197,6 +213,21 @@ namespace Windows
         {
             progressBar.Value = 0;
             ToggleEnabled();
+        }
+        
+        private void CloseConverter(object sender, EventArgs e)
+        {
+            ConverterSettings settings = new ConverterSettings()
+            {
+                InDirectory = Shared.InDir,
+                OutDirectory = Shared.OutDir,
+                IncludeIAT = includeIAT.Checked,
+                GroupSheets = groupSheets.Checked,
+                GroupSims = groupSimulations.Checked,
+                IncludeNABSA = includeNABSA.Checked
+            };
+
+            settings.Write();
         }
 
         private void ToggleEnabled()
