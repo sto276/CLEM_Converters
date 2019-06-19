@@ -11,7 +11,7 @@ namespace Reader
     /// <summary>
     /// Data sourced from an IAT file
     /// </summary>
-    public partial class IAT : IApsimX, IDisposable
+    public partial class IAT : IApsimX
 	{       
         /// <summary>
         ///Constructs a new IAT object with the given name
@@ -23,7 +23,14 @@ namespace Reader
             Directory.CreateDirectory($"{Shared.OutDir}/{Name}");
 
             // Read the document
-            Document = SpreadsheetDocument.Open(path, false);
+            try
+            {
+                Document = SpreadsheetDocument.Open(path, false);
+            }
+            catch (IOException)
+            {
+                throw new ConversionException();
+            }
 
             // Load the workbook
             Book = Document.WorkbookPart;
@@ -108,24 +115,8 @@ namespace Reader
             GetBoughtFodderPools();
         }
 
-        public void Dispose()
+        public void ClearTables()
         {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed) return;
-
-            if(disposing)
-            {
-                Document.Dispose();
-            }
-
             CropsGrown = null;
             CropSpecs = null;
             ForagesGrown = null;
@@ -141,6 +132,32 @@ namespace Reader
             Overheads = null;
             Fodder = null;
             FodderSpecs = null;
+        }
+
+        public void Dispose()
+        {
+            // Disposal of unmanaged resources.
+            Dispose(true);
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if(disposing)
+            {
+                Document.Close();
+                
+            }
+
+            Book = null;
+            ParameterSheet = null;
+            Part = null;
+
+            ClearTables();
 
             disposed = true;
         }

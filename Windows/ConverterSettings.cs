@@ -45,7 +45,8 @@ namespace Windows
 
             Directory.CreateDirectory(path);
 
-            var json = (new JavaScriptSerializer()).Serialize(this);
+            var serializer = new JavaScriptSerializer();
+            var json = serializer.Serialize(this);
 
             File.WriteAllText(path + "/settings.json", json);
         }

@@ -42,5 +42,7 @@ namespace Reader
         private List<string> Breeds { get; set; }
 
         private IEnumerable<string>  PresentBreeds { get; set; }
+
+        private bool disposed = false;
     }
 }

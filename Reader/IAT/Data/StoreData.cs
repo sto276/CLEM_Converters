@@ -49,7 +49,8 @@ namespace Reader
         /// <param name="iat">Source IAT</param>
         private void GetGrownFodderPools()
         {
-            WorksheetPart crop = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);               
+            WorksheetPart crop = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
+            var rows = crop.Worksheet.Descendants<Row>().Skip(1);
 
             // Attempt to find the fodder pool for each crop
             foreach (int id in GrainIDs)
@@ -57,35 +58,28 @@ namespace Reader
                 // Check if the crop has residue
                 if (CropsGrown.GetData<double>(4, id) <= 0) continue;
 
-                // Find crop data
-                var rows = crop.Worksheet.Descendants<Row>().Skip(1);                    
-                var inputs =
-                    from row in rows
-                    where TestRow(id, row)
-                    select row;
-
                 // Find the cropname
                 string cropname = CropSpecs.RowNames.ElementAt(id + 1);
 
                 // Check data was found
                 int pool = 0;
-                if (inputs.Any())
+                if (rows.Any(r => TestRow(id, r)))
                 {
                     // Select the first row of the valid inputs
-                    var input = inputs.First().Descendants<Cell>();
+                    Cell input = rows.First(r => TestRow(id, r)).Descendants<Cell>().ElementAt(10);
 
                     // Find what pool the residue uses
-                    int.TryParse(ParseCell(input.ElementAt(10)), out pool);
+                    int.TryParse(ParseCell(input), out pool);
                 }
                 else
                 {
-                    Shared.Write(new ConversionError()
+                    Shared.WriteError(new ErrorData()
                     {
                         FileName = Name,
                         FileType = "IAT",
                         Message = $"Crop type {cropname} wasn't found in the inputs sheet",
                         Severity = "Low",
-                        Table = "N/A",
+                        Table = "-",
                         Sheet = "crop_inputs"
                     });
                 }

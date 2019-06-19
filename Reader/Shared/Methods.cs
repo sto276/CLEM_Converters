@@ -2,27 +2,28 @@
 using Newtonsoft.Json;
 using System.IO;
 
-
 namespace Reader
-{    public static partial class Shared
+{
+    public static partial class Shared
     {
         public static void WriteApsimX(Simulations simulations, string name)
         {
-            StreamWriter stream = new StreamWriter($"{OutDir}\\{name}.apsimx");
-            JsonWriter writer = new JsonTextWriter(stream)
+            using (StreamWriter stream = new StreamWriter($"{OutDir}\\{name}.apsimx"))
+            using (JsonWriter writer = new JsonTextWriter(stream))
             {
-                CloseOutput = true,
-                AutoCompleteOnClose = true
-            };
+                writer.CloseOutput = true;
+                writer.AutoCompleteOnClose = true;                
 
-            JsonSerializer serializer = new JsonSerializer()
-            {
-                Formatting = Formatting.Indented,
-                TypeNameHandling = TypeNameHandling.Objects
-            };
-            serializer.Serialize(writer, simulations);
+                JsonSerializer serializer = new JsonSerializer()
+                {
+                    Formatting = Formatting.Indented,
+                    TypeNameHandling = TypeNameHandling.Objects                    
+                };
+                serializer.Serialize(writer, simulations);
 
-            writer.Close();
+                serializer = null;
+                simulations.Dispose();
+            }
         }
     }
 }

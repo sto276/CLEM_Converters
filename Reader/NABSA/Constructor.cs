@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace Reader
 {
-    public partial class NABSA :IApsimX
+    public partial class NABSA : IApsimX
     {
         public NABSA(string path)
         {
@@ -55,6 +55,27 @@ namespace Reader
                                 ).Sum() > 0
                             // Breeds with a non-zero number of ruminants present
                             select Breeds.ElementAt(index);
+        }
+
+        public void Dispose()
+        {
+            // Dispose of unmanaged resources.
+            Dispose(true);
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                
+            }
+
+            disposed = true;
         }
     }
 }

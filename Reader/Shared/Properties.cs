@@ -17,6 +17,8 @@ namespace Reader
         /// </summary>
         private static FileStream ErrorStream;
 
+        private static StreamReader ErrorReader;
+
         /// <summary>
         /// The error log stream writer
         /// </summary>

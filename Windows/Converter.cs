@@ -72,7 +72,11 @@ namespace Windows
                 };
                 if (label.Contains(".nabsa")) item.Combo.Visible = false;
 
-                if (label.Contains(".xlsx")) item.Combo.Items.AddRange(GetSheets(file));
+                if (label.Contains(".xlsx"))
+                {
+                    var sheets = GetSheets(file);
+                    if (sheets != null) item.Combo.Items.AddRange(sheets);
+                }
 
                 items.Add(item);
                 i++;
@@ -81,20 +85,29 @@ namespace Windows
             panel.Controls.AddRange(items.ToArray());
             panel.Refresh();
         }
-        
+
         private string[] GetSheets(string file)
         {
-            SpreadsheetDocument doc = SpreadsheetDocument.Open(file, false);
-            WorkbookPart part = doc.WorkbookPart;
+            try
+            {
+                using (SpreadsheetDocument document = SpreadsheetDocument.Open(file, false))
+                {
+                    WorkbookPart part = document.WorkbookPart;
 
-            var sheets = part.Workbook.Descendants<Sheet>()
-                .Where(s => !s.Name.ToString().ToLower().Contains("input"))
-                .Select(s => s.Name.ToString())
-                .ToArray();
+                    var sheets = part.Workbook.Descendants<Sheet>()
+                        .Where(s => !s.Name.ToString().ToLower().Contains("input"))
+                        .Select(s => s.Name.ToString())
+                        .ToArray();
 
-            doc.Dispose();
+                    return sheets;
+                }
+            }
+            catch (IOException)
+            {
 
-            return sheets;
+            }
+
+            return null;
         }
 
         private void Converter_Load(object sender, EventArgs e)
@@ -146,13 +159,18 @@ namespace Windows
         {
             ToggleEnabled();
 
+            // Find all the items which the user selected
             var selected = panel.Controls.OfType<FileListItem>()
                 .Where(i => i.Check.Checked);
 
+            // Reset trackers
             int sheets = 0;
+            nabsa.Clear();
+            iat.Clear();
 
             foreach (var selection in selected)
             {
+                // Find the full file path
                 string file = Shared.InDir + "/" + selection.Check.Text;
 
                 if (file.EndsWith(".nabsa"))
@@ -164,7 +182,7 @@ namespace Windows
                     string sheet = selection.Combo.Text;
                     iat.Add(new Tuple<string, string>(file, sheet));
 
-                    if (sheet == "All") sheets++;
+                    if (sheet != "All") sheets++;
                     else
                     {
                         int count = selection.Combo.Items
@@ -181,7 +199,7 @@ namespace Windows
             }
 
             progressBar.Value = 0;
-            progressBar.Maximum = 2 * iat.Count() + sheets + nabsa.Count();
+            progressBar.Maximum = iat.Count() + nabsa.Count() + sheets;
 
             // Start the asynchronous operation.
             backgroundConverter.RunWorkerAsync();                        

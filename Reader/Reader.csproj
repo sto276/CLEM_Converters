@@ -85,7 +85,7 @@
     <Compile Include="IAT\Constructor.cs" />
     <Compile Include="IAT\SubTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Shared\ErrorLog.cs" />
+    <Compile Include="Shared\ErrorHandling.cs" />
     <Compile Include="Shared\Methods.cs" />
     <Compile Include="Shared\Properties.cs" />
   </ItemGroup>

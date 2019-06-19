@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Models
@@ -6,7 +7,7 @@ namespace Models
     /// <summary>
     /// Base node in the tree, this should not be instantiated directly
     /// </summary>
-    public class Node
+    public class Node : IDisposable
     {
         public string Name { get; set; }      
 
@@ -23,6 +24,9 @@ namespace Models
 
         [JsonIgnore]
         public IApsimX Source { get; set; }
+
+        [JsonIgnore]
+        private bool disposed = false;
 
         public Node(Node parent)
         {
@@ -47,6 +51,27 @@ namespace Models
         {
             if (nodes is null) return;
             foreach (Node node in nodes) Add(node);
+        }
+
+        public void Dispose()
+        {
+            // Dispose of unmanaged resources.
+            Dispose(true);
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                Source?.Dispose();
+            }
+
+            disposed = true;
         }
     }
 }

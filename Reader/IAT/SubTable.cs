@@ -223,7 +223,7 @@ namespace Reader
             /// <returns></returns>
             private T ConvertData<T>(string s)
             {
-                var CE = new ConversionError()
+                var ED = new ErrorData()
                 {
                     FileName = iat.Name,
                     FileType = "IAT",
@@ -240,29 +240,29 @@ namespace Reader
                 }
                 catch (FormatException)
                 {
-                    CE.Message = "Empty cell";
-                    CE.Severity = "Low";
-                    Shared.Write(CE);
+                    ED.Message = "Empty cell";
+                    ED.Severity = "Low";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    CE.Message = "Index out of range";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);                    
+                    ED.Message = "Index out of range";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);                    
                     return default;
                 }
                 catch (InvalidCastException)
                 {
                     T t = default;
-                    CE.Message = $"Type mismatch, expected {t.GetType().Name}";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);
+                    ED.Message = $"Type mismatch, expected {t.GetType().Name}";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch
                 {
-                    Shared.Write(CE);
+                    Shared.WriteError(ED);
                     return default;
                 }                
             }
@@ -275,7 +275,7 @@ namespace Reader
             public T GetData<T>(int row, int column)
             {
                 string s = data[row, column];
-                var CE = new ConversionError()
+                var ED = new ErrorData()
                 {
                     FileName = iat.Name,
                     FileType = "IAT",
@@ -292,29 +292,29 @@ namespace Reader
                 }
                 catch (FormatException)
                 {
-                    CE.Message = "Empty cell";
-                    CE.Severity = "Low";
-                    Shared.Write(CE);
+                    ED.Message = "Empty cell";
+                    ED.Severity = "Low";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    CE.Message = "Index out of range";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);
+                    ED.Message = "Index out of range";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch (InvalidCastException)
                 {
                     T t = default;
-                    CE.Message = $"Type mismatch, expected {t.GetType().Name}";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);
+                    ED.Message = $"Type mismatch, expected {t.GetType().Name}";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch
                 {
-                    Shared.Write(CE);
+                    Shared.WriteError(ED);
                     return default;
                 }
             }

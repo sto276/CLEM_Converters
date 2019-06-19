@@ -13,7 +13,7 @@ namespace Reader
     {
         public static void Run(IEnumerable<string> files)
         {
-            Shared.OpenLog();
+            Shared.OpenErrorLog();
 
             foreach (string file in files)
             {
@@ -31,7 +31,7 @@ namespace Reader
                 Shared.Worker?.ReportProgress(0);
             }
 
-            Shared.CloseLog();
+            Shared.CloseErrorLog();
         }
 
         public Clock GetClock(Simulation simulation)

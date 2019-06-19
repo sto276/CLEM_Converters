@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Models
 {
@@ -7,7 +8,7 @@ namespace Models
     using CLEM.Activities;
     using CLEM.Resources;
     using CLEM.Groupings;
-    public interface IApsimX
+    public interface IApsimX : IDisposable
     {
         // PROPERTIES:  
         /// <summary>
