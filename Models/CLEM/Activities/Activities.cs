@@ -1,7 +1,9 @@
-﻿namespace Models.CLEM.Activities
-{
-    using CLEM.Reporting;
+﻿using Models.CLEM.Reporting;
+using Models.CLEM.Resources;
+using Models.Core;
 
+namespace Models.CLEM.Activities
+{
     /// <summary>
     /// Generic base node for all activity models. 
     /// This node should not be instantiated directly.
@@ -78,6 +80,7 @@
             ActivityFolder herd = new ActivityFolder(this){Name = "Manage herd"};
 
             herd.Add(Source.GetManageBreeds(herd));
+            herd.Add(GetFeed(herd));
             herd.Add(new RuminantActivityGrazeAll(herd));
             herd.Add(new RuminantActivityGrow(herd));
             herd.Add(new RuminantActivityBreed(herd));
@@ -85,6 +88,26 @@
             herd.Add(new RuminantActivityMuster(herd));
 
             Add(herd);
+        }
+
+        private ActivityFolder GetFeed(ActivityFolder herd)
+        {            
+            AnimalFoodStore store = SearchTree<AnimalFoodStore>((ZoneCLEM)Parent);
+
+            if (store.Children.Count == 0) return null; 
+
+            ActivityFolder feed = new ActivityFolder(herd) { Name = "Feed ruminants" };            
+
+            foreach (Node child in store.Children)
+            {
+                feed.Add(new RuminantActivityFeed(feed)
+                {
+                    Name = "Feed " + child.Name,
+                    FeedTypeName = "AnimalFoodStore." + child.Name
+                });
+            }
+
+            return feed;
         }
     }
 

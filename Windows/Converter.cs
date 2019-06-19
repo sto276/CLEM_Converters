@@ -52,27 +52,28 @@ namespace Windows
 
             List<FileListItem> items = new List<FileListItem>();
 
+            // Protect against invalid input directory
+            Directory.CreateDirectory(Shared.InDir);
+
             var files = Directory.EnumerateFiles(Shared.InDir, "*.*", SearchOption.TopDirectoryOnly)
-                .Where(s => !s.StartsWith("~") && 
-                    (
-                        (includeIAT.Checked && s.EndsWith(".xlsx")) ||
-                        (includeNABSA.Checked && s.EndsWith(".nabsa"))
-                    )
+                .Select(p => Path.GetFileName(p))
+                .Where(f => !f.StartsWith("~$"))
+                .Where(f => 
+                        (includeIAT.Checked && f.EndsWith(".xlsx")) ||
+                        (includeNABSA.Checked && f.EndsWith(".nabsa"))                    
                 );
 
             int i = 0;
             foreach (string file in files)
             {
-                string label = Path.GetFileName(file);
-
-                FileListItem item = new FileListItem(label)
+                FileListItem item = new FileListItem(file)
                 {
                     Anchor = AnchorStyles.Top,
                     Location = new Point(0, i * 25)
                 };
-                if (label.Contains(".nabsa")) item.Combo.Visible = false;
+                if (file.Contains(".nabsa")) item.Combo.Visible = false;
 
-                if (label.Contains(".xlsx"))
+                if (file.Contains(".xlsx"))
                 {
                     var sheets = GetSheets(file);
                     if (sheets != null) item.Combo.Items.AddRange(sheets);
@@ -213,6 +214,9 @@ namespace Windows
 
         private void BeginConversion(object sender, EventArgs e)
         {
+            // Protects against potentially deleted paths
+            Directory.CreateDirectory(Shared.OutDir);
+
             Shared.Worker = sender as BackgroundWorker;
 
             IAT.GroupSheets = groupSheets.Checked;

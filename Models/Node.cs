@@ -53,6 +53,32 @@ namespace Models
             foreach (Node node in nodes) Add(node);
         }
 
+        public Node SearchTree<Node>(Models.Node node) where Node : Models.Node
+        {            
+            foreach(Models.Node child in node.Children)
+            {
+                if (child.GetType() == typeof(Node)) return (Node)child;
+                else
+                {
+                    var search = SearchTree<Node>(child);
+                    if (search != null) return search;
+                }
+            }
+            return null;
+        }
+
+        public Node GetAncestor<Node>() where Node : Models.Node
+        {
+            Models.Node ancestor = Parent;
+
+            while (ancestor.Parent.GetType() != typeof(Node))
+            {
+                ancestor = ancestor.Parent;
+            }
+
+            return (Node)ancestor.Parent;
+        }
+
         public void Dispose()
         {
             // Dispose of unmanaged resources.

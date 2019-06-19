@@ -86,7 +86,7 @@ namespace Reader
                     LabourFilter AgeFilter = new LabourFilter(item)
                     {
                         Name = "AgeFilter",
-                        Parameter = 0,
+                        Parameter = 2,
                         Operator = 5,
                         Value = years.ToString()
                     };

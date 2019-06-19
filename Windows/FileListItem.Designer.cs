@@ -50,14 +50,14 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.comboBox);
-            this.splitContainer1.Size = new System.Drawing.Size(440, 30);
-            this.splitContainer1.SplitterDistance = 234;
+            this.splitContainer1.Size = new System.Drawing.Size(540, 30);
+            this.splitContainer1.SplitterDistance = 319;
             this.splitContainer1.TabIndex = 0;
             // 
             // checkBox
             // 
             this.checkBox.AutoSize = true;
-            this.checkBox.Location = new System.Drawing.Point(3, 7);
+            this.checkBox.Location = new System.Drawing.Point(14, 7);
             this.checkBox.Name = "checkBox";
             this.checkBox.Size = new System.Drawing.Size(105, 17);
             this.checkBox.TabIndex = 0;
@@ -69,9 +69,9 @@
             this.comboBox.FormattingEnabled = true;
             this.comboBox.Items.AddRange(new object[] {
             "All"});
-            this.comboBox.Location = new System.Drawing.Point(3, 5);
+            this.comboBox.Location = new System.Drawing.Point(5, 5);
             this.comboBox.Name = "comboBox";
-            this.comboBox.Size = new System.Drawing.Size(198, 21);
+            this.comboBox.Size = new System.Drawing.Size(209, 21);
             this.comboBox.TabIndex = 0;
             this.comboBox.Text = "All";
             // 
@@ -81,7 +81,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainer1);
             this.Name = "FileListItem";
-            this.Size = new System.Drawing.Size(440, 30);
+            this.Size = new System.Drawing.Size(540, 30);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);

@@ -64,7 +64,7 @@ namespace Windows
             this.aboutToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(484, 24);
+            this.menuStrip.Size = new System.Drawing.Size(584, 24);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -146,7 +146,7 @@ namespace Windows
             this.btnOutput});
             this.toolStrip.Location = new System.Drawing.Point(0, 24);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(484, 25);
+            this.toolStrip.Size = new System.Drawing.Size(584, 25);
             this.toolStrip.TabIndex = 1;
             this.toolStrip.Text = "toolStrip1";
             // 
@@ -192,7 +192,7 @@ namespace Windows
             // btnCancel
             // 
             this.btnCancel.Enabled = false;
-            this.btnCancel.Location = new System.Drawing.Point(397, 426);
+            this.btnCancel.Location = new System.Drawing.Point(497, 526);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
@@ -202,7 +202,7 @@ namespace Windows
             // 
             // btnConvert
             // 
-            this.btnConvert.Location = new System.Drawing.Point(316, 426);
+            this.btnConvert.Location = new System.Drawing.Point(416, 526);
             this.btnConvert.Name = "btnConvert";
             this.btnConvert.Size = new System.Drawing.Size(75, 23);
             this.btnConvert.TabIndex = 4;
@@ -213,10 +213,10 @@ namespace Windows
             // progressBar
             // 
             this.progressBar.ForeColor = System.Drawing.Color.Lime;
-            this.progressBar.Location = new System.Drawing.Point(12, 426);
+            this.progressBar.Location = new System.Drawing.Point(12, 526);
             this.progressBar.Maximum = 10;
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(298, 23);
+            this.progressBar.Size = new System.Drawing.Size(398, 23);
             this.progressBar.Step = 1;
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar.TabIndex = 5;
@@ -226,14 +226,14 @@ namespace Windows
             this.panel.AutoScroll = true;
             this.panel.Location = new System.Drawing.Point(12, 52);
             this.panel.Name = "panel";
-            this.panel.Size = new System.Drawing.Size(460, 368);
+            this.panel.Size = new System.Drawing.Size(560, 468);
             this.panel.TabIndex = 6;
             // 
             // Converter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 461);
+            this.ClientSize = new System.Drawing.Size(584, 561);
             this.Controls.Add(this.panel);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.btnConvert);
@@ -242,7 +242,10 @@ namespace Windows
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
+            this.MaximumSize = new System.Drawing.Size(600, 600);
+            this.MinimumSize = new System.Drawing.Size(600, 600);
             this.Name = "Converter";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "CLEM Converter";
             this.Load += new System.EventHandler(this.Converter_Load);
             this.menuStrip.ResumeLayout(false);
