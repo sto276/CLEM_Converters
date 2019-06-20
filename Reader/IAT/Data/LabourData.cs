@@ -20,6 +20,9 @@ namespace Reader
             {"Child Female", 7},
         };    
 
+        /// <summary>
+        /// Creates the a model for each Labour Type
+        /// </summary>
         public IEnumerable<LabourType> GetLabourTypes(Labour parent)
         {
             List<LabourType> types = new List<LabourType>();
@@ -55,6 +58,9 @@ namespace Reader
             return types.AsEnumerable();
         }
         
+        /// <summary>
+        /// Models the availability of each Labour Type
+        /// </summary>
         public IEnumerable<LabourAvailabilityItem> GetAvailabilityItems(LabourAvailabilityList parent)
         {
             List<LabourAvailabilityItem> items = new List<LabourAvailabilityItem>();

@@ -1,13 +1,17 @@
-﻿using System;
+﻿using Models.Core;
+using Models.CLEM;
+using Models.CLEM.Activities;
+using Models.CLEM.Resources;
+using Models.CLEM.Groupings;
+using System;
 using System.Collections.Generic;
 
 namespace Models
 {
-    using Core;
-    using CLEM;
-    using CLEM.Activities;
-    using CLEM.Resources;
-    using CLEM.Groupings;
+    /// <summary>
+    /// Interface for accessing the data needed to generate an ApsimX
+    /// model from external source.
+    /// </summary>
     public interface IApsimX : IDisposable
     {
         // PROPERTIES:  

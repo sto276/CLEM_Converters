@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Models.CLEM.Resources;
+using Models.CLEM.Activities;
+using Models.CLEM.Reporting;
+using System.Collections.Generic;
 
 namespace Models.CLEM
 {
-    using Resources;
-    using Activities;
-    using Reporting;
-
     /// <summary>
     /// Container for a CLEM model
     /// </summary>
@@ -36,7 +35,6 @@ namespace Models.CLEM
             Add(Source.GetFiles(this));          
             Add(new ResourcesHolder(this));
             Add(new ActivitiesHolder(this));
-
             AddReports();            
         }
 

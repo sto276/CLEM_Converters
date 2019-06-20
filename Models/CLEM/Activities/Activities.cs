@@ -1,6 +1,5 @@
 ﻿using Models.CLEM.Reporting;
 using Models.CLEM.Resources;
-using Models.Core;
 
 namespace Models.CLEM.Activities
 {
@@ -90,6 +89,9 @@ namespace Models.CLEM.Activities
             Add(herd);
         }
 
+        /// <summary>
+        /// Add a RuminantActivityFeed for each item in the AnimalFoodStore
+        /// </summary>
         private ActivityFolder GetFeed(ActivityFolder herd)
         {            
             AnimalFoodStore store = SearchTree<AnimalFoodStore>((ZoneCLEM)Parent);

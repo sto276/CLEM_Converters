@@ -7,7 +7,7 @@ namespace Reader
     public partial class IAT
     {       
         /// <summary>
-        /// Writes the 'Manage forages' activity segment of an .apsimx file
+        /// Constructs the Manage Forages model
         /// </summary>
         /// <param name="iat">The IAT file to access data from</param>
         public IEnumerable<CropActivityManageCrop> GetManageForages(ActivityFolder forages)
@@ -52,10 +52,8 @@ namespace Reader
         }
 
         /// <summary>
-        /// 
+        /// Constructs the Native Pasture model
         /// </summary>
-        /// <param name="parent"></param>
-        /// <returns></returns>
         public IEnumerable<CropActivityManageCrop> GetNativePasture(ActivityFolder forages)
         {
             List<CropActivityManageCrop> pastures = new List<CropActivityManageCrop>();

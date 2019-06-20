@@ -14,6 +14,5 @@
             Name = "AnimalPricing";
             Add(Source.GetAnimalPrices(this));
         }
-    }
-    
+    }    
 }

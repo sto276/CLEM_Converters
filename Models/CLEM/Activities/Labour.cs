@@ -24,6 +24,4 @@
         public LabourRequirement(Node parent) : base(parent)
         { }
     }    
-
-    
 }

@@ -78,7 +78,7 @@ namespace Reader
                 {
                     Shared.WriteError(new ErrorData()
                     {
-                        FileName = file.Item1,
+                        FileName = Path.GetFileName(file.Item1),
                         FileType = "IAT",
                         Message = "The file could not be read",
                         Sheet = "-",

@@ -45,7 +45,7 @@
     }
 
     /// <summary>
-    /// 
+    /// Models the number of available working days for a labour class
     /// </summary>
     public class LabourAvailabilityItem : Node
     {
