@@ -11,6 +11,7 @@ The model is essentially the 'skeleton' of an .apsimx file. It outlines the comp
 The following file types/model readers are available at present:
   - IAT
   - NABSA
+  
 The function of a reader is to be able to parse a data file and provide the information the model needs to generate an .apsimx file. The readers project also contains the "Shared" namespace, which contains methods which are shared between readers (such as error tracking/handling). 
 
 ## GUIs
