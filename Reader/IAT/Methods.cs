@@ -11,17 +11,17 @@ using DocumentFormat.OpenXml.Spreadsheet;
 namespace Reader
 {
     public partial class IAT
-    {
-        public static void Run(IEnumerable<string> files, bool join, bool split)
+    {    
+        public static void Run(IEnumerable<string> files)
         {
-            Shared.OpenLog("ErrorLog");
+            Shared.OpenErrorLog();
 
             Simulations simulations = new Simulations(null);
 
             foreach (string file in files)
             {
+                // Read in the IAT
                 IAT iat = new IAT(file);
-
                 Folder folder = new Folder(simulations) { Name = iat.Name };
 
                 // Find all the parameter sheets in the IAT
@@ -32,47 +32,130 @@ namespace Reader
                     string name = sheet.Name.ToString();
                     if (!name.ToLower().Contains("param")) continue;
                     iat.SetSheet(name);
+                }               
 
-                    // Write the resulting simulation to its own .apsimx file
-                    if (split)
-                    {
-                        AttachIAT(simulations, iat);
-                        Shared.WriteApsimX(simulations, iat.Name);
-
-                        // Reset the simulations node after writing out
-                        simulations = new Simulations(null);
-                    }
-                    // Or collect all the simulations in the IAT
-                    else
-                    {
-                        if (join) AttachIAT(folder, iat);
-                        else AttachIAT(simulations, iat);
-                    }
-                }
-
-                // Files will already be written if split is true
-                if (split) continue;
+                // Files will already be written if groupSims is false
+                if (!GroupSims) continue;
 
                 // Collect all the IAT files in the same .apsimx file
-                if (join) simulations.Children.Add(folder);
+                if (GroupSheets) simulations.Children.Add(folder);
                 // Only gather parameter sets into the same .apsimx file
                 else
                 {
                     Shared.WriteApsimX(simulations, iat.Name);
                     simulations = new Simulations(null);
-                }
+                }                
             }
-            if (join) Shared.WriteApsimX(simulations, "Simulations");
+            if (GroupSheets) Shared.WriteApsimX(simulations, "Simulations");
 
-            Shared.CloseLog();
+            Shared.CloseErrorLog();
         }
 
-        private static void AttachIAT(Node node, IAT iat)
+        public static void Run(IEnumerable<Tuple<string, string>> files)
+        {
+            Shared.OpenErrorLog();
+
+            Simulations simulations = new Simulations(null);
+
+            IAT iat;
+            Folder folder = null;
+
+            foreach (var file in files)
+            {
+                // Cancel the conversion
+                if (Shared.Worker.CancellationPending)
+                {
+                    Shared.CloseErrorLog();
+                    return;
+                }
+
+                // Read in the IAT
+                try
+                {
+                    iat = new IAT(file.Item1);
+                }
+                catch (ConversionException)
+                {
+                    Shared.WriteError(new ErrorData()
+                    {
+                        FileName = Path.GetFileName(file.Item1),
+                        FileType = "IAT",
+                        Message = "The file could not be read",
+                        Sheet = "-",
+                        Table = "-",
+                        Severity = "High"
+                    });
+                    continue;
+                }
+
+                if (GroupSims && GroupSheets) folder = new Folder(simulations) { Name = iat.Name };
+
+                if (file.Item2 != "All")
+                {
+                    iat.SetSheet(file.Item2);
+                    AttachParameterSheet(simulations, iat);
+
+                    // Update the Progress bar
+                    Shared.Worker?.ReportProgress(0);
+                }
+                else
+                {
+                    // Find all the parameter sheets in the IAT                    
+                    foreach (Sheet sheet in iat.Book.Workbook.Sheets)
+                    {
+                        // Cancel the conversion
+                        if (Shared.Worker.CancellationPending)
+                        {
+                            Shared.CloseErrorLog();
+                            return;
+                        }
+
+                        // Ensure a parameter sheet is selected
+                        string name = sheet.Name.ToString();
+                        if (!name.ToLower().Contains("param")) continue;
+
+                        iat.SetSheet(name);
+
+                        if (GroupSims && GroupSheets) AttachParameterSheet(folder, iat);
+                        else AttachParameterSheet(simulations, iat);
+
+                        iat.ClearTables();
+
+                        // Update the Progress bar
+                        Shared.Worker?.ReportProgress(0);
+                    }
+                }
+
+                if (!GroupSims)
+                {
+                    Shared.WriteApsimX(simulations, iat.Name);
+                    simulations = new Simulations(null);
+                }
+                else if (GroupSheets)
+                {
+                    simulations.Add(folder);
+                }
+
+                iat.Dispose();
+
+                GC.WaitForPendingFinalizers();
+            }
+           
+
+            if (GroupSims) Shared.WriteApsimX(simulations, "Simulations");
+            Shared.CloseErrorLog();
+        }
+
+        // Creates a node structure from the IAT, using the set Sheet
+        private static void AttachParameterSheet(Node node, IAT iat)
         {
             node.Source = iat;
-            Simulation simulation = new Simulation(node);
-            simulation.Name = iat.ParameterSheet.Name;
+            Simulation simulation = new Simulation(node)
+            {
+                Name = iat.ParameterSheet.Name
+            };
             node.Children.Add(simulation);
+            iat.ClearTables();
         }
 
         public Clock GetClock(Simulation simulation)
@@ -129,62 +212,63 @@ namespace Reader
         /// <param name="name">The name of the output file</param>
         public void WriteCropPRN()
         {
+            string path = $"{Shared.OutDir}/{Name}/FileCrop.prn";
             try
             {
                 // Overwrite any exisiting PRN file
-                FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileCrop.prn", FileMode.Create);
-                StreamWriter swriter = new StreamWriter(stream);
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                using (StreamWriter writer = new StreamWriter(stream))
+                {      
+                    // Find the data set
+                    WorksheetPart crop = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
+                    var rows = crop.Worksheet.Descendants<Row>().Skip(1);
 
-                // Find the data set
-                WorksheetPart crop = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
-                var rows = crop.Worksheet.Descendants<Row>().Skip(1);
+                    // Write file header to output stream
+                    writer.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}");
+                    writer.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
 
-                // Write file header to output stream
-                swriter.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}");
-                swriter.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
+                    // Iterate over data, writing to output stream
+                    string SoilNum, CropName, YEAR, Month, AmtKg;
+                    foreach (Row row in rows)
+                    {
+                        var cells = row.Descendants<Cell>();
+                        if (cells.First().InnerText != Climate) continue;
 
-                // Iterate over data, writing to output stream
-                string SoilNum, CropName, YEAR, Month, AmtKg;
-                foreach (Row row in rows)
-                {
-                    var cells = row.Descendants<Cell>();
-                    if (cells.First().InnerText != Climate) continue;
+                        SoilNum = ParseCell(cells.ElementAt(1));
+                        CropName = ParseCell(cells.ElementAt(3)).Replace(" ", "");
+                        YEAR = ParseCell(cells.ElementAt(5));
+                        Month = ParseCell(cells.ElementAt(6));
+                        AmtKg = ParseCell(cells.ElementAt(7));
 
-                    SoilNum = ParseCell(cells.ElementAt(1));
-                    CropName = ParseCell(cells.ElementAt(3)).Replace(" ", "");
-                    YEAR = ParseCell(cells.ElementAt(5));
-                    Month = ParseCell(cells.ElementAt(6));
-                    AmtKg = ParseCell(cells.ElementAt(7));
-
-                    // Writing row to file
-                    if (AmtKg == "") AmtKg = "0";
-                    swriter.WriteLine($"{SoilNum,-35}{CropName,-35}{YEAR,-35}{Month,-35}{AmtKg}");
+                        // Writing row to file
+                        if (AmtKg == "") AmtKg = "0";
+                        writer.WriteLine($"{SoilNum,-35}{CropName,-35}{YEAR,-35}{Month,-35}{AmtKg}");
+                    }
                 }
-                swriter.Close();
             }
             catch (IOException)
             {
-                // Will only be caught if the file exists and is in use by another program;
+                // Should only be caught if the file exists and is in use by another program;
                 // Alerts the user then safely continues with the program.
-                Shared.Write(new ConversionError()
+                Shared.WriteError(new ErrorData()
                 {
                     FileName = Name,
                     FileType = "IAT",
                     Message = "FileCrop.prn was open in another application.",
                     Severity = "Low",
-                    Table = "N/A",
+                    Table = "-",
                     Sheet = "crop_inputs"
                 });
             }
             catch (Exception e)
             {
-                Shared.Write(new ConversionError()
+                Shared.WriteError(new ErrorData()
                 {
                     FileName = Name,
                     FileType = "IAT",
                     Message = e.Message,
                     Severity = "Moderate",
-                    Table = "N/A",
+                    Table = "-",
                     Sheet = "crop_inputs"
                 });
             }    
@@ -197,44 +281,65 @@ namespace Reader
         /// <param name="name">The name of the output file</param>
         public void WriteResiduePRN()
         {
+            string path = $"{Shared.OutDir}/{Name}/FileCropResidue.prn";
             try
             {
-                FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileCropResidue.prn", FileMode.Create);
-                StreamWriter swriter = new StreamWriter(stream);
-                WorksheetPart residue = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
-
-                // Add header to document
-                swriter.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}Npct");
-                swriter.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
-
-                // Iterate over spreadsheet data and copy to output stream
-                string SoilNum, ForageName, YEAR, Month, AmtKg, Npct;
-                var rows = residue.Worksheet.Descendants<Row>().Skip(1);
-                foreach (Row row in rows)
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                using (StreamWriter writer = new StreamWriter(stream))
                 {
-                    var cells = row.Descendants<Cell>();
-                    if (cells.First().InnerText != Climate) continue;
+                    WorksheetPart residue = (WorksheetPart)Book.GetPartById(SearchSheets("crop_inputs").Id);
 
-                    SoilNum = ParseCell(cells.ElementAt(1));
-                    ForageName = ParseCell(cells.ElementAt(3)).Replace(" ", "");
-                    YEAR = ParseCell(cells.ElementAt(5));
-                    Month = ParseCell(cells.ElementAt(6));
-                    AmtKg = ParseCell(cells.ElementAt(8));
-                    Npct = ParseCell(cells.ElementAt(9));
+                    // Add header to document
+                    writer.WriteLine($"{"SoilNum",-35}{"CropName",-35}{"YEAR",-35}{"Month",-35}{"AmtKg",-35}Npct");
+                    writer.WriteLine($"{"()",-35}{"()",-35}{"()",-35}{"()",-35}{"()",-35}()");
 
-                    // Writing row to file
-                    if (AmtKg == "") AmtKg = "0";
-                    swriter.WriteLine($"{SoilNum,-35}{ForageName,-35}{YEAR,-35}{Month,-35}{AmtKg,-35}{Npct}");
+                    // Iterate over spreadsheet data and copy to output stream
+                    string SoilNum, ForageName, YEAR, Month, AmtKg, Npct;
+                    var rows = residue.Worksheet.Descendants<Row>().Skip(1);
+                    foreach (Row row in rows)
+                    {
+                        var cells = row.Descendants<Cell>();
+                        if (cells.First().InnerText != Climate) continue;
+
+                        SoilNum = ParseCell(cells.ElementAt(1));
+                        ForageName = ParseCell(cells.ElementAt(3)).Replace(" ", "");
+                        YEAR = ParseCell(cells.ElementAt(5));
+                        Month = ParseCell(cells.ElementAt(6));
+                        AmtKg = ParseCell(cells.ElementAt(8));
+                        Npct = ParseCell(cells.ElementAt(9));
+
+                        // Writing row to file
+                        if (AmtKg == "") AmtKg = "0";
+                        writer.WriteLine($"{SoilNum,-35}{ForageName,-35}{YEAR,-35}{Month,-35}{AmtKg,-35}{Npct}");
+                    }
                 }
-                swriter.Close();
             }
             catch (IOException)
             {
-                // Will only be caught if the file exists and is in use by another program;
+                // Should only be caught if the file exists and is in use by another program;
                 // Alerts the user then safely continues with the program.
-                Console.WriteLine("FileCropResidue.prn is open in another application and couldn't be overwritten.");
+                Shared.WriteError(new ErrorData()
+                {
+                    FileName = Name,
+                    FileType = "IAT",
+                    Message = "FileCropResidue.prn was open in another application.",
+                    Severity = "Low",
+                    Table = "-",
+                    Sheet = "crop_inputs"
+                });
             }
-            // Need to add additional error handling here
+            catch (Exception e)
+            {
+                Shared.WriteError(new ErrorData()
+                {
+                    FileName = Name,
+                    FileType = "IAT",
+                    Message = e.Message,
+                    Severity = "Moderate",
+                    Table = "-",
+                    Sheet = "crop_inputs"
+                });
+            }
         }
 
         /// <summary>
@@ -244,47 +349,69 @@ namespace Reader
         /// <param name="name">The name of the output file</param>
         public void WriteForagePRN()
         {
+            string path = $"{Shared.OutDir}/{Name}/FileForage.prn";
             try
             {
-                FileStream stream = new FileStream($"{Shared.OutDir}/{Name}/FileForage.prn", FileMode.Create);
-                StreamWriter swriter = new StreamWriter(stream);
-                WorksheetPart forage = (WorksheetPart)Book.GetPartById(SearchSheets("forage_inputs").Id);
-
-                // Add header to document
-                swriter.WriteLine($"{"SoilNum",-36}{"CropName",-36}{"YEAR",-36}{"Month",-36}{"AmtKg",-36}Npct");
-                swriter.WriteLine($"{"()",-36}{"()",-36}{"()",-36}{"()",-36}{"()",-36}()");
-
-                // Iterate over spreadsheet data and copy to output stream
-                string SoilNum, ForageName, YEAR, Month, AmtKg, Npct;
-                var rows = forage.Worksheet.Descendants<Row>().Skip(1);
-                foreach (Row row in rows)
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                using (StreamWriter writer = new StreamWriter(stream))
                 {
-                    var cells = row.Descendants<Cell>();
-                    if (cells.First().InnerText != Climate) continue;
+                    WorksheetPart forage = (WorksheetPart)Book.GetPartById(SearchSheets("forage_inputs").Id);
+                    var rows = forage.Worksheet.Descendants<Row>().Skip(1);
 
-                    SoilNum = ParseCell(cells.ElementAt(1));
-                    ForageName = ParseCell(cells.ElementAt(3)).Replace(" ", "");
-                    YEAR = ParseCell(cells.ElementAt(5));
-                    Month = ParseCell(cells.ElementAt(7));
-                    AmtKg = ParseCell(cells.ElementAt(8));
-                    Npct = ParseCell(cells.ElementAt(9));
+                    // Add header to document
+                    writer.WriteLine($"{"SoilNum",-36}{"CropName",-36}{"YEAR",-36}{"Month",-36}{"AmtKg",-36}Npct");
+                    writer.WriteLine($"{"()",-36}{"()",-36}{"()",-36}{"()",-36}{"()",-36}()");
 
-                    // Write row to file
-                    if (AmtKg == "") AmtKg = "0";
-                    swriter.WriteLine($"{SoilNum,-36}{ForageName,-36}{YEAR,-36}{Month,-36}{AmtKg,-36}{Npct}");
+                    // Strings for holding data
+                    string SoilNum, ForageName, YEAR, Month, AmtKg, Npct;
+
+                    // Iterate over spreadsheet data and copy to output stream
+                    foreach (Row row in rows)
+                    {
+                        var cells = row.Descendants<Cell>();
+                        if (cells.First().InnerText != Climate) continue;
+
+                        SoilNum = ParseCell(cells.ElementAt(1));
+                        ForageName = ParseCell(cells.ElementAt(3)).Replace(" ", "");
+                        YEAR = ParseCell(cells.ElementAt(5));
+                        Month = ParseCell(cells.ElementAt(7));
+                        AmtKg = ParseCell(cells.ElementAt(8));
+                        Npct = ParseCell(cells.ElementAt(9));
+
+                        // Write row to file
+                        if (AmtKg == "") AmtKg = "0";
+                        writer.WriteLine($"{SoilNum,-36}{ForageName,-36}{YEAR,-36}{Month,-36}{AmtKg,-36}{Npct}");
+                    }
                 }
-
-                swriter.Close();
             }
             catch (IOException)
             {
-                // Will only be caught if the file exists and is in use by another program;
+                // Should only be caught if the file exists and is in use by another program;
                 // Alerts the user then safely continues with the program.
-                Console.WriteLine("FileForage.prn is open in another application and couldn't be overwritten.");
+                Shared.WriteError(new ErrorData()
+                {
+                    FileName = Name,
+                    FileType = "IAT",
+                    Message = "FileForage.prn was open in another application.",
+                    Severity = "Low",
+                    Table = "-",
+                    Sheet = "forage_inputs"
+                });
             }
-            // Need to add additional error handling here            
+            catch (Exception e)
+            {
+                Shared.WriteError(new ErrorData()
+                {
+                    FileName = Name,
+                    FileType = "IAT",
+                    Message = e.Message,
+                    Severity = "Moderate",
+                    Table = "-",
+                    Sheet = "forage_inputs"
+                });
+            }
         }
-        
+
         /// <summary>
         /// Parses a cell and returns its value in string representation
         /// </summary>

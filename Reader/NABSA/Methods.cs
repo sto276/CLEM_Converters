@@ -13,7 +13,7 @@ namespace Reader
     {
         public static void Run(IEnumerable<string> files)
         {
-            Shared.OpenLog("log.txt");
+            Shared.OpenErrorLog();
 
             foreach (string file in files)
             {
@@ -26,9 +26,12 @@ namespace Reader
                 simulations.Add(new Simulation(simulations) { Name = nabsa.Name });
 
                 Shared.WriteApsimX(simulations, Path.GetFileNameWithoutExtension(file));
+
+                // Update the Progress bar
+                Shared.Worker?.ReportProgress(0);
             }
 
-            Shared.CloseLog();
+            Shared.CloseErrorLog();
         }
 
         public Clock GetClock(Simulation simulation)

@@ -1,8 +1,8 @@
-﻿namespace Models.Core
-{
-    using CLEM;
-    using Storage;
+﻿using Models.CLEM;
+using Models.Storage;
 
+namespace Models.Core
+{
     /// <summary>
     /// Container for a series of simulations
     /// </summary>

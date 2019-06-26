@@ -1,4 +1,5 @@
 ﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,8 +22,18 @@ namespace Reader
             Name = Path.GetFileNameWithoutExtension(path);
             Directory.CreateDirectory($"{Shared.OutDir}/{Name}");
 
+            // Read the document
+            try
+            {
+                Document = SpreadsheetDocument.Open(path, false);
+            }
+            catch (IOException)
+            {
+                throw new ConversionException();
+            }
+
             // Load the workbook
-            Book = SpreadsheetDocument.Open(path, false).WorkbookPart;
+            Book = Document.WorkbookPart;
 
             // Find the string table
             StringTable = Book.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();            
@@ -32,8 +43,8 @@ namespace Reader
             WriteForagePRN();
             WriteResiduePRN();
 
-            // Find a parameter sheet to use
-            SetSheet("param");                      
+            // Update the Progress bar
+            Shared.Worker?.ReportProgress(0);                     
         }
         
         /// <summary>
@@ -102,6 +113,53 @@ namespace Reader
             Pools = new Dictionary<int, string>();            
             GetGrownFodderPools();
             GetBoughtFodderPools();
-        }       
+        }
+
+        public void ClearTables()
+        {
+            CropsGrown = null;
+            CropSpecs = null;
+            ForagesGrown = null;
+            ForageSpecs = null;
+            LandSpecs = null;
+            LabourSupply = null;
+            RumNumbers = null;
+            RumAges = null;
+            RumWeights = null;
+            RumCoeffs = null;
+            RumSpecs = null;
+            RumPrices = null;
+            Overheads = null;
+            Fodder = null;
+            FodderSpecs = null;
+        }
+
+        public void Dispose()
+        {
+            // Disposal of unmanaged resources.
+            Dispose(true);
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if(disposing)
+            {
+                Document.Close();
+                
+            }
+
+            Book = null;
+            ParameterSheet = null;
+            Part = null;
+
+            ClearTables();
+
+            disposed = true;
+        }
     } 
 }

@@ -1,7 +1,7 @@
-﻿namespace Models.CLEM.Activities
-{
-    using CLEM.Groupings;
+﻿using Models.CLEM.Groupings;
 
+namespace Models.CLEM.Activities
+{   
     /// <summary>
     /// Models the breeding of ruminants
     /// </summary>

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reader", "Reader\Reader.csproj", "{F9922B4D-528F-458A-BBE4-F3D5A119986C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windows", "Windows\Windows.csproj", "{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,26 @@ Global
 		{F9922B4D-528F-458A-BBE4-F3D5A119986C}.Release|x64.Build.0 = Release|Any CPU
 		{F9922B4D-528F-458A-BBE4-F3D5A119986C}.Release|x86.ActiveCfg = Release|Any CPU
 		{F9922B4D-528F-458A-BBE4-F3D5A119986C}.Release|x86.Build.0 = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|ARM.Build.0 = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|x64.Build.0 = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Debug|x86.Build.0 = Debug|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|ARM.ActiveCfg = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|ARM.Build.0 = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|ARM64.Build.0 = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|x64.ActiveCfg = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|x64.Build.0 = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|x86.ActiveCfg = Release|Any CPU
+		{A0E9FE2B-4EF6-4B55-9911-BB89E1D7055E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

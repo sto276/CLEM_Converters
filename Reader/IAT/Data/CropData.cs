@@ -51,18 +51,19 @@ namespace Reader
 
             int[] ids = CropsGrown.GetRowData<int>(0).ToArray();
 
-            foreach (int id in GrainIDs)
-            {
-                // Find the name of the crop in the file
-                Sheet sheet = SearchSheets("crop_inputs");
-                WorksheetPart inputs = (WorksheetPart)Book.GetPartById(sheet.Id);
+            // Find the name of the crop in the file
+            Sheet sheet = SearchSheets("crop_inputs");
+            WorksheetPart inputs = (WorksheetPart)Book.GetPartById(sheet.Id);
 
-                // Find the name of the crop
-                IEnumerable<Row> rows = sheet.Elements<Row>();
+            // Find the name of the crop
+            int rows = sheet.Elements<Row>().Count();
+
+            foreach (int id in GrainIDs)
+            {                
                 string name = "Unknown";               
                 int row = 1;
 
-                while (row < rows.Count())
+                while (row < rows)
                 {
                     if (GetCellValue(inputs, row, 3) == id.ToString())
                     {

@@ -15,56 +15,68 @@ namespace Reader
         private int RumActiveID { get; set; }
 
         /// <summary>
-        /// Hardcoded mapping of IAT variables to CLEM.
-        /// See declaration for definition of items.
+        /// Contains a mapping from one IAT parameter to one CLEM parameter
         /// </summary>
-        /// <remarks>
-        ///    - Item1, Name of table containing data
-        ///    - Item2, Name of variable in IAT
-        ///    - Item3, Name of variable in CLEM
-        ///    - Item4, Conversion factor
-        /// </remarks>
-        private readonly List<Tuple<string, string, string, double>> Maps = new List<Tuple<string, string, string, double>>()
+        private struct Map
         {
-            new Tuple<string, string, string, double>("RumCoeffs", "SRW", "SRWFemale", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "birth_SRW", "SRWBirth", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "Critical_cow_wt", "CriticalCowWeight", 0.01),
-            new Tuple<string, string, string, double>("RumCoeffs", "grwth_coeff1", "AgeGrowthRateCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "grwth_coeff2", "SRWGrowthScalar", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "km_coeff", "EMaintEfficiencyCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "km_incpt", "EMaintEfficiencyIntercept", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "kg_coeff", "EGrowthEfficiencyCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "kg_incpt", "EGrowthEfficiencyIntercept", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "kl_coeff", "ELactationEfficiencyCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "kl_incpt", "ELactationEfficiencyIntercept", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "kme", "Kme", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "intake_coeff", "IntakeCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "intake_incpt", "IntakeIntercept", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "IPI_coeff", "InterParturitionIntervalCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "IPI_incpt", "InterParturitionIntervalIntercept", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "birth_rate_coeff", "ConceptionRateCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "birth_rate_incpt", "ConceptionRateIntercept", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "birth_rate_assym", "ConceptionRateAsymptote", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "juvenile_mort_coeff", "JuvenileMortalityCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "juvenile_mort_exp", "JuvenileMortalityExponent", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "juvenile_mort_max", "JuvenileMortalityMaximum", 0.01),
-            new Tuple<string, string, string, double>("RumCoeffs", "wool_coeff", "WoolCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "cashmere_coeff", "CashmereCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "Rum_gest_int", "GestationLength", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "Milk_offset_day", "MilkOffsetDay", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "Milk_Peak_day", "MilkPeakDay", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "Milk_Curve_suck", "MilkCurveSuckling", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "Milk_Curve_nonsuck", "MilkCurveNonSuckling", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "protein_coeff", "ProteinCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "protein_degrad", "ProteinDegradability", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "milk_intake_coeff", "MilkIntakeCoefficient", 1),
-            new Tuple<string, string, string, double>("RumCoeffs", "milk_intake_incpt", "MilkIntakeIntercept", 1),
-            new Tuple<string, string, string, double>("RumSpecs", "Mortality_base", "MortalityBase", 0.01),
-            new Tuple<string, string, string, double>("RumSpecs", "Twin_rate", "TwinRate", 1),
-            new Tuple<string, string, string, double>("RumSpecs", "Joining_age", "MinimumAge1stMating", 1),
-            new Tuple<string, string, string, double>("RumSpecs", "Joining_size", "MinimumSize1stMating", 0.01),
-            new Tuple<string, string, string, double>("RumSpecs", "Milk_max", "MilkPeakYield", 1),
-            new Tuple<string, string, string, double>("RumSpecs", "Milk_end", "MilkingDays", 30)
+            public string Table;
+            public string ParamIAT;
+            public string ParamCLEM;
+            public double Proportion;
+
+            public Map(string table, string paramIAT, string paramCLEM, double proportion)
+            {
+                Table = table;
+                ParamIAT = paramIAT;
+                ParamCLEM = paramCLEM;
+                Proportion = proportion;
+            }
+        }            
+
+        /// <summary>
+        /// Hardcoded list of all IAT to CLEM mappings.
+        /// </summary>
+        private readonly List<Map> Maps = new List<Map>()
+        {
+            new Map("RumCoeffs", "SRW", "SRWFemale", 1),
+            new Map("RumCoeffs", "birth_SRW", "SRWBirth", 1),
+            new Map("RumCoeffs", "Critical_cow_wt", "CriticalCowWeight", 0.01),
+            new Map("RumCoeffs", "grwth_coeff1", "AgeGrowthRateCoefficient", 1),
+            new Map("RumCoeffs", "grwth_coeff2", "SRWGrowthScalar", 1),
+            new Map("RumCoeffs", "km_coeff", "EMaintEfficiencyCoefficient", 1),
+            new Map("RumCoeffs", "km_incpt", "EMaintEfficiencyIntercept", 1),
+            new Map("RumCoeffs", "kg_coeff", "EGrowthEfficiencyCoefficient", 1),
+            new Map("RumCoeffs", "kg_incpt", "EGrowthEfficiencyIntercept", 1),
+            new Map("RumCoeffs", "kl_coeff", "ELactationEfficiencyCoefficient", 1),
+            new Map("RumCoeffs", "kl_incpt", "ELactationEfficiencyIntercept", 1),
+            new Map("RumCoeffs", "kme", "Kme", 1),
+            new Map("RumCoeffs", "intake_coeff", "IntakeCoefficient", 1),
+            new Map("RumCoeffs", "intake_incpt", "IntakeIntercept", 1),
+            new Map("RumCoeffs", "IPI_coeff", "InterParturitionIntervalCoefficient", 1),
+            new Map("RumCoeffs", "IPI_incpt", "InterParturitionIntervalIntercept", 1),
+            new Map("RumCoeffs", "birth_rate_coeff", "ConceptionRateCoefficient", 1),
+            new Map("RumCoeffs", "birth_rate_incpt", "ConceptionRateIntercept", 1),
+            new Map("RumCoeffs", "birth_rate_assym", "ConceptionRateAsymptote", 1),
+            new Map("RumCoeffs", "juvenile_mort_coeff", "JuvenileMortalityCoefficient", 1),
+            new Map("RumCoeffs", "juvenile_mort_exp", "JuvenileMortalityExponent", 1),
+            new Map("RumCoeffs", "juvenile_mort_max", "JuvenileMortalityMaximum", 0.01),
+            new Map("RumCoeffs", "wool_coeff", "WoolCoefficient", 1),
+            new Map("RumCoeffs", "cashmere_coeff", "CashmereCoefficient", 1),
+            new Map("RumCoeffs", "Rum_gest_int", "GestationLength", 1),
+            new Map("RumCoeffs", "Milk_offset_day", "MilkOffsetDay", 1),
+            new Map("RumCoeffs", "Milk_Peak_day", "MilkPeakDay", 1),
+            new Map("RumCoeffs", "Milk_Curve_suck", "MilkCurveSuckling", 1),
+            new Map("RumCoeffs", "Milk_Curve_nonsuck", "MilkCurveNonSuckling", 1),
+            new Map("RumCoeffs", "protein_coeff", "ProteinCoefficient", 1),
+            new Map("RumCoeffs", "protein_degrad", "ProteinDegradability", 1),
+            new Map("RumCoeffs", "milk_intake_coeff", "MilkIntakeCoefficient", 1),
+            new Map("RumCoeffs", "milk_intake_incpt", "MilkIntakeIntercept", 1),
+            new Map("RumSpecs", "Mortality_base", "MortalityBase", 0.01),
+            new Map("RumSpecs", "Twin_rate", "TwinRate", 1),
+            new Map("RumSpecs", "Joining_age", "MinimumAge1stMating", 1),
+            new Map("RumSpecs", "Joining_size", "MinimumSize1stMating", 0.01),
+            new Map("RumSpecs", "Milk_max", "MilkPeakYield", 1),
+            new Map("RumSpecs", "Milk_end", "MilkingDays", 30)
         };
 
         /// <summary>
@@ -84,24 +96,30 @@ namespace Reader
         }                   
 
         /// <summary>
-        /// Finds the coefficients/specifications of a single breed in an IAT
+        /// Map the IAT parameters to their CLEM counterpart
         /// </summary>
-        /// <param name="iat">Source IAT</param>
-        /// <param name="col">Column containing desired breed data</param>
-        /// <returns></returns>
         public void SetParameters(RuminantType ruminant)
         {                             
             foreach(var map in Maps)
             {                
-                var table = this.GetType().GetProperty(map.Item1).GetValue(this, null) as SubTable;
-                int row = table.RowNames.FindIndex(s => s == map.Item2);
-                if (row < 0) continue;
-                double value = table.GetData<double>(row, RumActiveID) * map.Item4;
-                ruminant.GetType().GetProperty(map.Item3).SetValue(ruminant, value);
-            }                
-        }
-        
+                // Find the subtable which contains the parameter
+                var table = this.GetType().GetProperty(map.Table).GetValue(this, null) as SubTable;
 
+                // Find the row which contains the parameter (if it exists)
+                int row = table.RowNames.FindIndex(s => s == map.ParamIAT);
+                if (row < 0) continue;
+
+                // Convert the value of the parameter to CLEM
+                double value = table.GetData<double>(row, RumActiveID) * map.Proportion;
+
+                // Set the value of the CLEM parameter
+                ruminant.GetType().GetProperty(map.ParamCLEM).SetValue(ruminant, value);
+            }                
+        }        
+
+        /// <summary>
+        /// Model all present ruminant breeds
+        /// </summary>
         public IEnumerable<RuminantType> GetRuminants(RuminantHerd parent)
         {          
             List<RuminantType> ruminants = new List<RuminantType>();
@@ -126,6 +144,9 @@ namespace Reader
             return ruminants;
         }
 
+        /// <summary>
+        /// Model all present cohorts of a given ruminant breed
+        /// </summary>
         public IEnumerable<RuminantTypeCohort> GetCohorts(RuminantInitialCohorts parent)
         {
             List<RuminantTypeCohort> cohorts = new List<RuminantTypeCohort>();
@@ -165,6 +186,11 @@ namespace Reader
             return cohorts;
         }
 
+        /// <summary>
+        /// Model the price of each present cohort for a given breed
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <returns></returns>
         public IEnumerable<AnimalPriceGroup> GetAnimalPrices(AnimalPricing parent)
         {
             List<AnimalPriceGroup> prices = new List<AnimalPriceGroup>();
@@ -184,6 +210,7 @@ namespace Reader
                         Value = RumPrices.GetData<double>(row, RumActiveID)
                     };
 
+                    // Filter cohort based on gender
                     group.Add(new RuminantFilter(group)
                     { 
                         Name = "GenderFilter",
@@ -191,6 +218,7 @@ namespace Reader
                         Value = cohort.ToLower().Contains("f") ? "Female" : "Male"
                     });
 
+                    // Filter cohort based on age
                     group.Add(new RuminantFilter(group)
                     {
                         Name = "AgeFilter",
@@ -207,6 +235,9 @@ namespace Reader
             return prices;
         }
 
+        /// <summary>
+        /// Model the management activities for each breed
+        /// </summary>
         public IEnumerable<ActivityFolder> GetManageBreeds(ActivityFolder herd)
         {
             List<ActivityFolder> breeds = new List<ActivityFolder>();
@@ -236,7 +267,6 @@ namespace Reader
                     Interval = 12,
                     MonthDue = 12
                 });
-
                 breed.Add(numbers);
 
                 // Manage breed weaning
@@ -259,7 +289,6 @@ namespace Reader
                     MonthsSinceBirth = RumSpecs.GetData<double>(32, id),
                     ProportionToRemove = RumSpecs.GetData<double>(4, id) * 0.01
                 });
-
                 breeds.Add(breed);
             }
 

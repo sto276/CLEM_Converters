@@ -4,16 +4,23 @@
 
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Collections.Generic;
 
 namespace Reader
 {    
     public partial class IAT
     {
+        public static bool GroupSheets { get; set; }
+
+        public static bool GroupSims { get; set; }
+
         /// <summary>
         /// Name of the IAT
         /// </summary>
-		public string Name { get; set; }
+		public string Name { get; set; }      
+
+        public SpreadsheetDocument Document { get; set; }
 
         /// <summary>
         /// Workbook information derived from a document
@@ -128,5 +135,7 @@ namespace Reader
         /// IDs of all ruminant types present in the simulation
         /// </summary>
         private List<int> RumIDs { get; set; }
+
+        private bool disposed = false;
     }
 }

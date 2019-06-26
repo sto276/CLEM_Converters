@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Models.CLEM.Resources;
+using Models.CLEM.Activities;
+using Models.CLEM.Reporting;
+using System.Collections.Generic;
 
 namespace Models.CLEM
 {
-    using Resources;
-    using Activities;
-    using Reporting;
-
     /// <summary>
     /// Container for a CLEM model
     /// </summary>
@@ -21,15 +20,9 @@ namespace Models.CLEM
 
         public double Slope { get; set; } = 0;
 
-        private ResourcesHolder resources;
-
-        private ActivitiesHolder activities;
-
         public ZoneCLEM(Node parent) : base(parent)
         {
             Name = "CLEM";
-            resources = new ResourcesHolder(this);
-            activities = new ActivitiesHolder(this);
 
             Add(new Memo(this)
             {
@@ -38,10 +31,10 @@ namespace Models.CLEM
                 "most parameters in the simulation have default values. " +
                 "It is recommended to ensure the validity of all parameters before " +
                 "running the simulation."
-            });                     
+            });
             Add(Source.GetFiles(this));          
-            Add(resources);
-            Add(activities);
+            Add(new ResourcesHolder(this));
+            Add(new ActivitiesHolder(this));
             AddReports();            
         }
 
@@ -70,7 +63,7 @@ namespace Models.CLEM
             reports.Add(new ReportActivitiesPerformed(reports));
             reports.Add(new ReportResourceShortfalls(reports));
 
-            foreach(Node child in resources.Children)
+            foreach(Node child in SearchTree<ResourcesHolder>(this).Children)
             {
                 string name = child.Name;
 

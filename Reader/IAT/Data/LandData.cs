@@ -1,7 +1,6 @@
 ﻿using Models.CLEM.Activities;
 using Models.CLEM.Resources;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Reader
 {
@@ -10,8 +9,7 @@ namespace Reader
         private double TotalArea { get; set; }
 
         /// <summary>
-        /// Searches the land specification table for valid land type data,
-        /// and returns the collection
+        /// Models the different land types
         /// </summary>
         /// <param name="parent"></param>
         public IEnumerable<LandType> GetLandTypes(Land parent)
@@ -42,6 +40,12 @@ namespace Reader
             return types;
         }                   
 
+        /// <summary>
+        /// Returns null.
+        /// </summary>
+        /// <remarks>
+        /// Required for the interface, but IAT does not use this component.
+        /// </remarks>
         public PastureActivityManage GetManagePasture(ActivitiesHolder folder)
         {
             return null;

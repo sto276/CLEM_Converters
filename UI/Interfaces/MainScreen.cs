@@ -168,8 +168,8 @@ namespace UI
                 listbox.Remove(child);
             }
 
-            string[] items = Directory.GetFiles(inentry.Text, pattern, SearchOption.TopDirectoryOnly);
-            foreach (string item in items)
+            string[] files = Directory.GetFiles(inentry.Text, pattern, SearchOption.TopDirectoryOnly);
+            foreach (string item in files)
             {
                 string label = Path.GetFileName(item);
 
@@ -239,8 +239,10 @@ namespace UI
 
             switch (combobox.ActiveText)
             {                
-                case "IAT":                    
-                    IAT.Run(files, joincheck.Active, splitcheck.Active);
+                case "IAT":
+                    IAT.GroupSheets = joincheck.Active;
+                    IAT.GroupSims = splitcheck.Active;
+                    IAT.Run(files);
                     break;
 
                 case "NABSA":

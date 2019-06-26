@@ -16,7 +16,7 @@ namespace Reader
             /// <summary>
             /// The IAT object which owns the table
             /// </summary>
-            private IAT iat;
+            private readonly IAT iat;
 
             /// <summary>
             /// Table name
@@ -173,10 +173,12 @@ namespace Reader
                 // Find rows containing the table data
                 var table_rows = iat.Part.Worksheet.Descendants<Row>().Skip(title_row).Take(rows);
 
+                Cell cell = null;
+
                 // Find the extra data cell in each row
                 foreach (Row row in table_rows)
                 {
-                    Cell cell = row.Descendants<Cell>().ElementAt(title_col);
+                    cell = row.Descendants<Cell>().ElementAt(title_col);
                     ExtraNames.Add(iat.ParseCell(cell));
                 }
                 return;
@@ -195,10 +197,11 @@ namespace Reader
 
                 // Go over each row in the table
                 int r = 0;
+                IEnumerable<Cell> cells;
                 foreach (Row row in table_rows)
                 {
                     // Select the cells in the row which are part of the table
-                    var cells = row.Descendants<Cell>().Skip(title_col + 1).Take(cols);
+                    cells = row.Descendants<Cell>().Skip(title_col + 1).Take(cols);
 
                     // Find the value of the cell data and store it
                     int c = 0;
@@ -220,7 +223,7 @@ namespace Reader
             /// <returns></returns>
             private T ConvertData<T>(string s)
             {
-                var CE = new ConversionError()
+                var ED = new ErrorData()
                 {
                     FileName = iat.Name,
                     FileType = "IAT",
@@ -237,29 +240,29 @@ namespace Reader
                 }
                 catch (FormatException)
                 {
-                    CE.Message = "Empty cell";
-                    CE.Severity = "Low";
-                    Shared.Write(CE);
+                    ED.Message = "Empty cell";
+                    ED.Severity = "Low";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    CE.Message = "Index out of range";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);                    
+                    ED.Message = "Index out of range";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);                    
                     return default;
                 }
                 catch (InvalidCastException)
                 {
                     T t = default;
-                    CE.Message = $"Type mismatch, expected {t.GetType().Name}";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);
+                    ED.Message = $"Type mismatch, expected {t.GetType().Name}";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch
                 {
-                    Shared.Write(CE);
+                    Shared.WriteError(ED);
                     return default;
                 }                
             }
@@ -272,7 +275,7 @@ namespace Reader
             public T GetData<T>(int row, int column)
             {
                 string s = data[row, column];
-                var CE = new ConversionError()
+                var ED = new ErrorData()
                 {
                     FileName = iat.Name,
                     FileType = "IAT",
@@ -289,29 +292,29 @@ namespace Reader
                 }
                 catch (FormatException)
                 {
-                    CE.Message = "Empty cell";
-                    CE.Severity = "Low";
-                    Shared.Write(CE);
+                    ED.Message = "Empty cell";
+                    ED.Severity = "Low";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    CE.Message = "Index out of range";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);
+                    ED.Message = "Index out of range";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch (InvalidCastException)
                 {
                     T t = default;
-                    CE.Message = $"Type mismatch, expected {t.GetType().Name}";
-                    CE.Severity = "Moderate";
-                    Shared.Write(CE);
+                    ED.Message = $"Type mismatch, expected {t.GetType().Name}";
+                    ED.Severity = "Moderate";
+                    Shared.WriteError(ED);
                     return default;
                 }
                 catch
                 {
-                    Shared.Write(CE);
+                    Shared.WriteError(ED);
                     return default;
                 }
             }
